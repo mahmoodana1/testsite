@@ -638,470 +638,488 @@
     <button class="fab" id="fab">＋</button>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-        // ============================================
-        // 🔴 PASTE FIREBASE CONFIG HERE 🔴
-        // ============================================
-        const firebaseConfig = {
-            apiKey: "AIzaSyCu6cbaEw4BzXvF8rGx94h6WHarEFH9Z-k",
-            authDomain: "coursesprogress-5658f.firebaseapp.com",
-            projectId: "coursesprogress-5658f",
-            storageBucket: "coursesprogress-5658f.firebasestorage.app",
-            messagingSenderId: "572695866101",
-            appId: "1:572695866101:web:bb6dc8058387358b7773bc",
-            measurementId: "G-XD8W9V1XPE"
+    // ============================================
+    // 🔴 PASTE FIREBASE CONFIG HERE 🔴
+    // ============================================
+ const firebaseConfig = {
+  apiKey: "AIzaSyCu6cbaEw4BzXvF8rGx94h6WHarEFH9Z-k",
+  authDomain: "coursesprogress-5658f.firebaseapp.com",
+  projectId: "coursesprogress-5658f",
+  storageBucket: "coursesprogress-5658f.firebasestorage.app",
+  messagingSenderId: "572695866101",
+  appId: "1:572695866101:web:bb6dc8058387358b7773bc",
+  measurementId: "G-XD8W9V1XPE"
+};
+
+
+    // --- INIT FIREBASE ---
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+
+    // --- APP STATE ---
+    let state = {
+        user: null,
+        todos: [],
+        courses: [],
+        focusId: null,
+        theme: 'light',
+        dailyGoal: 5
+    };
+    let selectedColor = 'blue';
+
+    // --- UTILS ---
+    const generateId = () => '_' + Math.random().toString(36).substr(2, 9);
+    const getEl = (id) => document.getElementById(id);
+    const colorMap = {
+        blue: 'var(--blue)',
+        purple: 'var(--purple)',
+        green: 'var(--green)',
+        orange: 'var(--orange)',
+        red: 'var(--red)'
+    };
+
+    // --- INITIALIZATION ---
+    function init() {
+        updateGreeting();
+        setInterval(updateGreeting, 60000);
+        
+        // Sidebar Logic (Mobile)
+        const sidebar = getEl('sidebar');
+        const overlay = getEl('sidebarOverlay');
+        
+        const openSidebar = () => {
+            sidebar.classList.add('open');
+            overlay.classList.add('active');
+            if(window.innerWidth < 900) getEl('sidebarClose').style.display = 'flex';
+        };
+        
+        const closeSidebar = () => {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
         };
 
-        // --- INIT FIREBASE ---
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const provider = new GoogleAuthProvider();
+        if(getEl('fab')) getEl('fab').onclick = openSidebar;
+        if(getEl('sidebarClose')) getEl('sidebarClose').onclick = closeSidebar;
+        if(overlay) overlay.onclick = closeSidebar;
 
-        // --- APP STATE ---
-        let state = {
-            user: null,
-            todos: [],
-            courses: [],
-            focusId: null,
-            theme: 'light',
-            dailyGoal: 5
-        };
-        let selectedColor = 'blue';
-
-        // --- UTILS ---
-        const generateId = () => '_' + Math.random().toString(36).substr(2, 9);
-        const getEl = (id) => document.getElementById(id);
-        const colorMap = {
-            blue: 'var(--accent-blue)',
-            purple: 'var(--accent-purple)',
-            green: 'var(--accent-green)',
-            orange: 'var(--accent-orange)',
-            red: 'var(--accent-red)'
-        };
-
-        // --- INITIALIZATION ---
-        function init() {
-            // UI Init
-            updateGreeting();
-            setInterval(updateGreeting, 60000);
-            
-            // Sidebar Logic (Mobile)
-            const sidebar = getEl('sidebar');
-            const overlay = getEl('sidebarOverlay');
-            
-            const openSidebar = () => {
-                sidebar.classList.add('open');
-                overlay.classList.add('active');
-                if(window.innerWidth < 900) getEl('sidebarClose').style.display = 'flex';
-            };
-            
-            const closeSidebar = () => {
-                sidebar.classList.remove('open');
-                overlay.classList.remove('active');
-            };
-
-            getEl('fab').onclick = openSidebar;
-            getEl('sidebarClose').onclick = closeSidebar;
-            overlay.onclick = closeSidebar;
-
-            // Sortable Init
+        // Sortable Init
+        if(getEl('taskList')) {
             new Sortable(getEl('taskList'), {
                 animation: 150,
                 ghostClass: 'sortable-ghost',
-                delay: 150,
+                delay: 150, 
                 delayOnTouchOnly: true,
                 onEnd: (evt) => {
-                    const item = state.todos.splice(evt.oldIndex, 1)[0];
-                    state.todos.splice(evt.newIndex, 0, item);
-                    saveData();
-                }
-            });
-        }
-
-        const updateGreeting = () => {
-            const d = new Date();
-            getEl('currentDate').textContent = d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }).toUpperCase();
-            const h = d.getHours();
-            getEl('greeting').textContent = h < 12 ? 'Good Morning' : h < 18 ? 'Good Afternoon' : 'Good Evening';
-        };
-
-        // --- AUTHENTICATION & SYNC ---
-        onAuthStateChanged(auth, (user) => {
-            getEl('loader').style.display = 'none';
-            if (user) {
-                state.user = user;
-                getEl('authContainer').innerHTML = `
-                    <div style="display:flex; align-items:center; gap:10px; background:rgba(125,125,125,0.1); padding:4px 12px 4px 4px; border-radius:50px;">
-                        <img src="${user.photoURL}" style="width:28px; height:28px; border-radius:50%;">
-                        <span class="text-sm" style="font-weight:600; cursor:pointer;" id="logoutBtn">Sign Out</span>
-                    </div>`;
-                getEl('logoutBtn').onclick = () => signOut(auth).then(() => location.reload());
-
-                onSnapshot(doc(db, 'users', user.uid), (docSnap) => {
-                    if (docSnap.exists()) {
-                        const d = docSnap.data();
-                        state.todos = d.todos || [];
-                        state.courses = d.courses || [];
-                        state.focusId = d.focusId || null;
-                        renderAll();
-                    } else {
+                    if (state.todos.length > 0) {
+                        const item = state.todos.splice(evt.oldIndex, 1)[0];
+                        state.todos.splice(evt.newIndex, 0, item);
                         saveData();
                     }
-                });
-            } else {
-                getEl('loginBtn').onclick = () => signInWithPopup(auth, provider);
-            }
-        });
-
-        async function saveData() {
-            if (!state.user) return;
-            const cleanState = {
-                todos: state.todos,
-                courses: state.courses,
-                focusId: state.focusId || null,
-                lastUpdated: new Date().toISOString()
-            };
-            await setDoc(doc(db, 'users', state.user.uid), cleanState, { merge: true });
-        }
-
-        // --- RENDER ENGINE ---
-        function renderAll() {
-            renderTasks();
-            renderFocus();
-            renderCourses();
-            updateProgress();
-        }
-
-        // 1. Task List
-        function renderTasks() {
-            const container = getEl('taskList');
-            container.innerHTML = '';
-            
-            if (state.todos.length === 0) {
-                getEl('emptyTasks').classList.remove('hidden');
-            } else {
-                getEl('emptyTasks').classList.add('hidden');
-                
-                state.todos.forEach(t => {
-                    const div = document.createElement('div');
-                    div.className = 'task-item';
-                    const c = colorMap[t.color] || colorMap.blue;
-                    div.style.borderLeft = `4px solid ${c}`;
-                    
-                    div.innerHTML = `
-                        <div class="checkbox-circle ${t.completed ? 'checked' : ''}" style="${t.completed ? `background:${c}; border-color:${c}` : ''}">
-                            ${t.completed ? '✓' : ''}
-                        </div>
-                        <div style="flex:1;">
-                            <div style="font-weight:600; font-size:0.95rem; ${t.completed ? 'text-decoration:line-through; opacity:0.6;' : ''}">${t.text}</div>
-                            ${t.due ? `<div class="text-xs text-muted" style="margin-top:2px;">Due ${new Date(t.due).toLocaleDateString()}</div>` : ''}
-                        </div>
-                        <button class="btn-icon task-focus-btn" title="Focus">🎯</button>
-                        <button class="btn-icon task-del-btn" style="color:var(--accent-red);">✕</button>
-                    `;
-
-                    div.querySelector('.checkbox-circle').onclick = () => toggleTask(t.id);
-                    div.querySelector('.task-focus-btn').onclick = () => setFocus(t.id);
-                    div.querySelector('.task-del-btn').onclick = () => deleteTask(t.id);
-
-                    container.appendChild(div);
-                });
-            }
-        }
-
-        // 2. Focus Hero
-        function renderFocus() {
-            const t = state.todos.find(x => x.id === state.focusId);
-            const section = getEl('focusSection');
-            section.style.borderLeft = 'none';
-
-            if (!t || t.completed) {
-                section.innerHTML = `
-                    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; opacity:0.6;">
-                        <h3>No Active Focus</h3>
-                        <p>Select a task to focus on.</p>
-                    </div>`;
-            } else {
-                const c = colorMap[t.color] || colorMap.blue;
-                section.innerHTML = `
-                    <div style="position:absolute; left:0; top:0; bottom:0; width:6px; background:${c};"></div>
-                    <div>
-                        <div class="text-xs" style="color:${c}; margin-bottom:12px;">CURRENT FOCUS</div>
-                        <div class="focus-title">${t.text}</div>
-                        ${t.due ? `<div class="text-muted">Due: ${new Date(t.due).toDateString()}</div>` : ''}
-                    </div>
-                    <div style="text-align:right; margin-top:24px;">
-                        <button id="completeFocusBtn" class="btn" style="background:${c}; color:white;">Mark Complete</button>
-                    </div>
-                `;
-                getEl('completeFocusBtn').onclick = () => toggleTask(t.id);
-            }
-        }
-
-        // 3. Enhanced Courses with Progress
-        function renderCourses() {
-            const container = getEl('coursesContainer');
-            container.innerHTML = '';
-            
-            if (state.courses.length === 0) {
-                getEl('emptyCourses').classList.remove('hidden');
-                return;
-            }
-            getEl('emptyCourses').classList.add('hidden');
-
-            state.courses.forEach(course => {
-                // Calculate progress
-                const totalGoals = course.goals.length;
-                const completedGoals = course.goals.filter(g => g.completed).length;
-                const progress = totalGoals > 0 ? (completedGoals / totalGoals) * 100 : 0;
-                
-                const card = document.createElement('div');
-                card.className = 'course-card';
-                
-                // Header with progress ring
-                const header = document.createElement('div');
-                header.className = 'course-header';
-                header.innerHTML = `
-                    <div class="course-title-section">
-                        <div class="course-progress-ring">
-                            <svg width="100%" height="100%" viewBox="0 0 36 36">
-                                <circle cx="18" cy="18" r="16" fill="none" stroke="rgba(125,125,125,0.1)" stroke-width="3"/>
-                                <circle class="progress-ring-circle" cx="18" cy="18" r="16" fill="none" 
-                                    stroke="${colorMap[course.color] || colorMap.blue}" 
-                                    stroke-width="3" 
-                                    stroke-dasharray="${progress * 1.005} 100.5"
-                                    stroke-linecap="round"/>
-                                <text x="18" y="22" text-anchor="middle" font-size="10" font-weight="700" fill="var(--text-primary)">${Math.round(progress)}%</text>
-                            </svg>
-                        </div>
-                        <div class="course-info">
-                            <h3>${course.name}</h3>
-                            <div class="course-stats">
-                                <span class="course-stat">📚 ${totalGoals} goals</span>
-                                <span class="course-stat">✓ ${completedGoals} done</span>
-                            </div>
-                        </div>
-                    </div>
-                    <span style="opacity:0.5; transition: transform 0.2s;">▼</span>
-                `;
-                header.onclick = (e) => {
-                    if (!e.target.closest('button')) {
-                        card.classList.toggle('open');
-                        const arrow = header.querySelector('span:last-child');
-                        arrow.style.transform = card.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
-                    }
-                };
-
-                // Body with goals
-                const body = document.createElement('div');
-                body.className = 'course-body';
-
-                // Goals section
-                const goalsSection = document.createElement('div');
-                goalsSection.className = 'goals-section';
-
-                course.goals.forEach(goal => {
-                    const goalItem = document.createElement('div');
-                    goalItem.className = 'goal-item';
-                    goalItem.innerHTML = `
-                        <div class="checkbox-circle ${goal.completed ? 'checked' : ''}">
-                            ${goal.completed ? '✓' : ''}
-                        </div>
-                        <div class="goal-content">
-                            <div class="goal-title ${goal.completed ? 'text-muted' : ''}" style="${goal.completed ? 'text-decoration:line-through;' : ''}">${goal.title}</div>
-                            ${goal.subtitle ? `<div class="goal-subtitle">${goal.subtitle}</div>` : ''}
-                        </div>
-                        <div class="goal-actions">
-                            <button class="btn btn-ghost btn-mini" title="Convert to Task">📋</button>
-                            <button class="btn btn-ghost btn-mini" title="Delete" style="color:var(--accent-red);">✕</button>
-                        </div>
-                    `;
-
-                    goalItem.querySelector('.checkbox-circle').onclick = () => toggleGoal(course.id, goal.id);
-                    goalItem.querySelectorAll('.btn-mini')[0].onclick = () => convertGoalToTask(course.id, goal.id);
-                    goalItem.querySelectorAll('.btn-mini')[1].onclick = () => deleteGoal(course.id, goal.id);
-
-                    goalsSection.appendChild(goalItem);
-                });
-
-                body.appendChild(goalsSection);
-
-                // Footer actions
-                const footer = document.createElement('div');
-                footer.className = 'course-footer';
-                footer.innerHTML = `
-                    <button class="btn btn-ghost btn-sm">+ Add Goal</button>
-                    <button class="btn btn-ghost btn-sm" style="color:var(--accent-red);">Delete Course</button>
-                `;
-                footer.children[0].onclick = () => addGoal(course.id);
-                footer.children[1].onclick = () => deleteCourse(course.id);
-
-                body.appendChild(footer);
-                card.appendChild(header);
-                card.appendChild(body);
-                container.appendChild(card);
+                }
             });
         }
+    }
 
-        function updateProgress() {
-            const total = state.todos.length;
-            const completed = state.todos.filter(t => t.completed).length;
-            const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
-            
-            getEl('progressText').textContent = `${completed}/${total} Tasks`;
-            getEl('progressPercent').textContent = `${percent}%`;
-            getEl('progressBar').style.width = `${percent}%`;
-        }
+    const updateGreeting = () => {
+        const d = new Date();
+        if(getEl('currentDate')) getEl('currentDate').textContent = d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }).toUpperCase();
+        const h = d.getHours();
+        if(getEl('greeting')) getEl('greeting').textContent = h < 12 ? 'Good Morning' : h < 18 ? 'Good Afternoon' : 'Good Evening';
+    };
 
-        // --- ACTION HANDLERS ---
+    // --- DATA MIGRATION (The Fix) ---
+    function migrateData(data) {
+        // Fix: Ensure courses have 'categories' array
+        if (data.courses && Array.isArray(data.courses)) {
+            data.courses = data.courses.map(c => {
+                // If it's an old course with 'lectures' but no 'categories'
+                if (!c.categories && (c.lectures || c.homeworks)) {
+                    console.log("Migrating old course structure...", c.name);
+                    
+                    const newCategories = [];
+                    
+                    // Convert old lectures to new Category
+                    if (c.lectures && c.lectures.length > 0) {
+                        newCategories.push({
+                            id: generateId(),
+                            name: 'Lectures',
+                            items: c.lectures.map(l => ({
+                                id: l.id || generateId(),
+                                name: l.name,
+                                completed: l.watched || false,
+                                note: ''
+                            }))
+                        });
+                    }
 
-        // Task Actions
-        window.setColor = (c, el) => {
-            document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected'));
-            el.classList.add('selected');
-            selectedColor = c;
-        };
+                    // Convert old homework to new Category
+                    if (c.homeworks && c.homeworks.length > 0) {
+                        newCategories.push({
+                            id: generateId(),
+                            name: 'Assignments',
+                            items: c.homeworks.map(h => ({
+                                id: h.id || generateId(),
+                                name: h.description,
+                                completed: h.completed || false,
+                                note: ''
+                            }))
+                        });
+                    }
 
-        getEl('addTaskForm').onsubmit = (e) => {
-            e.preventDefault();
-            const input = getEl('taskInput');
-            const date = getEl('taskDate');
-            if (input.value.trim()) {
-                state.todos.unshift({
-                    id: generateId(),
-                    text: input.value.trim(),
-                    color: selectedColor,
-                    due: date.value,
-                    completed: false,
-                    createdAt: new Date().toISOString()
-                });
-                input.value = '';
-                if (!state.focusId) state.focusId = state.todos[0].id;
-                saveData();
-                renderAll();
-            }
-        };
+                    // If empty, add default
+                    if (newCategories.length === 0) {
+                        newCategories.push({ id: generateId(), name: 'General', items: [] });
+                    }
 
-        window.toggleTask = (id) => {
-            const t = state.todos.find(x => x.id === id);
-            if (t) {
-                t.completed = !t.completed;
-                if (t.completed) {
-                    confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 } });
-                    if (state.focusId === id) state.focusId = null;
+                    return { ...c, categories: newCategories };
                 }
-                saveData();
-                renderAll();
-            }
-        };
+                
+                // If it's a new course but categories is missing
+                if (!c.categories) {
+                    return { ...c, categories: [] };
+                }
+                
+                return c;
+            });
+        }
+        return data;
+    }
 
-        window.deleteTask = (id) => {
-            state.todos = state.todos.filter(x => x.id !== id);
-            saveData();
-            renderAll();
-        };
+    // --- AUTHENTICATION & SYNC ---
+    onAuthStateChanged(auth, (user) => {
+        if(getEl('loading')) getEl('loading').style.display = 'none';
+        
+        if (user) {
+            state.user = user;
+            getEl('authArea').innerHTML = `
+                <div style="display:flex; align-items:center; gap:10px; background:rgba(125,125,125,0.1); padding:4px 12px 4px 4px; border-radius:50px;">
+                    <img src="${user.photoURL}" style="width:28px; height:28px; border-radius:50%;">
+                    <button class="btn btn-ghost btn-sm" id="logoutBtn" style="border:none; padding:4px 8px;">Exit</button>
+                </div>`;
+            getEl('logoutBtn').onclick = () => signOut(auth).then(() => location.reload());
 
-        window.setFocus = (id) => {
-            state.focusId = id;
-            saveData();
-            renderAll();
-            if(window.innerWidth < 900) {
-                getEl('sidebar').classList.remove('open');
-                getEl('sidebarOverlay').classList.remove('active');
-            }
-        };
+            // Database Sync
+            onSnapshot(doc(db, 'users', user.uid), (docSnap) => {
+                if (docSnap.exists()) {
+                    let d = docSnap.data();
+                    
+                    // Run Migration to fix old data
+                    d = migrateData(d);
 
-        // Course Actions
-        window.addCourse = () => {
-            const name = prompt("Course Name (e.g. Physics 101):");
-            if (name) {
-                state.courses.push({
-                    id: generateId(),
-                    name: name,
-                    color: 'blue',
-                    goals: []
-                });
-                saveData();
-                renderCourses();
-            }
-        };
+                    state.todos = d.todos || [];
+                    state.courses = d.courses || [];
+                    state.focusId = d.focusId || null;
+                    renderAll();
+                } else {
+                    saveData(); // Init new user
+                }
+            });
+        } else {
+            getEl('loginBtn').onclick = () => signInWithPopup(auth, provider);
+        }
+    });
 
-        window.deleteCourse = (cid) => {
-            if(confirm('Delete this course?')) {
-                state.courses = state.courses.filter(c => c.id !== cid);
-                saveData();
-                renderCourses();
-            }
+    async function saveData() {
+        if (!state.user) return;
+        const cleanState = {
+            todos: state.todos,
+            courses: state.courses,
+            focusId: state.focusId || null,
+            lastUpdated: new Date().toISOString()
         };
+        await setDoc(doc(db, 'users', state.user.uid), cleanState, { merge: true });
+    }
 
-        window.addGoal = (cid) => {
-            const title = prompt("Goal title:");
-            if (title) {
-                const subtitle = prompt("Goal subtitle (optional, e.g., 'Due Friday'):");
-                const course = state.courses.find(x => x.id === cid);
-                course.goals.push({
-                    id: generateId(),
-                    title: title,
-                    subtitle: subtitle || '',
-                    completed: false,
-                    createdAt: new Date().toISOString()
-                });
-                saveData();
-                renderCourses();
-            }
-        };
+    // --- RENDER ENGINE ---
+    function renderAll() {
+        renderTasks();
+        renderFocus();
+        renderCourses();
+        updateProgress();
+    }
 
-        window.toggleGoal = (cid, gid) => {
-            const course = state.courses.find(x => x.id === cid);
-            const goal = course.goals.find(x => x.id === gid);
-            goal.completed = !goal.completed;
-            if (goal.completed) {
-                confetti({ particleCount: 40, spread: 60, origin: { y: 0.6 } });
-            }
-            saveData();
-            renderCourses();
-        };
-
-        window.deleteGoal = (cid, gid) => {
-            const course = state.courses.find(x => x.id === cid);
-            course.goals = course.goals.filter(x => x.id !== gid);
-            saveData();
-            renderCourses();
-        };
-
-        window.convertGoalToTask = (cid, gid) => {
-            const course = state.courses.find(x => x.id === cid);
-            const goal = course.goals.find(x => x.id === gid);
+    // 1. Task List
+    function renderTasks() {
+        const container = getEl('taskList');
+        container.innerHTML = '';
+        
+        if (state.todos.length === 0) {
+            getEl('emptyTasks').classList.remove('hidden');
+        } else {
+            getEl('emptyTasks').classList.add('hidden');
             
-            // Create task from goal
+            state.todos.forEach(t => {
+                const div = document.createElement('div');
+                div.className = 'task-item';
+                const c = colorMap[t.color] || colorMap.blue;
+                div.style.borderLeft = `4px solid ${c}`;
+                
+                div.innerHTML = `
+                    <div class="check-circle ${t.completed ? 'checked' : ''}" style="${t.completed ? `background:${c}; border-color:${c}` : ''}">
+                        ${t.completed ? '✓' : ''}
+                    </div>
+                    <div style="flex:1;">
+                        <div style="font-weight:600; font-size:0.95rem; ${t.completed ? 'text-decoration:line-through; opacity:0.6;' : ''}">${t.text}</div>
+                        ${t.due ? `<div style="font-size:0.75rem; color:var(--text-secondary); margin-top:2px;">Due ${new Date(t.due).toLocaleDateString()}</div>` : ''}
+                    </div>
+                    <button class="btn-icon task-focus-btn" title="Focus" style="font-size:1.2rem;">🎯</button>
+                    <button class="btn-icon task-del-btn" style="color:var(--red); font-size:1.2rem;">✕</button>
+                `;
+
+                div.querySelector('.check-circle').onclick = () => toggleTask(t.id);
+                div.querySelector('.task-focus-btn').onclick = () => setFocus(t.id);
+                div.querySelector('.task-del-btn').onclick = () => deleteTask(t.id);
+
+                container.appendChild(div);
+            });
+        }
+    }
+
+    // 2. Focus Hero
+    function renderFocus() {
+        const t = state.todos.find(x => x.id === state.focusId);
+        const section = getEl('focusSection');
+        
+        // Reset border
+        section.style.borderLeft = 'none';
+
+        if (!t || t.completed) {
+            section.innerHTML = `
+                <div style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; opacity:0.6;">
+                    <h3>No Active Focus</h3>
+                    <p>Select a task to focus on.</p>
+                </div>`;
+        } else {
+            const c = colorMap[t.color] || colorMap.blue;
+            section.innerHTML = `
+                <div style="position:absolute; left:0; top:0; bottom:0; width:6px; background:${c};"></div>
+                <div>
+                    <div style="font-size:0.75rem; font-weight:700; color:${c}; margin-bottom:12px; letter-spacing:1px;">CURRENT FOCUS</div>
+                    <div style="font-size:2rem; font-weight:700; line-height:1.2;">${t.text}</div>
+                    ${t.due ? `<div style="color:var(--text-secondary); margin-top:8px;">Due: ${new Date(t.due).toDateString()}</div>` : ''}
+                </div>
+                <div style="text-align:right; margin-top:20px;">
+                    <button id="completeFocusBtn" class="btn" style="background:${c}; color:white;">Mark Complete</button>
+                </div>
+            `;
+            getEl('completeFocusBtn').onclick = () => toggleTask(t.id);
+        }
+    }
+
+    // 3. Dynamic Courses
+    function renderCourses() {
+        const con = getEl('coursesContainer');
+        const empty = getEl('emptyCourses');
+        
+        if(!state.courses || state.courses.length === 0) { 
+            con.innerHTML = ''; 
+            empty.style.display='block'; 
+            return; 
+        }
+        empty.style.display = 'none';
+
+        con.innerHTML = state.courses.map(course => {
+            // Safety check for categories
+            const categories = course.categories || [];
+            
+            const catsHTML = categories.map(cat => {
+                const itemsHTML = (cat.items || []).map(item => `
+                    <div class="item-row">
+                        <div class="item-main">
+                            <div class="check-circle ${item.completed?'checked':''}" onclick="window.toggleItem('${course.id}', '${cat.id}', '${item.id}')">✓</div>
+                            <div style="flex:1; ${item.completed?'text-decoration:line-through;opacity:0.6':''}">${item.name}</div>
+                            <button class="btn-icon" style="width:24px;height:24px;" onclick="document.getElementById('note-${item.id}').classList.toggle('open')">📝</button>
+                            <button class="btn-icon" style="width:24px;height:24px;color:var(--red);" onclick="window.deleteItem('${course.id}', '${cat.id}', '${item.id}')">✕</button>
+                        </div>
+                        <div id="note-${item.id}" class="note-container ${item.note?'open':''}">
+                            <textarea class="note-textarea" placeholder="Add notes..." onblur="window.saveNote('${course.id}', '${cat.id}', '${item.id}', this.value)">${item.note || ''}</textarea>
+                        </div>
+                    </div>
+                `).join('');
+
+                return `
+                    <div class="category-block">
+                        <div class="category-header">
+                            <span>${cat.name}</span>
+                            <button class="btn btn-ghost btn-sm" onclick="window.addItem('${course.id}', '${cat.id}')" style="padding:2px 8px; font-size:0.7rem;">+ Item</button>
+                        </div>
+                        ${itemsHTML}
+                    </div>
+                `;
+            }).join('');
+
+            return `
+            <div class="course-card">
+                <div class="course-header" onclick="this.parentElement.classList.toggle('open')">
+                    <span style="font-weight:600; font-size:1.1rem;">${course.name}</span>
+                    <span style="font-size:1.2rem; opacity:0.5;">⌄</span>
+                </div>
+                <div class="course-body">
+                    ${catsHTML}
+                    <div style="margin-top:24px; display:flex; gap:10px;">
+                        <button class="btn btn-ghost btn-sm" onclick="window.addCategory('${course.id}')">+ Category</button>
+                        <button class="btn btn-ghost btn-sm" style="color:var(--red); border-color:rgba(255,59,48,0.3);" onclick="window.deleteCourse('${course.id}')">Delete Course</button>
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function updateProgress() {
+        const total = state.todos.length;
+        const completed = state.todos.filter(t => t.completed).length;
+        const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
+        
+        if(getEl('progressText')) getEl('progressText').textContent = `${completed}/${total} Tasks`;
+        if(getEl('progressPercent')) getEl('progressPercent').textContent = `${percent}%`;
+        if(getEl('progressBar')) getEl('progressBar').style.width = `${percent}%`;
+    }
+
+    // --- GLOBAL ACTIONS (Window Binding) ---
+
+    // Task Actions
+    window.setColor = (c, el) => {
+        document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedColor = c;
+    };
+
+    getEl('addTaskForm').onsubmit = (e) => {
+        e.preventDefault();
+        const input = getEl('taskInput');
+        const date = getEl('taskDate');
+        if (input.value.trim()) {
             state.todos.unshift({
                 id: generateId(),
-                text: `[${course.name}] ${goal.title}${goal.subtitle ? ' - ' + goal.subtitle : ''}`,
-                color: course.color,
-                due: '',
+                text: input.value.trim(),
+                color: selectedColor,
+                due: date.value,
                 completed: false,
                 createdAt: new Date().toISOString()
             });
-            
-            // Remove goal from course
-            course.goals = course.goals.filter(x => x.id !== gid);
-            
+            input.value = '';
+            if (!state.focusId) state.focusId = state.todos[0].id;
+            saveData();
+            renderAll(); 
+        }
+    };
+
+    window.toggleTask = (id) => {
+        const t = state.todos.find(x => x.id === id);
+        if (t) {
+            t.completed = !t.completed;
+            if (t.completed) {
+                confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 } });
+                if (state.focusId === id) state.focusId = null;
+            }
             saveData();
             renderAll();
-            
-            // Show notification
-            alert(`✓ Moved to Task Queue: ${goal.title}`);
-        };
+        }
+    };
 
-        // --- TIMER LOGIC ---
-        let timer, timeLeft, isRunning = false;
-        
-        window.toggleTimerSettings = () => getEl('timerSettings').classList.toggle('hidden');
-        
+    window.deleteTask = (id) => {
+        state.todos = state.todos.filter(x => x.id !== id);
+        if (state.focusId === id) state.focusId = null;
+        saveData();
+        renderAll();
+    };
+
+    window.setFocus = (id) => {
+        state.focusId = id;
+        saveData();
+        renderAll();
+        // Close sidebar on mobile if open
+        if(window.innerWidth < 900) {
+            getEl('sidebar').classList.remove('open');
+            getEl('sidebarOverlay').classList.remove('active');
+        }
+    };
+
+    // Course Actions
+    window.addCourse = () => {
+        const name = prompt("Course Name (e.g. Physics 101):");
+        if (name) {
+            state.courses.push({
+                id: generateId(),
+                name: name,
+                categories: [
+                    { id: generateId(), name: 'Lectures', items: [] },
+                    { id: generateId(), name: 'Assignments', items: [] }
+                ]
+            });
+            saveData();
+            renderCourses();
+        }
+    };
+
+    window.deleteCourse = (cid) => {
+        if(confirm('Delete this entire course?')) {
+            state.courses = state.courses.filter(c => c.id !== cid);
+            saveData();
+            renderCourses();
+        }
+    };
+
+    window.addCategory = (cid) => {
+        const name = prompt("New Category Name (e.g. Labs, Week 1):");
+        if(name) {
+            const course = state.courses.find(c => c.id === cid);
+            course.categories.push({ id: generateId(), name: name, items: [] });
+            saveData();
+            renderCourses();
+        }
+    };
+
+    window.addItem = (cid, catId) => {
+        const name = prompt("Item Name:");
+        if(name) {
+            const course = state.courses.find(c => c.id === cid);
+            const cat = course.categories.find(c => c.id === catId);
+            cat.items.push({ id: generateId(), name: name, completed: false, note: '' });
+            saveData();
+            renderCourses();
+        }
+    };
+
+    window.toggleItem = (cid, catId, itemId) => {
+        const course = state.courses.find(c => c.id === cid);
+        const cat = course.categories.find(c => c.id === catId);
+        const item = cat.items.find(i => i.id === itemId);
+        item.completed = !item.completed;
+        saveData();
+        renderCourses();
+    };
+
+    window.saveNote = (cid, catId, itemId, text) => {
+        const course = state.courses.find(c => c.id === cid);
+        const cat = course.categories.find(c => c.id === catId);
+        const item = cat.items.find(i => i.id === itemId);
+        if(item.note !== text) {
+            item.note = text;
+            saveData();
+        }
+    };
+    
+    window.deleteItem = (cid, catId, itemId) => {
+         const course = state.courses.find(c => c.id === cid);
+         const cat = course.categories.find(c => c.id === catId);
+         cat.items = cat.items.filter(i => i.id !== itemId);
+         saveData();
+         renderCourses();
+    };
+
+    // --- TIMER LOGIC ---
+    let timer, timeLeft, isRunning = false;
+    
+    window.toggleTimerSettings = () => getEl('timerSettings').classList.toggle('hidden');
+    
+    if(getEl('startTimer')) {
         getEl('startTimer').onclick = function() {
             if(isRunning) {
                 clearInterval(timer); isRunning=false; this.textContent = "Start";
@@ -1121,24 +1139,29 @@
                 }, 1000);
             }
         };
-        
+    }
+    
+    if(getEl('resetTimer')) {
         getEl('resetTimer').onclick = () => {
             clearInterval(timer); isRunning = false;
             timeLeft = getEl('workDur').value * 60;
             getEl('timerDisplay').innerText = `${Math.floor(timeLeft/60).toString().padStart(2,'0')}:00`;
             getEl('startTimer').textContent = "Start";
         };
+    }
 
-        // --- THEME LOGIC ---
+    // --- THEME LOGIC ---
+    if(getEl('themeToggle')) {
         getEl('themeToggle').onclick = () => {
             document.body.classList.toggle('dark-mode');
             localStorage.setItem('studySparkTheme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
         };
-        if(localStorage.getItem('studySparkTheme') === 'dark') document.body.classList.add('dark-mode');
+    }
+    if(localStorage.getItem('studySparkTheme') === 'dark') document.body.classList.add('dark-mode');
 
-        // Start
-        init();
+    // Start
+    init();
 
-    </script>
+  </script>
 </body>
 </html>
