@@ -14,623 +14,334 @@
 
     <style>
         /* =========================================
-           1. CSS VARIABLES & THEME ENGINE
+           CSS VARIABLES (Apple System Colors)
            ========================================= */
         :root {
-            /* --- PALETTE: Apple/Ikea Modern (Light) --- */
-            --bg-body: #F5F5F7;       /* System Grey 6 */
+            --bg-body: #F5F5F7;
             --bg-sidebar: #FFFFFF;
             
-            /* Glassmorphism Variables */
+            /* Glassmorphism */
             --glass-material: rgba(255, 255, 255, 0.65);
             --glass-border: 1px solid rgba(255, 255, 255, 0.4);
             --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
             --blur-strength: 30px;
 
-            /* Typography */
+            /* Text */
             --text-primary: #1D1D1F;
             --text-secondary: #86868B;
-            --text-tertiary: #B0B0B5;
+            --text-tertiary: #C7C7CC;
 
-            /* Accents (Solid, High Contrast) */
-            --accent-blue: #0071e3;
-            --accent-purple: #5e5ce6;
-            --accent-green: #34c759;
-            --accent-orange: #ff9f0a;
-            --accent-red: #ff3b30;
-            --accent-teal: #30b0c7;
+            /* Accents */
+            --blue: #0071e3;
+            --purple: #5e5ce6;
+            --green: #34c759;
+            --orange: #ff9f0a;
+            --red: #ff3b30;
 
-            /* Components */
-            --radius-sm: 12px;
-            --radius-md: 18px;
-            --radius-lg: 28px;
-            --card-hover-transform: translateY(-4px);
-            --transition-speed: 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            /* Dimensions */
+            --radius-md: 14px;
+            --radius-lg: 24px;
         }
 
         body.dark-mode {
-            /* --- PALETTE: Apple Dark Mode --- */
             --bg-body: #000000;
             --bg-sidebar: #1C1C1E;
-
-            /* Glassmorphism Variables */
-            --glass-material: rgba(28, 28, 30, 0.70);
-            --glass-border: 1px solid rgba(255, 255, 255, 0.08);
-            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-
-            /* Typography */
+            --glass-material: rgba(28, 28, 30, 0.75);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
             --text-primary: #F5F5F7;
             --text-secondary: #98989D;
-            --text-tertiary: #58585E;
-
-            /* Accents (Adjusted for dark mode luminosity) */
-            --accent-blue: #0a84ff;
-            --accent-purple: #bf5af2;
-            --accent-green: #30d158;
-            --accent-orange: #ff9f0a;
-            --accent-red: #ff453a;
+            --text-tertiary: #48484A;
         }
 
         /* =========================================
-           2. GLOBAL RESETS & BASE STYLES
+           RESET & BASE
            ========================================= */
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            outline: none;
-            user-select: none; /* App-like feel */
-        }
-
-        /* Allow text selection only in inputs and notes */
-        input, textarea { user-select: text; }
-
-        body {
-            margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-body);
-            color: var(--text-primary);
-            transition: background-color 0.4s ease, color 0.2s ease;
-            min-height: 100vh;
-            overflow-x: hidden;
-            /* Prevent rubber-banding on iOS */
-            overscroll-behavior-y: none; 
-        }
-
-        /* Scrollbar Styling */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--text-tertiary); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
-
-        /* Typography Helpers */
-        h1 { font-size: 2.2rem; font-weight: 700; letter-spacing: -0.02em; margin: 0; line-height: 1.1; }
-        h2 { font-size: 1.4rem; font-weight: 600; letter-spacing: -0.01em; margin: 0; }
-        h3 { font-size: 1.1rem; font-weight: 600; margin: 0; }
-        p { font-size: 1rem; color: var(--text-secondary); margin: 0; line-height: 1.5; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         
-        .text-sm { font-size: 0.85rem; }
-        .text-xs { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
-        .text-muted { color: var(--text-secondary); }
+        body {
+            margin: 0; font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--bg-body); color: var(--text-primary);
+            transition: background 0.3s ease, color 0.2s ease;
+            min-height: 100vh; overflow-x: hidden;
+        }
 
         /* =========================================
-           3. LAYOUT & GRID SYSTEM
+           LAYOUT
            ========================================= */
         .app-layout {
             display: grid;
-            grid-template-columns: 1fr; /* Mobile Default */
+            grid-template-columns: 1fr;
             height: 100vh;
             overflow: hidden;
         }
-
-        /* Desktop Layout (Sidebar + Main Content) */
+        
+        /* Desktop: Sidebar + Content */
         @media (min-width: 900px) {
-            .app-layout {
-                grid-template-columns: 380px 1fr;
-            }
+            .app-layout { grid-template-columns: 380px 1fr; }
         }
 
-        /* Main Content Area */
+        /* =========================================
+           SIDEBAR (Tasks)
+           ========================================= */
+        .sidebar {
+            background: var(--bg-sidebar);
+            border-right: 1px solid rgba(0,0,0,0.05);
+            display: flex; flex-direction: column;
+            padding: 32px 24px; height: 100%; z-index: 100;
+            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        
+        .dark-mode .sidebar { border-right: 1px solid rgba(255,255,255,0.08); }
+
+        /* Mobile Drawer */
+        @media (max-width: 899px) {
+            .sidebar {
+                position: fixed; top: 0; left: 0; bottom: 0; width: 85%; max-width: 360px;
+                transform: translateX(-100%); box-shadow: 20px 0 50px rgba(0,0,0,0.2);
+            }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar-overlay {
+                position: fixed; inset: 0; background: rgba(0,0,0,0.3); backdrop-filter: blur(4px);
+                z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+            }
+            .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
+        }
+
+        /* --- Collapsible Sections --- */
+        .task-section-header {
+            display: flex; align-items: center; justify-content: space-between;
+            font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;
+            color: var(--text-secondary); margin-top: 24px; margin-bottom: 12px;
+            cursor: pointer; user-select: none;
+        }
+        .task-section-header:hover { color: var(--text-primary); }
+        .rotate-icon { transition: transform 0.2s; }
+        .collapsed .rotate-icon { transform: rotate(-90deg); }
+        .collapsed + .task-list-group { display: none; }
+
+        /* =========================================
+           MAIN DASHBOARD
+           ========================================= */
         .main-content {
-            padding: 24px;
-            overflow-y: auto;
-            height: 100vh;
-            padding-bottom: 120px; /* Space for FAB on mobile */
-            position: relative;
+            padding: 24px; overflow-y: auto; height: 100vh; position: relative;
+            padding-bottom: 120px;
         }
+        @media (min-width: 900px) { .main-content { padding: 48px; } }
 
-        @media (min-width: 900px) {
-            .main-content {
-                padding: 48px;
-            }
-        }
-
-        /* Section Container (Glass) */
-        .glass-section {
+        /* Glass Container */
+        .glass-box {
             background: var(--glass-material);
             backdrop-filter: blur(var(--blur-strength));
             -webkit-backdrop-filter: blur(var(--blur-strength));
             border: var(--glass-border);
             border-radius: var(--radius-lg);
             box-shadow: var(--glass-shadow);
-            padding: 24px;
-            margin-bottom: 24px;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        /* Hover effect for desktop liveliness */
-        @media (hover: hover) {
-            .glass-section:hover {
-                transform: var(--card-hover-transform);
-                box-shadow: 0 15px 40px rgba(0,0,0,0.08);
-            }
-        }
-
-        /* Masonry-style Grid for Courses/Stats */
-        .bento-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 24px;
+            padding: 24px; margin-bottom: 24px;
+            transition: transform 0.2s;
         }
 
         /* =========================================
-           4. SIDEBAR (TASKS)
+           COMPONENTS
            ========================================= */
-        .sidebar {
-            background: var(--bg-sidebar);
-            border-right: 1px solid rgba(0,0,0,0.05);
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            z-index: 100;
-            padding: 32px 24px;
-            transition: transform var(--transition-speed);
+        /* Typography */
+        h1 { font-size: 2rem; font-weight: 700; margin: 0; }
+        h2 { font-size: 1.25rem; font-weight: 600; margin: 0; }
+        
+        /* Inputs (The "No Popup" Solution) */
+        .input-inline {
+            width: 100%; padding: 10px 14px;
+            background: rgba(125,125,125,0.08);
+            border: 1px solid transparent; border-radius: 10px;
+            font-family: inherit; font-size: 0.95rem; color: var(--text-primary);
+            transition: all 0.2s;
         }
-
-        /* Mobile Drawer Behavior */
-        @media (max-width: 899px) {
-            .sidebar {
-                position: fixed;
-                top: 0; left: 0; bottom: 0;
-                width: 85%;
-                max-width: 360px;
-                transform: translateX(-100%);
-                box-shadow: 20px 0 50px rgba(0,0,0,0.2);
-            }
-            .sidebar.open {
-                transform: translateX(0);
-            }
-            /* Overlay for mobile drawer */
-            .sidebar-overlay {
-                position: fixed; inset: 0;
-                background: rgba(0,0,0,0.3);
-                backdrop-filter: blur(5px);
-                z-index: 90;
-                opacity: 0; pointer-events: none;
-                transition: opacity 0.3s;
-            }
-            .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
+        .input-inline:focus {
+            background: var(--bg-sidebar); border-color: var(--blue);
+            box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15);
         }
-
-        .dark-mode .sidebar {
-            border-right: 1px solid rgba(255,255,255,0.05);
+        
+        /* Hidden Input Rows */
+        .input-row { 
+            display: none; padding: 10px 0; animation: slideDown 0.2s ease;
         }
-
-        /* Task List Container */
-        .task-list-container {
-            flex: 1;
-            overflow-y: auto;
-            margin-top: 24px;
-            padding-bottom: 20px;
-        }
-
-        /* =========================================
-           5. UI COMPONENTS: INPUTS & BUTTONS
-           ========================================= */
-        /* Clean Inputs */
-        .input-group {
-            background: rgba(125, 125, 125, 0.08);
-            border-radius: var(--radius-md);
-            padding: 8px 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            transition: background 0.2s;
-            border: 1px solid transparent;
-        }
-        .input-group:focus-within {
-            background: var(--bg-sidebar);
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.1);
-        }
-        .input-clean {
-            border: none; background: transparent;
-            font-size: 1rem; color: var(--text-primary);
-            width: 100%; font-family: inherit;
-            padding: 8px 0;
-        }
-        .input-clean::placeholder { color: var(--text-tertiary); }
-
-        /* Date Picker */
-        input[type="date"] {
-            border: none; background: rgba(125,125,125,0.1);
-            color: var(--text-secondary);
-            font-family: inherit; font-size: 0.85rem; font-weight: 600;
-            padding: 6px 10px; border-radius: 8px;
-            cursor: pointer;
-        }
+        .input-row.visible { display: block; }
 
         /* Buttons */
         .btn {
-            border: none; padding: 12px 24px;
-            border-radius: var(--radius-md);
-            font-size: 0.95rem; font-weight: 600;
-            cursor: pointer;
+            border: none; padding: 8px 16px; border-radius: 10px;
+            font-size: 0.9rem; font-weight: 600; cursor: pointer;
             transition: transform 0.1s, opacity 0.2s;
-            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            display: inline-flex; align-items: center; gap: 6px;
         }
         .btn:active { transform: scale(0.96); }
-        
         .btn-primary { background: var(--text-primary); color: var(--bg-body); }
         .btn-ghost { background: transparent; color: var(--text-secondary); border: 1px solid rgba(125,125,125,0.2); }
-        .btn-ghost:hover { background: rgba(125,125,125,0.1); color: var(--text-primary); }
-        
-        .btn-icon { width: 36px; height: 36px; padding: 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
-        .btn-icon:hover { background: rgba(125,125,125,0.1); }
+        .btn-icon { width: 32px; height: 32px; padding: 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: transparent; border: none; cursor: pointer; color: var(--text-secondary); }
+        .btn-icon:hover { background: rgba(125,125,125,0.1); color: var(--text-primary); }
 
-        /* FAB (Mobile Only) */
+        /* Tasks */
+        .task-item {
+            background: var(--bg-body); padding: 14px; margin-bottom: 8px;
+            border-radius: var(--radius-md); display: flex; align-items: center; gap: 12px;
+            transition: transform 0.2s; border: 1px solid transparent;
+        }
+        .dark-mode .task-item { background: rgba(255,255,255,0.05); }
+        .task-item:hover { transform: translateX(4px); border-color: rgba(125,125,125,0.1); }
+        
+        .check-circle {
+            width: 22px; height: 22px; border-radius: 50%;
+            border: 2px solid var(--text-tertiary); cursor: pointer;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .check-circle.checked { background: var(--green); border-color: var(--green); color: white; font-size: 14px; }
+
+        /* Courses */
+        .course-card {
+            background: var(--bg-sidebar); border-radius: var(--radius-md);
+            overflow: hidden; margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        .dark-mode .course-card { border-color: rgba(255,255,255,0.08); }
+        
+        .course-header {
+            padding: 20px; display: flex; justify-content: space-between; align-items: center;
+            cursor: pointer; transition: background 0.2s;
+        }
+        .course-header:hover { background: rgba(125,125,125,0.03); }
+        .course-body { padding: 0 20px 20px 20px; display: none; }
+        .course-card.open .course-body { display: block; animation: slideDown 0.3s ease; }
+
+        /* Categories */
+        .cat-block { margin-top: 20px; }
+        .cat-header {
+            font-size: 0.8rem; font-weight: 700; color: var(--text-secondary);
+            text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        
+        /* Items within Category */
+        .item-row {
+            display: flex; flex-direction: column; padding: 10px 0;
+            border-bottom: 1px solid rgba(125,125,125,0.1);
+        }
+        .item-top { display: flex; align-items: center; gap: 10px; width: 100%; }
+        .item-name { flex: 1; font-size: 0.95rem; }
+        .completed .item-name { text-decoration: line-through; opacity: 0.5; }
+        
+        /* Note Area */
+        .note-wrapper {
+            max-height: 0; overflow: hidden; transition: max-height 0.3s ease;
+        }
+        .note-wrapper.open { max-height: 150px; margin-top: 8px; }
+        .note-input {
+            width: 100%; border: none; background: rgba(125,125,125,0.05);
+            border-radius: 8px; padding: 10px; color: var(--text-primary);
+            font-family: inherit; font-size: 0.9rem; resize: none;
+        }
+
+        /* FAB */
         .fab {
             position: fixed; bottom: 24px; right: 24px;
-            width: 64px; height: 64px; border-radius: 32px;
+            width: 56px; height: 56px; border-radius: 28px;
             background: var(--text-primary); color: var(--bg-body);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            border: none; font-size: 28px; cursor: pointer; z-index: 200;
-            display: flex; align-items: center; justify-content: center;
-            transition: transform 0.2s;
+            border: none; font-size: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+            z-index: 200; cursor: pointer; display: flex; align-items: center; justify-content: center;
         }
-        .fab:active { transform: scale(0.9); }
         @media (min-width: 900px) { .fab { display: none; } }
 
-        /* =========================================
-           6. SPECIFIC FEATURES: TASKS & COURSES
-           ========================================= */
+        /* Utils */
+        .hidden { display: none !important; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* --- Task Item --- */
-        .task-item {
-            background: var(--bg-body);
-            padding: 16px; margin-bottom: 12px;
-            border-radius: var(--radius-md);
-            display: flex; align-items: center; gap: 16px;
-            border: 1px solid rgba(0,0,0,0.03);
-            transition: transform 0.2s, box-shadow 0.2s;
-            cursor: grab;
-        }
-        .dark-mode .task-item { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.05); }
-        .task-item:hover { transform: translateX(4px); }
-        .task-item.sortable-ghost { opacity: 0.3; }
-
-        /* Custom Checkbox */
-        .checkbox-circle {
-            width: 24px; height: 24px; border-radius: 50%;
-            border: 2px solid var(--text-tertiary);
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: all 0.2s; flex-shrink: 0;
-        }
-        .checkbox-circle.checked {
-            background: var(--accent-green); border-color: var(--accent-green);
-            color: white; font-size: 14px;
-        }
-
-        /* --- Current Focus Card (Hero) --- */
-        .focus-hero {
-            min-height: 240px;
-            background: var(--bg-sidebar); /* Solid contrast against glass */
-            display: flex; flex-direction: column; justify-content: space-between;
-            position: relative; overflow: hidden;
-        }
-        .focus-hero::before {
-            content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px;
-            background: var(--accent-blue); /* Dynamic color */
-        }
-        .focus-title { font-size: 2.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 16px; }
-        
-        /* --- ENHANCED COURSES SYSTEM --- */
-        .course-card {
-            background: var(--bg-sidebar);
-            border-radius: var(--radius-md);
-            overflow: hidden;
-            margin-bottom: 16px;
-            border: 1px solid rgba(0,0,0,0.05);
-            transition: box-shadow 0.2s;
-        }
-        .dark-mode .course-card { border: 1px solid rgba(255,255,255,0.05); }
-
-        .course-header {
-            padding: 16px 20px;
-            display: flex; justify-content: space-between; align-items: center;
-            cursor: pointer; background: rgba(125,125,125,0.03);
-            border-bottom: 1px solid rgba(125,125,125,0.08);
-        }
-        .course-header:hover { background: rgba(125,125,125,0.06); }
-
-        .course-title-section {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .course-progress-ring {
-            width: 40px;
-            height: 40px;
-            position: relative;
-            flex-shrink: 0;
-        }
-
-        .progress-ring-circle {
-            transform: rotate(-90deg);
-            transform-origin: 50% 50%;
-        }
-
-        .course-info h3 {
-            font-size: 1.1rem;
-            margin-bottom: 4px;
-        }
-
-        .course-stats {
-            display: flex;
-            gap: 12px;
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-        }
-
-        .course-stat {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        /* Dynamic Content Area */
-        .course-body { 
-            padding: 0;
-            display: none; 
-            animation: slideDown 0.3s ease; 
-        }
-        .course-card.open .course-body { display: block; }
-
-        /* Goals Section (Compact) */
-        .goals-section {
-            padding: 16px 20px;
-            background: rgba(125,125,125,0.02);
-        }
-
-        .goal-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(125,125,125,0.06);
-        }
-
-        .goal-item:last-child {
-            border-bottom: none;
-        }
-
-        .goal-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .goal-title {
-            font-weight: 600;
-            font-size: 0.95rem;
-        }
-
-        .goal-subtitle {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-        }
-
-        .goal-actions {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-        }
-
-        .btn-sm {
-            padding: 6px 12px;
-            font-size: 0.8rem;
-        }
-
-        .btn-mini {
-            width: 28px;
-            height: 28px;
-            padding: 0;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.85rem;
-        }
-
-        /* Course Actions Footer */
-        .course-footer {
-            padding: 16px 20px;
-            border-top: 1px solid rgba(125,125,125,0.08);
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        /* Color Picker (Compact) */
-        .color-selector { display: flex; gap: 8px; margin-top: 12px; }
-        .color-dot {
-            width: 26px; height: 26px; border-radius: 50%;
-            cursor: pointer; transition: transform 0.2s;
-            border: 2px solid transparent;
-        }
-        .color-dot:hover { transform: scale(1.1); }
+        /* Color Dots */
+        .color-dot { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
         .color-dot.selected { transform: scale(1.2); border-color: var(--text-primary); }
 
-        /* Animations */
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        .hidden { display: none !important; }
-
-        /* Loading Overlay */
-        #loader {
-            position: fixed; inset: 0; background: var(--bg-body); z-index: 9999;
-            display: flex; align-items: center; justify-content: center;
-            flex-direction: column;
-        }
-        .spinner {
-            width: 40px; height: 40px; border: 4px solid rgba(125,125,125,0.2);
-            border-top: 4px solid var(--accent-blue); border-radius: 50%;
-            animation: spin 1s linear infinite; margin-bottom: 16px;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* Mobile Responsive Adjustments */
-        @media (max-width: 899px) {
-            .course-progress-ring {
-                width: 36px;
-                height: 36px;
-            }
-            
-            .course-info h3 {
-                font-size: 1rem;
-            }
-            
-            .course-stats {
-                font-size: 0.7rem;
-            }
-            
-            .goal-item {
-                padding: 8px 0;
-            }
-            
-            .btn-sm {
-                padding: 4px 10px;
-                font-size: 0.75rem;
-            }
-        }
-
+        /* Loader */
+        #loader { position: fixed; inset: 0; background: var(--bg-body); z-index: 9999; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
-    <div id="loader">
-        <div class="spinner"></div>
-        <h3 style="font-weight: 500;">Loading Spark...</h3>
-    </div>
+    <div id="loader"><h3>Loading...</h3></div>
 
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <div class="app-layout">
         
         <aside class="sidebar" id="sidebar">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                <h2>Task Queue</h2>
-                <button class="btn-icon btn-ghost" id="sidebarClose" style="display:none;">✕</button>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2>Tasks</h2>
+                <button class="btn-icon" id="sidebarClose" style="display:none;">✕</button>
             </div>
 
             <form id="addTaskForm">
-                <div class="input-group">
-                    <input type="text" id="taskInput" class="input-clean" placeholder="What needs doing?" autocomplete="off">
+                <input type="text" id="taskInput" class="input-inline" placeholder="Add a new task..." autocomplete="off">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
+                    <div style="display:flex; gap:6px;">
+                        <div class="color-dot selected" style="background:var(--blue)" onclick="setColor('blue', this)"></div>
+                        <div class="color-dot" style="background:var(--purple)" onclick="setColor('purple', this)"></div>
+                        <div class="color-dot" style="background:var(--orange)" onclick="setColor('orange', this)"></div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="padding:6px 12px; font-size:0.8rem;">Add</button>
                 </div>
-                
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
-                    <input type="date" id="taskDate">
-                    <button type="submit" class="btn btn-primary btn-sm">Add Task</button>
-                </div>
-
-                <div class="color-selector">
-                    <div class="color-dot selected" style="background: var(--accent-blue);" onclick="setColor('blue', this)"></div>
-                    <div class="color-dot" style="background: var(--accent-purple);" onclick="setColor('purple', this)"></div>
-                    <div class="color-dot" style="background: var(--accent-green);" onclick="setColor('green', this)"></div>
-                    <div class="color-dot" style="background: var(--accent-orange);" onclick="setColor('orange', this)"></div>
-                    <div class="color-dot" style="background: var(--accent-red);" onclick="setColor('red', this)"></div>
-                </div>
+                <input type="date" id="taskDate" style="border:none; background:transparent; color:var(--text-secondary); font-family:inherit; margin-top:8px; width:100%;">
             </form>
 
-            <div class="task-list-container" id="taskListContainer">
-                <div id="taskList"></div>
-                <div id="emptyTasks" class="hidden" style="text-align:center; margin-top:40px; color:var(--text-tertiary);">
-                    <div style="font-size:3rem; margin-bottom:10px;">🍃</div>
-                    <p>All tasks completed.<br>Enjoy your free time!</p>
+            <div style="flex:1; overflow-y:auto; margin-top:20px; padding-right:4px;">
+                
+                <div class="task-section-header" onclick="toggleSection(this)">
+                    <span>Active</span>
+                    <span class="rotate-icon">▼</span>
                 </div>
+                <div id="activeTaskList" class="task-list-group"></div>
+
+                <div class="task-section-header collapsed" onclick="toggleSection(this)">
+                    <span>Completed</span>
+                    <span class="rotate-icon">▼</span>
+                </div>
+                <div id="completedTaskList" class="task-list-group"></div>
+
             </div>
             
-            <div style="margin-top:auto; padding-top:20px; border-top:1px solid rgba(125,125,125,0.1); text-align:center;">
-                <button class="btn btn-ghost btn-sm" id="themeToggle">Dark Mode 🌙</button>
+            <div style="text-align:center; padding-top:20px; border-top:1px solid rgba(125,125,125,0.1);">
+                <button class="btn btn-ghost" id="themeToggle" style="font-size:0.8rem;">Switch Appearance 🌗</button>
             </div>
         </aside>
 
-
         <main class="main-content">
             
-            <header style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px;">
+            <header style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:32px;">
                 <div>
-                    <p class="text-xs text-muted" id="currentDate">FRIDAY, OCT 24</p>
-                    <h1 id="greeting">Good Morning</h1>
+                    <p style="font-size:0.8rem; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:1px;" id="currentDate">TODAY</p>
+                    <h1 id="greeting">Hello</h1>
                 </div>
-                <div id="authContainer">
+                <div id="authArea">
                     <button id="loginBtn" class="btn btn-primary">Sign In</button>
                 </div>
             </header>
 
-            <section class="glass-section focus-hero" id="focusSection">
-                <div style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; opacity:0.6;">
-                    <h3>No Active Focus</h3>
-                    <p>Click the 🎯 icon on a task to set focus.</p>
+            <div class="glass-box" id="focusCard" style="min-height:200px; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; position:relative; overflow:hidden;">
                 </div>
-            </section>
 
-            <div class="bento-grid" style="margin-bottom: 24px;">
-                <div class="glass-section" style="text-align: center; margin:0;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                        <span class="text-xs text-muted">POMODORO</span>
-                        <button class="btn-icon" style="width:24px;height:24px;" onclick="toggleTimerSettings()">⚙️</button>
-                    </div>
-                    
-                    <div style="font-size: 3.5rem; font-weight: 800; font-variant-numeric: tabular-nums; margin: 10px 0; background: linear-gradient(135deg, var(--text-primary), var(--text-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;" id="timerDisplay">25:00</div>
-                    
-                    <div id="timerSettings" class="hidden" style="margin-bottom:12px;">
-                        <input type="number" id="workDur" value="25" style="width:50px; padding:4px; text-align:center; border-radius:6px; border:1px solid rgba(125,125,125,0.2);"> min
-                    </div>
+            <div class="glass-box" style="padding:0; overflow:hidden; background:transparent; box-shadow:none; border:none; backdrop-filter:none;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                    <h2>Courses</h2>
+                    <button class="btn btn-ghost" onclick="toggleInput('newCourseRow')">+ New Course</button>
+                </div>
 
-                    <div style="display:flex; gap:12px; justify-content:center;">
-                        <button id="startTimer" class="btn btn-primary btn-sm">Start</button>
-                        <button id="resetTimer" class="btn btn-ghost btn-sm">Reset</button>
+                <div id="newCourseRow" class="input-row glass-box" style="padding:16px; margin-bottom:20px;">
+                    <input type="text" id="newCourseInput" class="input-inline" placeholder="Course Name (e.g. Physics 101)" onkeydown="handleEnter(event, addCourse)">
+                    <div style="margin-top:8px; display:flex; justify-content:flex-end; gap:8px;">
+                        <button class="btn btn-ghost" onclick="toggleInput('newCourseRow')">Cancel</button>
+                        <button class="btn btn-primary" onclick="addCourse()">Create Course</button>
                     </div>
                 </div>
 
-                <div class="glass-section" style="margin:0; display:flex; flex-direction:column; justify-content:center;">
-                    <span class="text-xs text-muted">DAILY PROGRESS</span>
-                    <div style="margin-top:16px;">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-                            <span style="font-weight:600;" id="progressText">0/5 Tasks</span>
-                            <span id="progressPercent">0%</span>
-                        </div>
-                        <div style="width:100%; height:8px; background:rgba(125,125,125,0.1); border-radius:4px; overflow:hidden;">
-                            <div id="progressBar" style="width:0%; height:100%; background:var(--accent-green); transition: width 0.5s;"></div>
-                        </div>
+                <div id="coursesContainer">
                     </div>
-                </div>
             </div>
-
-            <section>
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
-                    <h2>Courses & Projects</h2>
-                    <button class="btn btn-ghost btn-sm" onclick="addCourse()">+ New Course</button>
-                </div>
-
-                <div id="coursesContainer"></div>
-                
-                <div id="emptyCourses" class="glass-section hidden" style="text-align:center; color:var(--text-secondary); padding:40px;">
-                    No courses yet. Add one to organize your lectures and labs!
-                </div>
-            </section>
 
         </main>
     </div>
@@ -638,13 +349,13 @@
     <button class="fab" id="fab">＋</button>
 
     <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-    // ============================================
-    // 🔴 PASTE FIREBASE CONFIG HERE 🔴
-    // ============================================
+        // ============================================
+        // 🔴 PASTE FIREBASE CONFIG HERE 🔴
+        // ============================================
  const firebaseConfig = {
   apiKey: "AIzaSyCu6cbaEw4BzXvF8rGx94h6WHarEFH9Z-k",
   authDomain: "coursesprogress-5658f.firebaseapp.com",
@@ -656,512 +367,380 @@
 };
 
 
-    // --- INIT FIREBASE ---
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const provider = new GoogleAuthProvider();
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
 
-    // --- APP STATE ---
-    let state = {
-        user: null,
-        todos: [],
-        courses: [],
-        focusId: null,
-        theme: 'light',
-        dailyGoal: 5
-    };
-    let selectedColor = 'blue';
-
-    // --- UTILS ---
-    const generateId = () => '_' + Math.random().toString(36).substr(2, 9);
-    const getEl = (id) => document.getElementById(id);
-    const colorMap = {
-        blue: 'var(--blue)',
-        purple: 'var(--purple)',
-        green: 'var(--green)',
-        orange: 'var(--orange)',
-        red: 'var(--red)'
-    };
-
-    // --- INITIALIZATION ---
-    function init() {
-        updateGreeting();
-        setInterval(updateGreeting, 60000);
-        
-        // Sidebar Logic (Mobile)
-        const sidebar = getEl('sidebar');
-        const overlay = getEl('sidebarOverlay');
-        
-        const openSidebar = () => {
-            sidebar.classList.add('open');
-            overlay.classList.add('active');
-            if(window.innerWidth < 900) getEl('sidebarClose').style.display = 'flex';
+        // --- STATE ---
+        let state = {
+            user: null,
+            todos: [],
+            courses: [],
+            focusId: null
         };
-        
-        const closeSidebar = () => {
-            sidebar.classList.remove('open');
-            overlay.classList.remove('active');
-        };
+        let selectedColor = 'blue';
 
-        if(getEl('fab')) getEl('fab').onclick = openSidebar;
-        if(getEl('sidebarClose')) getEl('sidebarClose').onclick = closeSidebar;
-        if(overlay) overlay.onclick = closeSidebar;
+        // --- DOM HELPER ---
+        const getEl = (id) => document.getElementById(id);
+        const generateId = () => '_' + Math.random().toString(36).substr(2, 9);
 
-        // Sortable Init
-        if(getEl('taskList')) {
-            new Sortable(getEl('taskList'), {
-                animation: 150,
-                ghostClass: 'sortable-ghost',
-                delay: 150, 
-                delayOnTouchOnly: true,
-                onEnd: (evt) => {
-                    if (state.todos.length > 0) {
-                        const item = state.todos.splice(evt.oldIndex, 1)[0];
-                        state.todos.splice(evt.newIndex, 0, item);
-                        saveData();
-                    }
-                }
-            });
+        // --- INIT ---
+        function init() {
+            // Update Date
+            const d = new Date();
+            getEl('currentDate').textContent = d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+            const h = d.getHours();
+            getEl('greeting').textContent = h < 12 ? 'Good Morning' : h < 18 ? 'Good Afternoon' : 'Good Evening';
+
+            // Mobile Sidebar
+            const sidebar = getEl('sidebar');
+            const overlay = getEl('sidebarOverlay');
+            
+            const openSidebar = () => {
+                sidebar.classList.add('open');
+                overlay.classList.add('active');
+                if(window.innerWidth < 900) getEl('sidebarClose').style.display = 'block';
+            };
+            
+            const closeSidebar = () => {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+            };
+
+            getEl('fab').onclick = openSidebar;
+            getEl('sidebarClose').onclick = closeSidebar;
+            overlay.onclick = closeSidebar;
+
+            // Sortable
+            new Sortable(getEl('activeTaskList'), { animation: 150, delay: 150, delayOnTouchOnly: true });
         }
-    }
 
-    const updateGreeting = () => {
-        const d = new Date();
-        if(getEl('currentDate')) getEl('currentDate').textContent = d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }).toUpperCase();
-        const h = d.getHours();
-        if(getEl('greeting')) getEl('greeting').textContent = h < 12 ? 'Good Morning' : h < 18 ? 'Good Afternoon' : 'Good Evening';
-    };
+        // --- AUTH ---
+        onAuthStateChanged(auth, (user) => {
+            getEl('loader').style.display = 'none';
+            if (user) {
+                state.user = user;
+                getEl('authArea').innerHTML = `
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <img src="${user.photoURL}" style="width:32px; height:32px; border-radius:50%;">
+                        <button class="btn btn-ghost" id="logoutBtn" style="padding:6px 12px; font-size:0.8rem;">Exit</button>
+                    </div>`;
+                getEl('logoutBtn').onclick = () => signOut(auth).then(() => location.reload());
 
-    // --- DATA MIGRATION (The Fix) ---
-    function migrateData(data) {
-        // Fix: Ensure courses have 'categories' array
-        if (data.courses && Array.isArray(data.courses)) {
-            data.courses = data.courses.map(c => {
-                // If it's an old course with 'lectures' but no 'categories'
-                if (!c.categories && (c.lectures || c.homeworks)) {
-                    console.log("Migrating old course structure...", c.name);
-                    
-                    const newCategories = [];
-                    
-                    // Convert old lectures to new Category
-                    if (c.lectures && c.lectures.length > 0) {
-                        newCategories.push({
-                            id: generateId(),
-                            name: 'Lectures',
-                            items: c.lectures.map(l => ({
-                                id: l.id || generateId(),
-                                name: l.name,
-                                completed: l.watched || false,
-                                note: ''
-                            }))
-                        });
-                    }
+                // Sync
+                onSnapshot(doc(db, 'users', user.uid), (docSnap) => {
+                    if (docSnap.exists()) {
+                        const d = docSnap.data();
+                        state.todos = d.todos || [];
+                        state.courses = migrateCourses(d.courses || []);
+                        state.focusId = d.focusId || null;
+                        renderAll();
+                    } else saveData();
+                });
+            } else {
+                getEl('loginBtn').onclick = () => signInWithPopup(auth, provider);
+            }
+        });
 
-                    // Convert old homework to new Category
-                    if (c.homeworks && c.homeworks.length > 0) {
-                        newCategories.push({
-                            id: generateId(),
-                            name: 'Assignments',
-                            items: c.homeworks.map(h => ({
-                                id: h.id || generateId(),
-                                name: h.description,
-                                completed: h.completed || false,
-                                note: ''
-                            }))
-                        });
-                    }
-
-                    // If empty, add default
-                    if (newCategories.length === 0) {
-                        newCategories.push({ id: generateId(), name: 'General', items: [] });
-                    }
-
-                    return { ...c, categories: newCategories };
-                }
-                
-                // If it's a new course but categories is missing
+        function migrateCourses(courses) {
+            // Ensure compatibility with new structure
+            return courses.map(c => {
                 if (!c.categories) {
-                    return { ...c, categories: [] };
+                    c.categories = [];
+                    // Migrate old props if they exist
+                    if(c.lectures) c.categories.push({ id: generateId(), name: 'Lectures', items: c.lectures.map(l => ({ id: generateId(), name: l.name, completed: l.watched || false }))});
+                    if(c.homeworks) c.categories.push({ id: generateId(), name: 'Homework', items: c.homeworks.map(h => ({ id: generateId(), name: h.description, completed: h.completed || false }))});
                 }
-                
                 return c;
             });
         }
-        return data;
-    }
 
-    // --- AUTHENTICATION & SYNC ---
-    onAuthStateChanged(auth, (user) => {
-        if(getEl('loading')) getEl('loading').style.display = 'none';
-        
-        if (user) {
-            state.user = user;
-            getEl('authArea').innerHTML = `
-                <div style="display:flex; align-items:center; gap:10px; background:rgba(125,125,125,0.1); padding:4px 12px 4px 4px; border-radius:50px;">
-                    <img src="${user.photoURL}" style="width:28px; height:28px; border-radius:50%;">
-                    <button class="btn btn-ghost btn-sm" id="logoutBtn" style="border:none; padding:4px 8px;">Exit</button>
-                </div>`;
-            getEl('logoutBtn').onclick = () => signOut(auth).then(() => location.reload());
-
-            // Database Sync
-            onSnapshot(doc(db, 'users', user.uid), (docSnap) => {
-                if (docSnap.exists()) {
-                    let d = docSnap.data();
-                    
-                    // Run Migration to fix old data
-                    d = migrateData(d);
-
-                    state.todos = d.todos || [];
-                    state.courses = d.courses || [];
-                    state.focusId = d.focusId || null;
-                    renderAll();
-                } else {
-                    saveData(); // Init new user
-                }
-            });
-        } else {
-            getEl('loginBtn').onclick = () => signInWithPopup(auth, provider);
+        async function saveData() {
+            if (!state.user) return;
+            const cleanData = {
+                todos: state.todos,
+                courses: state.courses,
+                focusId: state.focusId || null,
+                lastUpdated: new Date().toISOString()
+            };
+            await setDoc(doc(db, 'users', state.user.uid), cleanData, { merge: true });
         }
-    });
 
-    async function saveData() {
-        if (!state.user) return;
-        const cleanState = {
-            todos: state.todos,
-            courses: state.courses,
-            focusId: state.focusId || null,
-            lastUpdated: new Date().toISOString()
-        };
-        await setDoc(doc(db, 'users', state.user.uid), cleanState, { merge: true });
-    }
+        // --- RENDER ---
+        function renderAll() {
+            renderTasks();
+            renderFocus();
+            renderCourses();
+        }
 
-    // --- RENDER ENGINE ---
-    function renderAll() {
-        renderTasks();
-        renderFocus();
-        renderCourses();
-        updateProgress();
-    }
+        // 1. Tasks (Collapsible Split)
+        function renderTasks() {
+            const activeList = getEl('activeTaskList');
+            const completedList = getEl('completedTaskList');
+            activeList.innerHTML = '';
+            completedList.innerHTML = '';
 
-    // 1. Task List
-    function renderTasks() {
-        const container = getEl('taskList');
-        container.innerHTML = '';
-        
-        if (state.todos.length === 0) {
-            getEl('emptyTasks').classList.remove('hidden');
-        } else {
-            getEl('emptyTasks').classList.add('hidden');
-            
+            const colors = { blue: 'var(--blue)', purple: 'var(--purple)', orange: 'var(--orange)', green: 'var(--green)', red: 'var(--red)' };
+
             state.todos.forEach(t => {
                 const div = document.createElement('div');
                 div.className = 'task-item';
-                const c = colorMap[t.color] || colorMap.blue;
-                div.style.borderLeft = `4px solid ${c}`;
+                const c = colors[t.color] || colors.blue;
+                if(!t.completed) div.style.borderLeft = `4px solid ${c}`;
                 
                 div.innerHTML = `
-                    <div class="check-circle ${t.completed ? 'checked' : ''}" style="${t.completed ? `background:${c}; border-color:${c}` : ''}">
-                        ${t.completed ? '✓' : ''}
+                    <div class="check-circle ${t.completed?'checked':''}" style="${t.completed?`background:${c};border-color:${c}`:''}" onclick="window.toggleTask('${t.id}')">
+                        ${t.completed?'✓':''}
                     </div>
                     <div style="flex:1;">
-                        <div style="font-weight:600; font-size:0.95rem; ${t.completed ? 'text-decoration:line-through; opacity:0.6;' : ''}">${t.text}</div>
-                        ${t.due ? `<div style="font-size:0.75rem; color:var(--text-secondary); margin-top:2px;">Due ${new Date(t.due).toLocaleDateString()}</div>` : ''}
+                        <div style="font-weight:600; font-size:0.95rem; ${t.completed?'text-decoration:line-through; opacity:0.5;':''}">${t.text}</div>
+                        ${t.due ? `<div style="font-size:0.75rem; color:var(--text-secondary);">Due ${new Date(t.due).toLocaleDateString()}</div>` : ''}
                     </div>
-                    <button class="btn-icon task-focus-btn" title="Focus" style="font-size:1.2rem;">🎯</button>
-                    <button class="btn-icon task-del-btn" style="color:var(--red); font-size:1.2rem;">✕</button>
+                    ${!t.completed ? `<button class="btn-icon" onclick="window.setFocus('${t.id}')">🎯</button>` : ''}
+                    <button class="btn-icon" style="color:var(--red);" onclick="window.deleteTask('${t.id}')">✕</button>
                 `;
 
-                div.querySelector('.check-circle').onclick = () => toggleTask(t.id);
-                div.querySelector('.task-focus-btn').onclick = () => setFocus(t.id);
-                div.querySelector('.task-del-btn').onclick = () => deleteTask(t.id);
-
-                container.appendChild(div);
+                if (t.completed) completedList.appendChild(div);
+                else activeList.appendChild(div);
             });
         }
-    }
 
-    // 2. Focus Hero
-    function renderFocus() {
-        const t = state.todos.find(x => x.id === state.focusId);
-        const section = getEl('focusSection');
-        
-        // Reset border
-        section.style.borderLeft = 'none';
-
-        if (!t || t.completed) {
-            section.innerHTML = `
-                <div style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; opacity:0.6;">
-                    <h3>No Active Focus</h3>
-                    <p>Select a task to focus on.</p>
-                </div>`;
-        } else {
-            const c = colorMap[t.color] || colorMap.blue;
-            section.innerHTML = `
-                <div style="position:absolute; left:0; top:0; bottom:0; width:6px; background:${c};"></div>
-                <div>
-                    <div style="font-size:0.75rem; font-weight:700; color:${c}; margin-bottom:12px; letter-spacing:1px;">CURRENT FOCUS</div>
-                    <div style="font-size:2rem; font-weight:700; line-height:1.2;">${t.text}</div>
-                    ${t.due ? `<div style="color:var(--text-secondary); margin-top:8px;">Due: ${new Date(t.due).toDateString()}</div>` : ''}
-                </div>
-                <div style="text-align:right; margin-top:20px;">
-                    <button id="completeFocusBtn" class="btn" style="background:${c}; color:white;">Mark Complete</button>
-                </div>
-            `;
-            getEl('completeFocusBtn').onclick = () => toggleTask(t.id);
-        }
-    }
-
-    // 3. Dynamic Courses
-    function renderCourses() {
-        const con = getEl('coursesContainer');
-        const empty = getEl('emptyCourses');
-        
-        if(!state.courses || state.courses.length === 0) { 
-            con.innerHTML = ''; 
-            empty.style.display='block'; 
-            return; 
-        }
-        empty.style.display = 'none';
-
-        con.innerHTML = state.courses.map(course => {
-            // Safety check for categories
-            const categories = course.categories || [];
+        // 2. Focus
+        function renderFocus() {
+            const t = state.todos.find(x => x.id === state.focusId);
+            const card = getEl('focusCard');
             
-            const catsHTML = categories.map(cat => {
-                const itemsHTML = (cat.items || []).map(item => `
-                    <div class="item-row">
-                        <div class="item-main">
-                            <div class="check-circle ${item.completed?'checked':''}" onclick="window.toggleItem('${course.id}', '${cat.id}', '${item.id}')">✓</div>
-                            <div style="flex:1; ${item.completed?'text-decoration:line-through;opacity:0.6':''}">${item.name}</div>
-                            <button class="btn-icon" style="width:24px;height:24px;" onclick="document.getElementById('note-${item.id}').classList.toggle('open')">📝</button>
-                            <button class="btn-icon" style="width:24px;height:24px;color:var(--red);" onclick="window.deleteItem('${course.id}', '${cat.id}', '${item.id}')">✕</button>
-                        </div>
-                        <div id="note-${item.id}" class="note-container ${item.note?'open':''}">
-                            <textarea class="note-textarea" placeholder="Add notes..." onblur="window.saveNote('${course.id}', '${cat.id}', '${item.id}', this.value)">${item.note || ''}</textarea>
-                        </div>
-                    </div>
-                `).join('');
+            // Clear styles
+            card.style.background = 'var(--glass-material)';
+            card.style.color = 'var(--text-primary)';
 
-                return `
-                    <div class="category-block">
-                        <div class="category-header">
-                            <span>${cat.name}</span>
-                            <button class="btn btn-ghost btn-sm" onclick="window.addItem('${course.id}', '${cat.id}')" style="padding:2px 8px; font-size:0.7rem;">+ Item</button>
-                        </div>
-                        ${itemsHTML}
+            if (!t || t.completed) {
+                card.innerHTML = `
+                    <div style="opacity:0.6;">
+                        <h3>No Focus Set</h3>
+                        <p>Select a task from the list.</p>
+                    </div>`;
+            } else {
+                const colors = { blue: 'var(--blue)', purple: 'var(--purple)', orange: 'var(--orange)', green: 'var(--green)', red: 'var(--red)' };
+                const c = colors[t.color] || colors.blue;
+                
+                card.style.background = c;
+                card.style.color = '#FFF';
+                
+                card.innerHTML = `
+                    <div style="text-align:left; width:100%;">
+                        <div style="font-size:0.8rem; font-weight:700; opacity:0.8; letter-spacing:1px; margin-bottom:8px;">CURRENT FOCUS</div>
+                        <div style="font-size:2rem; font-weight:700; line-height:1.1;">${t.text}</div>
+                        ${t.due ? `<div style="margin-top:8px; opacity:0.9;">Due: ${new Date(t.due).toDateString()}</div>` : ''}
+                    </div>
+                    <div style="margin-top:20px; width:100%; display:flex; justify-content:flex-end;">
+                        <button class="btn" style="background:white; color:${c}; border:none;" onclick="window.toggleTask('${t.id}')">Complete</button>
                     </div>
                 `;
-            }).join('');
+            }
+        }
 
-            return `
-            <div class="course-card">
-                <div class="course-header" onclick="this.parentElement.classList.toggle('open')">
+        // 3. Dynamic Courses
+        function renderCourses() {
+            const container = getEl('coursesContainer');
+            container.innerHTML = '';
+
+            state.courses.forEach(course => {
+                const card = document.createElement('div');
+                card.className = 'course-card';
+                
+                // Header
+                const header = document.createElement('div');
+                header.className = 'course-header';
+                header.innerHTML = `
                     <span style="font-weight:600; font-size:1.1rem;">${course.name}</span>
-                    <span style="font-size:1.2rem; opacity:0.5;">⌄</span>
-                </div>
-                <div class="course-body">
-                    ${catsHTML}
-                    <div style="margin-top:24px; display:flex; gap:10px;">
-                        <button class="btn btn-ghost btn-sm" onclick="window.addCategory('${course.id}')">+ Category</button>
-                        <button class="btn btn-ghost btn-sm" style="color:var(--red); border-color:rgba(255,59,48,0.3);" onclick="window.deleteCourse('${course.id}')">Delete Course</button>
-                    </div>
-                </div>
-            </div>`;
-        }).join('');
-    }
+                    <span style="opacity:0.4;">▼</span>
+                `;
+                header.onclick = () => card.classList.toggle('open');
 
-    function updateProgress() {
-        const total = state.todos.length;
-        const completed = state.todos.filter(t => t.completed).length;
-        const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
-        
-        if(getEl('progressText')) getEl('progressText').textContent = `${completed}/${total} Tasks`;
-        if(getEl('progressPercent')) getEl('progressPercent').textContent = `${percent}%`;
-        if(getEl('progressBar')) getEl('progressBar').style.width = `${percent}%`;
-    }
+                // Body
+                const body = document.createElement('div');
+                body.className = 'course-body';
 
-    // --- GLOBAL ACTIONS (Window Binding) ---
+                // Render Categories
+                course.categories.forEach(cat => {
+                    const block = document.createElement('div');
+                    block.className = 'cat-block';
+                    
+                    block.innerHTML = `
+                        <div class="cat-header">
+                            <span>${cat.name}</span>
+                            <button class="btn-icon" style="width:24px;height:24px;" onclick="window.toggleInput('new-item-${cat.id}')">＋</button>
+                        </div>
+                        
+                        <div id="new-item-${cat.id}" class="input-row">
+                            <input type="text" class="input-inline" placeholder="New Item Name..." onkeydown="window.handleItemEnter(event, '${course.id}', '${cat.id}')">
+                        </div>
+                    `;
 
-    // Task Actions
-    window.setColor = (c, el) => {
-        document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected'));
-        el.classList.add('selected');
-        selectedColor = c;
-    };
+                    // Items
+                    cat.items.forEach(item => {
+                        const row = document.createElement('div');
+                        row.className = 'item-row';
+                        row.innerHTML = `
+                            <div class="item-top">
+                                <div class="check-circle ${item.completed?'checked':''}" onclick="window.toggleItem('${course.id}', '${cat.id}', '${item.id}')">✓</div>
+                                <span class="item-name">${item.name}</span>
+                                <button class="btn-icon" style="width:24px;height:24px;" onclick="document.getElementById('note-${item.id}').classList.toggle('open')">📝</button>
+                                <button class="btn-icon" style="width:24px;height:24px; color:var(--red);" onclick="window.deleteItem('${course.id}', '${cat.id}', '${item.id}')">✕</button>
+                            </div>
+                            <div id="note-${item.id}" class="note-wrapper ${item.note?'open':''}">
+                                <textarea class="note-input" placeholder="Add a note..." onblur="window.saveNote('${course.id}', '${cat.id}', '${item.id}', this.value)">${item.note || ''}</textarea>
+                            </div>
+                        `;
+                        block.appendChild(row);
+                    });
 
-    getEl('addTaskForm').onsubmit = (e) => {
-        e.preventDefault();
-        const input = getEl('taskInput');
-        const date = getEl('taskDate');
-        if (input.value.trim()) {
-            state.todos.unshift({
-                id: generateId(),
-                text: input.value.trim(),
-                color: selectedColor,
-                due: date.value,
-                completed: false,
-                createdAt: new Date().toISOString()
+                    body.appendChild(block);
+                });
+
+                // Footer Actions (Add Category / Delete)
+                const footer = document.createElement('div');
+                footer.style.marginTop = '24px';
+                footer.style.display = 'flex';
+                footer.style.justifyContent = 'space-between';
+                footer.innerHTML = `
+                    <button class="btn btn-ghost" style="padding:6px 12px; font-size:0.8rem;" onclick="window.toggleInput('new-cat-${course.id}')">+ Category</button>
+                    <button class="btn-icon" style="color:var(--red);" onclick="window.deleteCourse('${course.id}')">🗑</button>
+                `;
+                
+                // Hidden Category Input
+                const catInput = document.createElement('div');
+                catInput.id = `new-cat-${course.id}`;
+                catInput.className = 'input-row';
+                catInput.style.marginBottom = '10px';
+                catInput.innerHTML = `<input type="text" class="input-inline" placeholder="Category Name (e.g. Week 1)" onkeydown="window.handleCatEnter(event, '${course.id}')">`;
+
+                body.appendChild(catInput);
+                body.appendChild(footer);
+                card.appendChild(header);
+                card.appendChild(body);
+                container.appendChild(card);
             });
-            input.value = '';
-            if (!state.focusId) state.focusId = state.todos[0].id;
-            saveData();
-            renderAll(); 
         }
-    };
 
-    window.toggleTask = (id) => {
-        const t = state.todos.find(x => x.id === id);
-        if (t) {
+        // --- GLOBAL ACTIONS (Window Binding) ---
+        window.setColor = (c, el) => {
+            document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedColor = c;
+        };
+
+        getEl('addTaskForm').onsubmit = (e) => {
+            e.preventDefault();
+            const txt = getEl('taskInput').value.trim();
+            if(txt) {
+                state.todos.unshift({
+                    id: generateId(), text: txt, color: selectedColor,
+                    completed: false, due: getEl('taskDate').value,
+                    createdAt: new Date().toISOString()
+                });
+                getEl('taskInput').value = '';
+                if(!state.focusId) state.focusId = state.todos[0].id;
+                saveData(); renderAll();
+            }
+        };
+
+        // Toggle Sections
+        window.toggleSection = (el) => {
+            el.classList.toggle('collapsed');
+        };
+
+        // Task Ops
+        window.toggleTask = (id) => {
+            const t = state.todos.find(x => x.id === id);
             t.completed = !t.completed;
-            if (t.completed) {
-                confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 } });
-                if (state.focusId === id) state.focusId = null;
+            if(t.completed) {
+                confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
+                if(state.focusId === id) state.focusId = null;
             }
-            saveData();
-            renderAll();
-        }
-    };
+            saveData(); renderAll();
+        };
+        window.deleteTask = (id) => { state.todos = state.todos.filter(x=>x.id!==id); saveData(); renderAll(); };
+        window.setFocus = (id) => { state.focusId = id; saveData(); renderAll(); 
+            if(window.innerWidth < 900) { getEl('sidebar').classList.remove('open'); getEl('sidebarOverlay').classList.remove('active'); }
+        };
 
-    window.deleteTask = (id) => {
-        state.todos = state.todos.filter(x => x.id !== id);
-        if (state.focusId === id) state.focusId = null;
-        saveData();
-        renderAll();
-    };
+        // Input Toggles
+        window.toggleInput = (id) => {
+            const el = getEl(id);
+            el.classList.toggle('visible');
+            if(el.classList.contains('visible')) el.querySelector('input').focus();
+        };
 
-    window.setFocus = (id) => {
-        state.focusId = id;
-        saveData();
-        renderAll();
-        // Close sidebar on mobile if open
-        if(window.innerWidth < 900) {
-            getEl('sidebar').classList.remove('open');
-            getEl('sidebarOverlay').classList.remove('active');
-        }
-    };
-
-    // Course Actions
-    window.addCourse = () => {
-        const name = prompt("Course Name (e.g. Physics 101):");
-        if (name) {
-            state.courses.push({
-                id: generateId(),
-                name: name,
-                categories: [
-                    { id: generateId(), name: 'Lectures', items: [] },
-                    { id: generateId(), name: 'Assignments', items: [] }
-                ]
-            });
-            saveData();
-            renderCourses();
-        }
-    };
-
-    window.deleteCourse = (cid) => {
-        if(confirm('Delete this entire course?')) {
-            state.courses = state.courses.filter(c => c.id !== cid);
-            saveData();
-            renderCourses();
-        }
-    };
-
-    window.addCategory = (cid) => {
-        const name = prompt("New Category Name (e.g. Labs, Week 1):");
-        if(name) {
-            const course = state.courses.find(c => c.id === cid);
-            course.categories.push({ id: generateId(), name: name, items: [] });
-            saveData();
-            renderCourses();
-        }
-    };
-
-    window.addItem = (cid, catId) => {
-        const name = prompt("Item Name:");
-        if(name) {
-            const course = state.courses.find(c => c.id === cid);
-            const cat = course.categories.find(c => c.id === catId);
-            cat.items.push({ id: generateId(), name: name, completed: false, note: '' });
-            saveData();
-            renderCourses();
-        }
-    };
-
-    window.toggleItem = (cid, catId, itemId) => {
-        const course = state.courses.find(c => c.id === cid);
-        const cat = course.categories.find(c => c.id === catId);
-        const item = cat.items.find(i => i.id === itemId);
-        item.completed = !item.completed;
-        saveData();
-        renderCourses();
-    };
-
-    window.saveNote = (cid, catId, itemId, text) => {
-        const course = state.courses.find(c => c.id === cid);
-        const cat = course.categories.find(c => c.id === catId);
-        const item = cat.items.find(i => i.id === itemId);
-        if(item.note !== text) {
-            item.note = text;
-            saveData();
-        }
-    };
-    
-    window.deleteItem = (cid, catId, itemId) => {
-         const course = state.courses.find(c => c.id === cid);
-         const cat = course.categories.find(c => c.id === catId);
-         cat.items = cat.items.filter(i => i.id !== itemId);
-         saveData();
-         renderCourses();
-    };
-
-    // --- TIMER LOGIC ---
-    let timer, timeLeft, isRunning = false;
-    
-    window.toggleTimerSettings = () => getEl('timerSettings').classList.toggle('hidden');
-    
-    if(getEl('startTimer')) {
-        getEl('startTimer').onclick = function() {
-            if(isRunning) {
-                clearInterval(timer); isRunning=false; this.textContent = "Start";
-            } else {
-                if(!timeLeft) timeLeft = getEl('workDur').value * 60;
-                isRunning = true; this.textContent = "Pause";
-                timer = setInterval(() => {
-                    if(timeLeft > 0) {
-                        timeLeft--;
-                        const m = Math.floor(timeLeft/60).toString().padStart(2,'0');
-                        const s = (timeLeft%60).toString().padStart(2,'0');
-                        getEl('timerDisplay').innerText = `${m}:${s}`;
-                    } else {
-                        clearInterval(timer); isRunning = false; this.textContent = "Start";
-                        alert("Timer finished!");
-                    }
-                }, 1000);
+        // Course Ops
+        window.addCourse = () => {
+            const input = getEl('newCourseInput');
+            if(input.value.trim()) {
+                state.courses.push({ id: generateId(), name: input.value.trim(), categories: [] });
+                input.value = '';
+                window.toggleInput('newCourseRow');
+                saveData(); renderCourses();
             }
         };
-    }
-    
-    if(getEl('resetTimer')) {
-        getEl('resetTimer').onclick = () => {
-            clearInterval(timer); isRunning = false;
-            timeLeft = getEl('workDur').value * 60;
-            getEl('timerDisplay').innerText = `${Math.floor(timeLeft/60).toString().padStart(2,'0')}:00`;
-            getEl('startTimer').textContent = "Start";
-        };
-    }
+        window.handleEnter = (e, func) => { if(e.key === 'Enter') func(); };
 
-    // --- THEME LOGIC ---
-    if(getEl('themeToggle')) {
+        window.deleteCourse = (cid) => {
+            if(confirm("Delete course?")) { state.courses = state.courses.filter(c=>c.id!==cid); saveData(); renderCourses(); }
+        };
+
+        // Category Ops
+        window.handleCatEnter = (e, cid) => {
+            if(e.key === 'Enter' && e.target.value.trim()) {
+                state.courses.find(c=>c.id===cid).categories.push({ id: generateId(), name: e.target.value.trim(), items: [] });
+                e.target.value = '';
+                window.toggleInput(`new-cat-${cid}`);
+                saveData(); renderCourses();
+            }
+        };
+
+        // Item Ops
+        window.handleItemEnter = (e, cid, catId) => {
+            if(e.key === 'Enter' && e.target.value.trim()) {
+                const course = state.courses.find(c=>c.id===cid);
+                const cat = course.categories.find(c=>c.id===catId);
+                cat.items.push({ id: generateId(), name: e.target.value.trim(), completed: false, note: '' });
+                e.target.value = '';
+                window.toggleInput(`new-item-${catId}`);
+                saveData(); renderCourses();
+            }
+        };
+
+        window.toggleItem = (cid, catId, itemId) => {
+            const cat = state.courses.find(c=>c.id===cid).categories.find(c=>c.id===catId);
+            const item = cat.items.find(i=>i.id===itemId);
+            item.completed = !item.completed;
+            saveData(); renderCourses();
+        };
+
+        window.deleteItem = (cid, catId, itemId) => {
+            const cat = state.courses.find(c=>c.id===cid).categories.find(c=>c.id===catId);
+            cat.items = cat.items.filter(i=>i.id!==itemId);
+            saveData(); renderCourses();
+        };
+
+        window.saveNote = (cid, catId, itemId, txt) => {
+            const cat = state.courses.find(c=>c.id===cid).categories.find(c=>c.id===catId);
+            const item = cat.items.find(i=>i.id===itemId);
+            if(item.note !== txt) { item.note = txt; saveData(); }
+        };
+
+        // Theme
         getEl('themeToggle').onclick = () => {
             document.body.classList.toggle('dark-mode');
-            localStorage.setItem('studySparkTheme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+            localStorage.setItem('studySparkTheme', document.body.classList.contains('dark-mode')?'dark':'light');
         };
-    }
-    if(localStorage.getItem('studySparkTheme') === 'dark') document.body.classList.add('dark-mode');
+        if(localStorage.getItem('studySparkTheme')==='dark') document.body.classList.add('dark-mode');
 
-    // Start
-    init();
+        // Start
+        init();
 
-  </script>
+    </script>
 </body>
 </html>
