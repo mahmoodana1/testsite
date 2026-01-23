@@ -3,341 +3,272 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>Study Spark</title>
+  <title>Study Spark Ultimate</title>
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
   <style>
     :root {
-      /* Apple-style Palette (Light Mode) */
-      --bg-body: #F5F5F7; /* Apple Off-White */
-      --card-bg: rgba(255, 255, 255, 0.65); /* Translucent */
+      /* Apple-style Palette (Light) */
+      --bg-body: #F2F2F7; /* System Gray 6 */
+      --card-glass: rgba(255, 255, 255, 0.65); /* Faint Glass */
       --card-solid: #FFFFFF;
-      --text-primary: #1D1D1F; /* Almost Black */
-      --text-secondary: #86868B;
+      --text-primary: #000000;
+      --text-secondary: #8E8E93;
+      --divider: rgba(60, 60, 67, 0.1);
       
-      /* Accents (Solid, No Gradients) */
-      --accent-blue: #007AFF;
-      --accent-purple: #5856D6;
-      --accent-green: #34C759;
-      --accent-orange: #FF9500;
-      --accent-red: #FF3B30;
+      /* Solid Accents */
+      --blue: #007AFF;
+      --purple: #5856D6;
+      --green: #34C759;
+      --orange: #FF9500;
+      --red: #FF3B30;
       
-      /* Glassmorphism */
-      --blur: 30px;
-      --border: 1px solid rgba(0, 0, 0, 0.05);
-      --shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
-      --radius: 24px;
+      /* Glass Props */
+      --blur: 25px;
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+      --radius: 20px;
     }
 
     body.dark-mode {
-      /* Apple-style Palette (Dark Mode) */
       --bg-body: #000000;
-      --card-bg: rgba(28, 28, 30, 0.65);
+      --card-glass: rgba(28, 28, 30, 0.65);
       --card-solid: #1C1C1E;
-      --text-primary: #F5F5F7;
-      --text-secondary: #86868B;
-      --border: 1px solid rgba(255, 255, 255, 0.1);
-      --shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+      --text-primary: #FFFFFF;
+      --text-secondary: #98989D;
+      --divider: rgba(84, 84, 88, 0.35);
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; user-select: none; }
     
     body {
       margin: 0;
-      /* System Fonts Stack (San Francisco, Segoe UI, Roboto) */
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       background-color: var(--bg-body);
       color: var(--text-primary);
-      transition: background 0.4s ease;
+      transition: background 0.3s ease;
       min-height: 100vh;
-      overflow-x: hidden;
-      padding-bottom: 80px;
+      padding-bottom: 100px;
     }
 
-    /* --- Animations --- */
-    @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-    .animate-in { animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+    /* --- Typography & Buttons --- */
+    h1 { font-size: 2rem; font-weight: 700; letter-spacing: -0.5px; margin: 0; }
+    h2 { font-size: 1.3rem; font-weight: 600; margin: 0; }
+    h3 { font-size: 1rem; font-weight: 600; margin: 0; }
+    
+    .btn {
+      background: var(--text-primary); color: var(--bg-body);
+      border: none; padding: 10px 18px; border-radius: 12px;
+      font-size: 0.9rem; font-weight: 600; cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+    .btn:active { transform: scale(0.96); }
+    .btn-ghost { background: transparent; color: var(--text-secondary); border: 1px solid var(--divider); }
+    .btn-icon { width: 32px; height: 32px; padding: 0; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; }
+    .btn-sm { padding: 6px 12px; font-size: 0.8rem; border-radius: 8px; }
 
     /* --- Layout --- */
     .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 20px;
+      max-width: 1400px; margin: 0 auto; padding: 20px;
+      display: grid; gap: 24px;
     }
-
-    /* PC Layout: Sidebar on Left, Content on Right */
-    @media (min-width: 900px) {
+    
+    /* Responsive Desktop */
+    @media (min-width: 1024px) {
       .container {
-        grid-template-columns: 350px 1fr; /* Fixed Sidebar, Flexible Content */
-        align-items: start;
+        grid-template-columns: 350px 1fr;
         padding: 40px;
+        align-items: start;
       }
-      /* Hide Mobile FAB on PC */
-      .fab { display: none !important; }
-      /* Sidebar is always visible on PC */
       .sidebar {
-        position: sticky !important;
-        top: 40px;
-        transform: none !important;
-        width: 100% !important;
-        height: calc(100vh - 80px) !important;
+        position: sticky !important; top: 40px; transform: none !important;
+        width: 100% !important; height: calc(100vh - 80px) !important;
+        background: var(--card-glass) !important; border-radius: var(--radius) !important;
+        backdrop-filter: blur(var(--blur)); -webkit-backdrop-filter: blur(var(--blur));
         box-shadow: none !important;
-        background: var(--card-bg) !important;
-        border: var(--border) !important;
-        border-radius: var(--radius) !important;
         z-index: 1 !important;
       }
-      .sidebar-overlay { display: none !important; }
-      #sidebarClose { display: none; }
+      .fab, #sidebarClose { display: none !important; }
     }
 
-    /* --- Cards (The "Glass" Look) --- */
-    .glass-panel {
-      background: var(--card-bg);
+    /* --- Glass Components --- */
+    .glass-box {
+      background: var(--card-glass);
       backdrop-filter: blur(var(--blur));
       -webkit-backdrop-filter: blur(var(--blur));
-      border: var(--border);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
-      padding: 24px;
-      transition: transform 0.2s;
+      /* Faint Border for depth */
+      border: 1px solid rgba(255, 255, 255, 0.1); 
     }
     
-    .glass-panel:hover {
-      transform: translateY(-2px); /* Lively hover effect */
+    .card-solid {
+      background: var(--card-solid);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
     }
 
-    /* --- Typography --- */
-    h1 { font-size: 2.5rem; font-weight: 700; letter-spacing: -0.02em; margin: 0; }
-    h2 { font-size: 1.2rem; font-weight: 600; margin: 0 0 16px 0; letter-spacing: -0.01em; }
-    h3 { font-size: 1rem; font-weight: 600; margin: 0; }
-    .subtitle { color: var(--text-secondary); font-size: 0.9rem; margin-top: 4px; font-weight: 500; }
-
-    /* --- Buttons --- */
-    .btn {
-      border: none;
-      background: var(--text-primary);
-      color: var(--bg-body);
-      padding: 12px 20px;
-      border-radius: 12px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: opacity 0.2s, transform 0.1s;
-      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-    }
-    .btn:active { transform: scale(0.96); }
-    .btn:hover { opacity: 0.8; }
-    
-    .btn-ghost { background: transparent; color: var(--text-secondary); border: 1px solid rgba(128,128,128,0.2); }
-    .btn-ghost:hover { background: rgba(128,128,128,0.1); color: var(--text-primary); }
-    
-    .btn-icon { width: 36px; height: 36px; padding: 0; border-radius: 50%; }
-
-    /* --- Inputs --- */
-    .input-group {
-      background: rgba(128,128,128,0.08);
-      border-radius: 14px;
-      padding: 4px;
-      display: flex;
-      align-items: center;
-      border: 1px solid transparent;
-      transition: background 0.2s, border-color 0.2s;
-    }
-    .input-group:focus-within { background: var(--bg-body); border-color: var(--accent-blue); }
-    
-    .input-clean {
-      background: transparent; border: none; padding: 10px; font-size: 1rem;
-      color: var(--text-primary); font-family: inherit; width: 100%;
-    }
-    
-    /* Date Picker Styling */
-    input[type="date"] {
-        border: none; background: transparent; color: var(--text-secondary);
-        font-family: inherit; font-size: 0.85rem; padding: 0 8px; cursor: pointer;
-    }
-    
-    /* --- Specific Components --- */
-
-    /* 1. Sidebar Task List */
+    /* --- Sidebar: Tasks --- */
     .sidebar {
       position: fixed; inset: 0; z-index: 1000;
       background: var(--bg-body);
-      transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+      transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
       display: flex; flex-direction: column; padding: 24px;
     }
     .sidebar.open { transform: translateY(0); }
-    
-    .task-item {
-      background: var(--card-solid);
-      padding: 16px; border-radius: 16px; margin-bottom: 10px;
-      display: flex; align-items: center; gap: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-      border: var(--border);
+
+    .input-clean {
+      width: 100%; padding: 12px; border: none; background: rgba(120,120,120,0.1);
+      border-radius: 10px; font-size: 1rem; color: var(--text-primary);
+      margin-bottom: 10px;
     }
-    
-    /* Custom Checkbox */
-    .check-circle {
-      width: 24px; height: 24px; border-radius: 50%;
-      border: 2px solid var(--text-secondary);
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      transition: all 0.2s;
-    }
-    .check-circle.checked {
-      background: var(--accent-green); border-color: var(--accent-green);
-      color: white; font-size: 14px;
+    input[type="date"] {
+      font-family: inherit; color: var(--text-secondary); background: transparent; border: none;
     }
 
-    /* 2. Current Focus Card (Hero) */
+    /* Task Item */
+    .task-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px; background: var(--card-solid);
+      border-radius: 14px; margin-bottom: 8px;
+      transition: transform 0.2s;
+      border-left: 4px solid transparent;
+    }
+    .check-circle {
+      width: 22px; height: 22px; border-radius: 50%;
+      border: 2px solid var(--text-secondary);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .check-circle.checked { background: var(--green); border-color: var(--green); color: white; font-size: 14px; }
+
+    /* --- Main Dashboard --- */
     .focus-card {
-      min-height: 250px;
+      min-height: 220px; padding: 30px;
       display: flex; flex-direction: column; justify-content: space-between;
       position: relative; overflow: hidden;
       background: var(--card-solid);
     }
-    /* Accent Bar on the left */
     .focus-card::before {
       content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px;
-      background: var(--accent-blue);
+      background: var(--blue);
     }
-    .focus-label { text-transform: uppercase; font-size: 0.75rem; letter-spacing: 2px; color: var(--accent-blue); font-weight: 700; margin-bottom: 12px; }
-    .focus-title { font-size: 2.2rem; line-height: 1.1; font-weight: 700; }
     
-    /* 3. Pomodoro */
-    .pomodoro-section { text-align: center; }
-    .timer-large { font-size: 4rem; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -2px; margin: 10px 0; }
+    /* --- Dynamic Courses --- */
+    .course-card {
+      background: var(--card-solid);
+      border-radius: 18px; margin-bottom: 24px;
+      overflow: hidden;
+      transition: box-shadow 0.2s;
+    }
+    .course-header {
+      padding: 20px; display: flex; justify-content: space-between; align-items: center;
+      cursor: pointer; background: rgba(120,120,120,0.03);
+    }
+    .course-body { padding: 0 20px 20px 20px; display: none; }
+    .course-card.open .course-body { display: block; animation: slideDown 0.3s ease; }
     
-    /* 4. Courses */
-    .course-row {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 16px; border-bottom: 1px solid rgba(128,128,128,0.1);
-      cursor: pointer;
+    .category-block { margin-top: 24px; }
+    .category-header { 
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;
+      color: var(--text-secondary); margin-bottom: 12px; font-weight: 700;
     }
-    .course-row:last-child { border-bottom: none; }
-    .progress-pill {
-      background: rgba(128,128,128,0.1); color: var(--text-primary);
-      padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;
+    
+    .item-row {
+      display: flex; flex-direction: column;
+      padding: 12px 0; border-bottom: 1px solid var(--divider);
     }
-
-    /* --- Utilities --- */
+    .item-main { display: flex; align-items: center; gap: 12px; }
+    .note-area {
+      width: 100%; margin-top: 10px; padding: 10px;
+      background: rgba(120,120,120,0.05); border: none; border-radius: 8px;
+      color: var(--text-primary); font-family: inherit; font-size: 0.9rem;
+      resize: vertical; min-height: 60px;
+    }
+    
+    /* --- Utils --- */
     .fab {
       position: fixed; bottom: 24px; right: 24px;
-      width: 60px; height: 60px; border-radius: 30px;
+      width: 56px; height: 56px; border-radius: 28px;
       background: var(--text-primary); color: var(--bg-body);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-      border: none; font-size: 24px; cursor: pointer; z-index: 900;
+      border: none; font-size: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      z-index: 200; cursor: pointer; display: flex; align-items: center; justify-content: center;
     }
-    .hidden { display: none !important; }
-    
-    /* Profile in Header */
-    .profile-pill {
-        background: rgba(128,128,128,0.1); padding: 4px 12px 4px 4px;
-        border-radius: 50px; display: flex; align-items: center; gap: 8px;
-        font-size: 0.9rem; font-weight: 500;
-    }
-
-    /* Color Dots */
-    .color-dot { width: 20px; height: 20px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
+    .color-dot { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
     .color-dot.selected { transform: scale(1.2); border-color: var(--text-primary); }
+    .hidden { display: none !important; }
+    @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
   </style>
 </head>
 <body>
 
-  <div id="authOverlay" style="position:fixed; inset:0; background:var(--bg-body); z-index:2000; display:flex; align-items:center; justify-content:center;">
-     <h3>Loading Workspace...</h3>
+  <div id="loading" style="position:fixed; inset:0; background:var(--bg-body); z-index:9999; display:flex; align-items:center; justify-content:center;">
+    <h3>Loading Spark...</h3>
   </div>
 
   <div class="container">
     
     <aside id="sidebar" class="sidebar">
-       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
-          <h2>Tasks</h2>
-          <button class="btn btn-ghost btn-icon" id="sidebarClose" style="display:block;">✕</button>
-       </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h1>Tasks</h1>
+        <button id="sidebarClose" class="btn btn-ghost btn-icon">✕</button>
+      </div>
 
-       <form id="addTodoForm" style="margin-bottom: 24px;">
-          <div class="input-group">
-              <input type="text" id="todoInput" class="input-clean" placeholder="Add a new task..." required>
-              <input type="date" id="todoDate">
-          </div>
-          
-          <div style="display:flex; gap:10px; margin-top:12px; align-items:center;">
-             <div class="color-dot" style="background:var(--accent-blue)" onclick="setColor('blue', this)"></div>
-             <div class="color-dot" style="background:var(--accent-purple)" onclick="setColor('purple', this)"></div>
-             <div class="color-dot" style="background:var(--accent-orange)" onclick="setColor('orange', this)"></div>
-             <div class="color-dot" style="background:var(--accent-red)" onclick="setColor('red', this)"></div>
-             <div style="flex:1"></div>
-             <button type="submit" class="btn btn-sm">Add</button>
-          </div>
-       </form>
+      <form id="addTaskForm">
+        <input type="text" id="taskInput" class="input-clean" placeholder="New Task..." required>
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+           <input type="date" id="taskDate">
+           <div style="flex:1"></div>
+           <div class="color-dot" style="background:var(--blue)" onclick="setColor('blue', this)"></div>
+           <div class="color-dot" style="background:var(--purple)" onclick="setColor('purple', this)"></div>
+           <div class="color-dot" style="background:var(--orange)" onclick="setColor('orange', this)"></div>
+        </div>
+        <button type="submit" class="btn" style="width:100%">Add to List</button>
+      </form>
 
-       <div id="todoList" style="overflow-y:auto; flex:1; padding-bottom:20px;">
-          </div>
+      <div id="taskList" style="margin-top:20px; overflow-y:auto; flex:1; padding-bottom:20px;">
+        </div>
     </aside>
 
-    <main style="display: flex; flex-direction: column; gap: 24px;">
-       
-       <header style="display:flex; justify-content:space-between; align-items:center;">
-          <div>
-              <div class="subtitle" id="currentDate">Friday, October 24</div>
-              <h1 id="greeting">Hello</h1>
-          </div>
-          <div id="authContainer">
-             <button id="loginBtn" class="btn">Sign In</button>
-          </div>
-       </header>
 
-       <div id="mainContent" class="hidden" style="display: flex; flex-direction: column; gap: 24px;">
+    <main style="display:flex; flex-direction:column; gap:24px;">
+      
+      <header style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+           <div style="color:var(--text-secondary); font-size:0.9rem; font-weight:600; text-transform:uppercase;">Study Spark</div>
+           <h1 id="greeting">Welcome Back</h1>
+        </div>
+        <div id="authArea">
+           <button id="loginBtn" class="btn">Sign In</button>
+        </div>
+      </header>
 
-           <section id="focusSection" class="glass-panel focus-card animate-in">
-               </section>
+      <div id="focusSection" class="glass-box focus-card">
+         </div>
 
-           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
-               
-               <div class="glass-panel pomodoro-section">
-                   <div style="display:flex; justify-content:space-between; width:100%; margin-bottom:10px;">
-                       <span style="font-weight:700; color:var(--accent-purple); font-size:0.8rem; letter-spacing:1px;">TIMER</span>
-                       <button class="btn btn-ghost btn-icon" style="width:24px; height:24px;" onclick="toggleSettings()">⚙️</button>
-                   </div>
-                   
-                   <div class="timer-large" id="timerDisplay">25:00</div>
-                   
-                   <div id="timerControls" style="display:flex; gap:12px; justify-content:center;">
-                       <button id="startTimer" class="btn" style="background:var(--bg-body); color:var(--text-primary);">Start</button>
-                       <button id="resetTimer" class="btn btn-ghost">Reset</button>
-                   </div>
-                   
-                   <div id="timerSettings" class="hidden" style="margin-top:10px;">
-                       <input type="number" id="workDur" value="25" style="width:50px; border:1px solid #ccc; border-radius:8px; padding:4px;"> min
-                   </div>
-               </div>
-
-               <div class="glass-panel" style="padding:0; overflow:hidden; display:flex; flex-direction:column;">
-                   <div style="padding:24px 24px 10px 24px; display:flex; justify-content:space-between; align-items:center;">
-                       <h3>Courses</h3>
-                       <button class="btn btn-ghost btn-icon" style="width:28px; height:28px;" onclick="addCourse()">+</button>
-                   </div>
-                   <div id="coursesList" style="overflow-y:auto; flex:1;">
-                       </div>
-               </div>
-
-           </div>
-           
-           <div style="text-align:center;">
-               <button id="themeToggle" class="btn btn-ghost">Switch Appearance</button>
-           </div>
-       </div>
-
-       <div id="loginPrompt" class="glass-panel hidden" style="text-align:center; padding: 40px;">
-           <h2>Get Started</h2>
-           <p class="subtitle">Sign in to sync your tasks.</p>
-       </div>
+      <div class="glass-box" style="padding:24px;">
+         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h2>Courses</h2>
+            <button class="btn btn-sm" onclick="addCourse()">+ New Course</button>
+         </div>
+         
+         <div id="coursesContainer">
+             </div>
+         
+         <div style="text-align:center; padding:20px; color:var(--text-secondary);" id="emptyCourses">
+            No courses yet. Add one to start tracking!
+         </div>
+      </div>
+      
+      <div style="text-align:center;">
+         <button id="themeToggle" class="btn btn-ghost">Switch Theme</button>
+      </div>
 
     </main>
   </div>
@@ -349,10 +280,10 @@
     import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
     import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-    // ===========================================
+    // ============================================
     // 🔴 PASTE FIREBASE CONFIG HERE 🔴
-    // ===========================================
-const firebaseConfig = {
+    // ============================================
+ const firebaseConfig = {
   apiKey: "AIzaSyCu6cbaEw4BzXvF8rGx94h6WHarEFH9Z-k",
   authDomain: "coursesprogress-5658f.firebaseapp.com",
   projectId: "coursesprogress-5658f",
@@ -368,219 +299,254 @@ const firebaseConfig = {
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
-    // State
+    // Data State
     let currentUser = null;
-    let todos = [], courses = [], currentTaskId = null;
+    let data = {
+        todos: [],
+        courses: [], // Structure: { id, name, categories: [ {id, name, items: []} ] }
+        focusId: null
+    };
     let selectedColor = 'blue';
 
-    // --- UI Init ---
-    const updateDate = () => {
-        const d = new Date();
-        document.getElementById('currentDate').textContent = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-        const h = d.getHours();
-        document.getElementById('greeting').textContent = h < 12 ? 'Good Morning' : h < 18 ? 'Good Afternoon' : 'Good Evening';
-    };
-    updateDate();
+    // UI Logic: Time
+    const h = new Date().getHours();
+    document.getElementById('greeting').innerText = h<12?'Good Morning':h<18?'Good Afternoon':'Good Evening';
 
-    // --- Auth ---
+    // UI Logic: Sidebar
+    const sidebar = document.getElementById('sidebar');
+    document.getElementById('fab').onclick = () => sidebar.classList.add('open');
+    document.getElementById('sidebarClose').onclick = () => sidebar.classList.remove('open');
+
+    // --- Firebase Auth & Sync ---
     onAuthStateChanged(auth, (user) => {
-        document.getElementById('authOverlay').style.display = 'none';
-        if (user) {
+        document.getElementById('loading').style.display = 'none';
+        if(user) {
             currentUser = user;
-            document.getElementById('authContainer').innerHTML = `
-                <div class="profile-pill">
-                    <img src="${user.photoURL}" style="width:24px; height:24px; border-radius:50%;">
-                    <span onclick="window.location.reload()" style="cursor:pointer">Sign Out</span>
+            document.getElementById('authArea').innerHTML = `
+                <div style="display:flex;align-items:center;gap:10px">
+                   <img src="${user.photoURL}" style="width:32px;height:32px;border-radius:50%">
+                   <button id="logout" class="btn btn-ghost btn-sm">Exit</button>
                 </div>`;
-            document.getElementById('mainContent').classList.remove('hidden');
-            document.getElementById('loginPrompt').classList.add('hidden');
+            document.getElementById('logout').onclick = () => signOut(auth).then(()=>location.reload());
             
-            // Sync
-            onSnapshot(doc(db, "users", user.uid), (snap) => {
-                if (snap.exists()) {
-                    const data = snap.data();
-                    todos = data.todos || [];
-                    courses = data.courses || [];
-                    currentTaskId = data.currentTaskId;
+            // Realtime Sync
+            onSnapshot(doc(db, 'users', user.uid), (snap) => {
+                if(snap.exists()) {
+                    const d = snap.data();
+                    data.todos = d.todos || [];
+                    data.courses = d.courses || [];
+                    data.focusId = d.focusId || null;
                     renderAll();
                 } else saveData();
             });
         } else {
-            document.getElementById('mainContent').classList.add('hidden');
-            document.getElementById('loginPrompt').classList.remove('hidden');
             document.getElementById('loginBtn').onclick = () => signInWithPopup(auth, provider);
         }
     });
 
     async function saveData() {
         if(!currentUser) return;
-        await setDoc(doc(db, "users", currentUser.uid), { todos, courses, currentTaskId }, { merge: true });
+        await setDoc(doc(db, 'users', currentUser.uid), data, { merge: true });
     }
 
-    // --- Rendering ---
+    // --- Core Logic: Rendering ---
+    
     function renderAll() {
-        renderTodos();
+        renderTasks();
         renderFocus();
         renderCourses();
     }
 
-    // 1. Task List
-    function renderTodos() {
-        const list = document.getElementById('todoList');
-        if(!todos.length) { list.innerHTML = `<div style="text-align:center; color:var(--text-secondary); padding:20px;">No tasks yet.</div>`; return; }
-
-        list.innerHTML = todos.map(t => {
-            // Determine accent color for checkbox
-            const colorMap = { blue:'#007AFF', purple:'#5856D6', orange:'#FF9500', red:'#FF3B30' };
-            const c = colorMap[t.color] || '#007AFF';
-            
+    // 1. Tasks
+    function renderTasks() {
+        const list = document.getElementById('taskList');
+        list.innerHTML = data.todos.map(t => {
+            const colors = { blue: '#007AFF', purple: '#5856D6', orange: '#FF9500' };
+            const c = colors[t.color] || colors.blue;
             return `
-            <div class="task-item" style="border-left: 4px solid ${c}">
-                <div class="check-circle ${t.completed?'checked':''}" 
-                     style="${t.completed?`background:${c}; border-color:${c}`:''}"
-                     onclick="window.toggleTodo('${t.id}')">
-                     ${t.completed ? '✓' : ''}
-                </div>
-                <div style="flex:1;">
-                    <div style="font-weight:600; ${t.completed?'text-decoration:line-through; color:var(--text-secondary)':''}">${t.text}</div>
-                    ${t.dueDate ? `<div style="font-size:0.8rem; color:var(--text-secondary);">Due ${new Date(t.dueDate).toLocaleDateString()}</div>` : ''}
-                </div>
-                <button class="btn btn-ghost btn-icon" onclick="window.setFocus('${t.id}')" title="Set Focus">🎯</button>
-                <button class="btn btn-ghost btn-icon" onclick="window.deleteTodo('${t.id}')" style="color:var(--text-secondary);">✕</button>
+            <div class="task-item" style="border-left-color:${c}">
+               <div class="check-circle ${t.completed?'checked':''}" style="${t.completed?`background:${c};border-color:${c}`:''}" onclick="window.toggleTask('${t.id}')">✓</div>
+               <div style="flex:1">
+                  <div style="font-weight:600; ${t.completed?'text-decoration:line-through;opacity:0.6':''}">${t.text}</div>
+                  ${t.due ? `<div style="font-size:0.8rem;color:var(--text-secondary)">Due ${new Date(t.due).toLocaleDateString()}</div>` : ''}
+               </div>
+               <button class="btn btn-ghost btn-icon" onclick="window.setFocus('${t.id}')">🎯</button>
+               <button class="btn btn-ghost btn-icon" onclick="window.deleteTask('${t.id}')">✕</button>
             </div>`;
         }).join('');
     }
 
-    // 2. Current Focus
+    // 2. Focus
     function renderFocus() {
-        const section = document.getElementById('focusSection');
-        const t = todos.find(x => x.id === currentTaskId);
+        const t = data.todos.find(x => x.id === data.focusId);
+        const card = document.getElementById('focusSection');
         
-        if (!t || t.completed) {
-            section.innerHTML = `
-                <div style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; opacity:0.6;">
-                    <h3>No Active Focus</h3>
-                    <p>Select a task from the list or add a new one.</p>
-                </div>
-            `;
-            // Remove colored border if no task
-            section.style.setProperty('--accent-blue', '#86868B');
+        if(!t || t.completed) {
+            card.innerHTML = `<div style="text-align:center; opacity:0.6; margin:auto;"><h3>No Active Focus</h3><p>Select a task to focus on.</p></div>`;
         } else {
-            const colorMap = { blue:'#007AFF', purple:'#5856D6', orange:'#FF9500', red:'#FF3B30' };
-            const c = colorMap[t.color] || '#007AFF';
-            
-            // Dynamic Accent Color for the Hero Card
-            const style = document.createElement('style');
-            style.innerHTML = `.focus-card::before { background: ${c} !important; } .focus-label { color: ${c} !important; }`;
-            section.appendChild(style);
-
-            section.innerHTML = `
+            card.innerHTML = `
                 <div>
-                    <div class="focus-label">Current Focus</div>
-                    <div class="focus-title">${t.text}</div>
-                    ${t.dueDate ? `<div class="subtitle">Due ${new Date(t.dueDate).toLocaleDateString()}</div>` : ''}
+                   <div style="text-transform:uppercase; font-size:0.75rem; letter-spacing:1.5px; font-weight:700; color:var(--blue); margin-bottom:12px;">Current Focus</div>
+                   <div style="font-size:2rem; font-weight:700; line-height:1.2;">${t.text}</div>
+                   ${t.due ? `<div style="color:var(--text-secondary); margin-top:8px;">Due: ${new Date(t.due).toDateString()}</div>` : ''}
                 </div>
-                <div style="margin-top:20px; text-align:right;">
-                    <button class="btn" style="background:${c}; color:white;" onclick="window.toggleTodo('${t.id}')">Mark Complete</button>
+                <div style="text-align:right; margin-top:20px;">
+                   <button class="btn" onclick="window.toggleTask('${t.id}')">Mark Complete</button>
                 </div>
             `;
         }
     }
 
-    // 3. Courses
+    // 3. Dynamic Courses
     function renderCourses() {
-        const list = document.getElementById('coursesList');
-        if(!courses.length) { list.innerHTML=`<div style="padding:20px; text-align:center; color:var(--text-secondary)">No courses added.</div>`; return; }
+        const con = document.getElementById('coursesContainer');
+        const empty = document.getElementById('emptyCourses');
         
-        list.innerHTML = courses.map(c => `
-            <div class="course-row" onclick="alert('Course detail view would open here!')">
-                <span style="font-weight:600;">${c.name}</span>
-                <span class="progress-pill">${c.lectures?.length || 0} Lectures</span>
+        if(!data.courses.length) { con.innerHTML = ''; empty.style.display='block'; return; }
+        empty.style.display = 'none';
+
+        con.innerHTML = data.courses.map(course => `
+            <div class="course-card">
+                <div class="course-header" onclick="this.parentElement.classList.toggle('open')">
+                    <span style="font-weight:600; font-size:1.1rem;">${course.name}</span>
+                    <span style="font-size:1.2rem; opacity:0.5;">⌄</span>
+                </div>
+                <div class="course-body">
+                    ${course.categories.map(cat => `
+                        <div class="category-block">
+                            <div class="category-header">
+                                <span>${cat.name}</span>
+                                <button class="btn btn-ghost btn-sm" onclick="window.addItem('${course.id}', '${cat.id}')" style="padding:2px 8px;">+ Item</button>
+                            </div>
+                            ${cat.items.map(item => `
+                                <div class="item-row">
+                                    <div class="item-main">
+                                        <div class="check-circle ${item.completed?'checked':''}" onclick="window.toggleItem('${course.id}', '${cat.id}', '${item.id}')">✓</div>
+                                        <div style="flex:1; ${item.completed?'text-decoration:line-through;opacity:0.6':''}">${item.name}</div>
+                                        <button class="btn btn-ghost btn-icon" style="width:24px;height:24px;" onclick="document.getElementById('note-${item.id}').classList.toggle('hidden')">📝</button>
+                                        <button class="btn btn-ghost btn-icon" style="width:24px;height:24px;color:var(--red);" onclick="window.deleteItem('${course.id}', '${cat.id}', '${item.id}')">✕</button>
+                                    </div>
+                                    <textarea id="note-${item.id}" class="note-area ${item.note?'':'hidden'}" placeholder="Add notes here..." onblur="window.saveNote('${course.id}', '${cat.id}', '${item.id}', this.value)">${item.note || ''}</textarea>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `).join('')}
+                    
+                    <div style="margin-top:24px; display:flex; gap:10px;">
+                        <button class="btn btn-ghost btn-sm" onclick="window.addCategory('${course.id}')">+ New Category</button>
+                        <button class="btn btn-ghost btn-sm" style="color:var(--red);" onclick="window.deleteCourse('${course.id}')">Delete Course</button>
+                    </div>
+                </div>
             </div>
         `).join('');
     }
 
-    // --- Logic ---
+    // --- Actions: Tasks ---
     window.setColor = (c, el) => {
-        document.querySelectorAll('.color-dot').forEach(d=>d.style.transform='scale(1)');
+        document.querySelectorAll('.color-dot').forEach(d => d.style.transform = 'scale(1)');
         el.style.transform = 'scale(1.3)';
         selectedColor = c;
-    }
+    };
 
-    document.getElementById('addTodoForm').onsubmit = (e) => {
+    document.getElementById('addTaskForm').onsubmit = (e) => {
         e.preventDefault();
-        const txt = document.getElementById('todoInput').value.trim();
-        const date = document.getElementById('todoDate').value;
+        const txt = document.getElementById('taskInput').value;
+        const date = document.getElementById('taskDate').value;
         if(txt) {
-            todos.unshift({ id: Date.now().toString(), text: txt, completed: false, color: selectedColor, dueDate: date || null });
-            document.getElementById('todoInput').value='';
-            if(!currentTaskId) currentTaskId = todos[0].id;
+            data.todos.unshift({ id: Date.now().toString(), text: txt, color: selectedColor, due: date, completed: false });
+            document.getElementById('taskInput').value = '';
+            if(!data.focusId) data.focusId = data.todos[0].id;
             saveData();
         }
-    }
+    };
 
-    window.toggleTodo = (id) => {
-        const t = todos.find(x=>x.id===id);
+    window.toggleTask = (id) => {
+        const t = data.todos.find(x => x.id === id);
         t.completed = !t.completed;
         if(t.completed) {
-            confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
-            if(currentTaskId === id) currentTaskId = null;
+            confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
+            if(data.focusId === id) data.focusId = null;
         }
         saveData();
-    }
-
-    window.setFocus = (id) => { currentTaskId = id; saveData(); }
-    window.deleteTodo = (id) => { todos = todos.filter(x=>x.id!==id); saveData(); }
+    };
     
+    window.deleteTask = (id) => { data.todos = data.todos.filter(x => x.id !== id); saveData(); };
+    window.setFocus = (id) => { data.focusId = id; saveData(); };
+
+    // --- Actions: Courses (Dynamic) ---
     window.addCourse = () => {
-        const n = prompt("Course Name:");
-        if(n) { courses.push({id:Date.now().toString(), name:n, lectures:[]}); saveData(); }
-    }
+        const name = prompt("Course Name (e.g., Biology 101):");
+        if(name) {
+            data.courses.push({ 
+                id: Date.now().toString(), 
+                name, 
+                categories: [
+                    { id: 'c1', name: 'Lectures', items: [] },
+                    { id: 'c2', name: 'Homework', items: [] }
+                ] 
+            });
+            saveData();
+        }
+    };
 
-    // --- Sidebar (Mobile) ---
-    const sidebar = document.getElementById('sidebar');
-    const fab = document.getElementById('fab');
-    const closeBtn = document.getElementById('sidebarClose');
-    
-    fab.onclick = () => sidebar.classList.add('open');
-    closeBtn.onclick = () => sidebar.classList.remove('open');
+    window.deleteCourse = (cid) => {
+        if(confirm("Delete this entire course?")) {
+            data.courses = data.courses.filter(c => c.id !== cid);
+            saveData();
+        }
+    };
 
-    // --- Sortable ---
-    new Sortable(document.getElementById('todoList'), { animation: 150, delay: 100, onEnd: (evt) => {
-        const item = todos.splice(evt.oldIndex, 1)[0];
-        todos.splice(evt.newIndex, 0, item);
+    window.addCategory = (cid) => {
+        const name = prompt("New Category Name (e.g., Labs, Projects):");
+        if(name) {
+            const course = data.courses.find(c => c.id === cid);
+            course.categories.push({ id: Date.now().toString(), name, items: [] });
+            saveData();
+        }
+    };
+
+    window.addItem = (cid, catId) => {
+        const name = prompt("Item Name:");
+        if(name) {
+            const course = data.courses.find(c => c.id === cid);
+            const cat = course.categories.find(c => c.id === catId);
+            cat.items.push({ id: Date.now().toString(), name, completed: false, note: '' });
+            saveData();
+        }
+    };
+
+    window.toggleItem = (cid, catId, itemId) => {
+        const course = data.courses.find(c => c.id === cid);
+        const cat = course.categories.find(c => c.id === catId);
+        const item = cat.items.find(i => i.id === itemId);
+        item.completed = !item.completed;
         saveData();
-    }});
+    };
 
-    // --- Theme & Pomodoro ---
+    window.saveNote = (cid, catId, itemId, text) => {
+        const course = data.courses.find(c => c.id === cid);
+        const cat = course.categories.find(c => c.id === catId);
+        const item = cat.items.find(i => i.id === itemId);
+        item.note = text;
+        saveData();
+    };
+    
+    window.deleteItem = (cid, catId, itemId) => {
+         const course = data.courses.find(c => c.id === cid);
+         const cat = course.categories.find(c => c.id === catId);
+         cat.items = cat.items.filter(i => i.id !== itemId);
+         saveData();
+    };
+
+    // --- Theme ---
     document.getElementById('themeToggle').onclick = () => {
         document.body.classList.toggle('dark-mode');
-        localStorage.setItem('theme', document.body.classList.contains('dark-mode')?'dark':'light');
-    }
-    if(localStorage.getItem('theme')==='dark') document.body.classList.add('dark-mode');
-
-    let timer, timeLeft, isRunning=false;
-    window.toggleSettings = () => document.getElementById('timerSettings').classList.toggle('hidden');
-    document.getElementById('startTimer').onclick = function() {
-        if(isRunning) { clearInterval(timer); isRunning=false; this.textContent="Start"; }
-        else {
-            if(!timeLeft) timeLeft=document.getElementById('workDur').value*60;
-            isRunning=true; this.textContent="Pause";
-            timer = setInterval(() => {
-                if(timeLeft>0) {
-                    timeLeft--;
-                    const m=Math.floor(timeLeft/60).toString().padStart(2,'0');
-                    const s=(timeLeft%60).toString().padStart(2,'0');
-                    document.getElementById('timerDisplay').innerText=`${m}:${s}`;
-                } else { clearInterval(timer); alert("Done!"); isRunning=false; }
-            }, 1000);
-        }
-    }
-    document.getElementById('resetTimer').onclick = () => {
-        clearInterval(timer); isRunning=false; timeLeft=document.getElementById('workDur').value*60;
-        document.getElementById('timerDisplay').innerText=`${Math.floor(timeLeft/60)}:00`;
-        document.getElementById('startTimer').textContent="Start";
-    }
+        localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+    };
+    if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
+    
+    // Sortable
+    new Sortable(document.getElementById('taskList'), { animation: 150, delay: 100 });
 
   </script>
 </body>
