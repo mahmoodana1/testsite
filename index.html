@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Study Spark</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      /* Modern Color Palette */
+      --primary: #6366f1; /* Indigo */
+      --primary-hover: #4f46e5;
+      --secondary: #10b981; /* Emerald */
+      --danger: #ef4444; /* Red */
+      --bg-body: #f3f4f6;
+      
+      /* Glassmorphism Surface Variables */
+      --glass-bg: rgba(255, 255, 255, 0.75);
+      --glass-border: rgba(255, 255, 255, 0.6);
+      --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+      --blur-strength: 16px;
+
+      /* Text Colors */
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --text-light: #ffffff;
+
+      /* Layout */
+      --radius-sm: 8px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --container-max: 1000px;
+    }
+
+    body.dark-mode {
+      --primary: #818cf8;
+      --bg-body: #0f172a; /* Slate 900 */
+      --glass-bg: rgba(30, 41, 59, 0.7); /* Slate 800 transparent */
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      transition: background-color 0.3s ease, color 0.3s ease;
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding-bottom: 80px; /* Space for fab */
+    }
+
+    /* --- UI Components --- */
+    
+    /* Buttons */
+    .button {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 10px 20px; border-radius: 12px; border: none;
+      font-weight: 600; font-size: 0.95rem; cursor: pointer;
+      transition: transform 0.1s ease, filter 0.2s;
+      gap: 8px;
+    }
+    .button:active { transform: scale(0.96); }
+    .button-primary { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25); }
+    .button-success { background: var(--secondary); color: white; }
+    .button-danger { background: var(--danger); color: white; }
+    .button-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--glass-border); }
+    .button-small { padding: 6px 12px; font-size: 0.85rem; border-radius: 8px; }
+
+    /* Inputs */
+    .input-field, .textarea-field {
+      width: 100%; padding: 12px 16px;
+      border-radius: 12px; border: 1px solid transparent;
+      background: rgba(0,0,0,0.03);
+      color: var(--text-main); font-family: inherit; font-size: 1rem;
+      transition: all 0.2s;
+    }
+    .dark-mode .input-field { background: rgba(255,255,255,0.05); }
+    .input-field:focus { outline: none; background: transparent; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+
+    /* Cards (Glass) */
+    .glass-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--blur-strength));
+      -webkit-backdrop-filter: blur(var(--blur-strength));
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--glass-shadow);
+      overflow: hidden;
+    }
+
+    /* --- Layout Structure --- */
+    .app-container {
+      max-width: var(--container-max);
+      margin: 0 auto;
+      padding: 20px;
+      width: 100%;
+    }
+
+    /* Header */
+    .app-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 30px; padding: 10px 0;
+    }
+    h1 { margin: 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.03em; }
+    
+    .auth-controls { display: flex; gap: 12px; align-items: center; }
+    .user-profile { display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.04); padding: 4px 12px 4px 4px; border-radius: 50px; }
+    .dark-mode .user-profile { background: rgba(255,255,255,0.1); }
+    .user-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+    .user-name { font-size: 0.85rem; font-weight: 600; max-width: 100px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    
+    /* --- Dashboard Grid (Desktop vs Mobile) --- */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+    
+    /* Tablet & Desktop: Side-by-side */
+    @media (min-width: 768px) {
+      .dashboard-grid {
+        grid-template-columns: 1.2fr 0.8fr; /* Task takes more space */
+        align-items: start;
+      }
+    }
+
+    /* --- Feature: Current Task --- */
+    .current-task-card {
+      padding: 24px;
+      color: white;
+      min-height: 200px;
+      display: flex; flex-direction: column; justify-content: space-between;
+      position: relative;
+    }
+    .current-task-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 12px; }
+    .current-task-title { font-size: 1.75rem; font-weight: 700; line-height: 1.2; margin-bottom: 16px; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .current-task-actions { display: flex; gap: 10px; margin-top: auto; }
+    
+    /* Task Gradients (Modern) */
+    .task-bg-red    { background: linear-gradient(135deg, #f87171, #ef4444); }
+    .task-bg-orange { background: linear-gradient(135deg, #fb923c, #f97316); }
+    .task-bg-yellow { background: linear-gradient(135deg, #facc15, #eab308); color: #333 !important; }
+    .task-bg-green  { background: linear-gradient(135deg, #34d399, #10b981); }
+    .task-bg-blue   { background: linear-gradient(135deg, #60a5fa, #3b82f6); }
+    .task-bg-purple { background: linear-gradient(135deg, #a78bfa, #8b5cf6); }
+    .task-bg-pink   { background: linear-gradient(135deg, #f472b6, #ec4899); }
+    .task-bg-gray   { background: linear-gradient(135deg, #94a3b8, #64748b); }
+
+    /* --- Feature: Pomodoro --- */
+    .pomodoro-card { padding: 24px; text-align: center; }
+    .pomodoro-display { font-size: 3.5rem; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -2px; margin: 10px 0; background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .pomodoro-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+    .timer-phase { display: inline-block; font-size: 0.75rem; padding: 4px 12px; border-radius: 20px; background: rgba(0,0,0,0.05); font-weight: 600; }
+    
+    /* --- Feature: Courses List --- */
+    .section-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    
+    .course-card { margin-bottom: 20px; transition: transform 0.2s, box-shadow 0.2s; }
+    .course-card:hover { transform: translateY(-2px); }
+    .course-header { padding: 20px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; }
+    .course-title { font-size: 1.1rem; font-weight: 700; margin: 0; }
+    .course-meta { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; }
+    
+    .course-details { 
+      display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.3s ease; 
+      background: rgba(0,0,0,0.02);
+    }
+    .course-card.expanded .course-details { grid-template-rows: 1fr; border-top: 1px solid var(--glass-border); }
+    .details-inner { overflow: hidden; padding: 0 20px 20px 20px; }
+    
+    .list-item { 
+      display: flex; align-items: center; gap: 12px; padding: 12px; 
+      background: var(--bg-body); margin-bottom: 8px; border-radius: 10px;
+      border: 1px solid transparent; transition: all 0.2s;
+    }
+    .list-item:hover { border-color: var(--primary); }
+    .list-item.completed { opacity: 0.6; background: transparent; text-decoration: line-through; }
+    
+    /* --- Sidebar (Tasks) --- */
+    .sidebar-overlay { 
+      position: fixed; inset: 0; background: rgba(0,0,0,0.3); backdrop-filter: blur(4px); 
+      z-index: 998; opacity: 0; pointer-events: none; transition: opacity 0.3s; 
+    }
+    .sidebar-overlay.open { opacity: 1; pointer-events: auto; }
+    
+    .sidebar {
+      position: fixed; top: 0; right: 0; bottom: 0;
+      width: 85%; max-width: 400px;
+      background: var(--bg-body);
+      z-index: 999;
+      transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: -5px 0 25px rgba(0,0,0,0.15);
+      padding: 24px;
+      display: flex; flex-direction: column;
+    }
+    .sidebar.open { transform: translateX(0); }
+    
+    .todo-item { 
+      padding: 16px; border-radius: 12px; margin-bottom: 12px; color: white; 
+      display: flex; align-items: center; gap: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .todo-check { 
+      width: 24px; height: 24px; border: 2px solid rgba(255,255,255,0.8); border-radius: 6px; 
+      display: flex; align-items: center; justify-content: center; cursor: pointer; 
+    }
+
+    /* Floating Toggle Button */
+    .fab {
+      position: fixed; bottom: 24px; right: 24px;
+      width: 56px; height: 56px; border-radius: 28px;
+      background: var(--text-main); color: var(--bg-body);
+      border: none; box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      font-size: 1.5rem; cursor: pointer; z-index: 900;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 0.2s;
+    }
+    .fab:active { transform: scale(0.9); }
+
+    /* Utils */
+    .hidden { display: none !important; }
+    .loader { border: 3px solid rgba(0,0,0,0.1); border-top: 3px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% {transform: rotate(0deg);} 100% {transform: rotate(360deg);} }
+    
+    /* Loading Overlay */
+    #authOverlay { 
+      position: fixed; inset: 0; background: var(--bg-body); z-index: 2000; 
+      display: flex; flex-direction: column; align-items: center; justify-content: center; 
+    }
+
+    /* Color Picker styling */
+    .color-options { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+    .color-circle { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
+    .color-circle.selected { border-color: var(--text-main); transform: scale(1.1); }
+  </style>
+</head>
+<body>
+
+  <div id="authOverlay">
+    <div class="loader"></div>
+    <h3 style="margin-top: 20px; font-weight: 500;">Loading Space...</h3>
+  </div>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <aside id="sidebar" class="sidebar">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+      <h2 style="margin:0; font-size:1.5rem;">Tasks</h2>
+      <button class="button button-ghost button-small" id="sidebarClose">✕</button>
+    </div>
+
+    <form id="addTodoForm" style="margin-bottom: 24px; background: rgba(0,0,0,0.03); padding: 16px; border-radius: 12px;">
+      <input type="text" id="todoInput" class="input-field" placeholder="What needs doing?" required style="margin-bottom:12px; background:white;">
+      <div style="display:flex; gap:8px; margin-bottom:12px;">
+         <input type="number" id="todoDueInput" class="input-field" placeholder="Days due" style="width: 100px; background:white;">
+         <button type="submit" class="button button-primary" style="flex:1;">Add</button>
+      </div>
+      <div class="color-options">
+        <div class="color-circle task-bg-red selected" data-color="red"></div>
+        <div class="color-circle task-bg-orange" data-color="orange"></div>
+        <div class="color-circle task-bg-yellow" data-color="yellow"></div>
+        <div class="color-circle task-bg-green" data-color="green"></div>
+        <div class="color-circle task-bg-blue" data-color="blue"></div>
+        <div class="color-circle task-bg-purple" data-color="purple"></div>
+        <div class="color-circle task-bg-pink" data-color="pink"></div>
+        <div class="color-circle task-bg-gray" data-color="gray"></div>
+      </div>
+    </form>
+
+    <ul id="todoList" style="list-style:none; padding:0; overflow-y:auto; flex:1;">
+      </ul>
+  </aside>
+
+  <button id="sidebarToggle" class="fab">📝</button>
+
+  <div class="app-container">
+    <header class="app-header">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <h1>Study Spark</h1>
+      </div>
+      
+      <div class="auth-controls">
+        <button id="themeToggle" class="button button-ghost" style="padding: 8px;">☀️</button>
+        
+        <div id="loginSection">
+          <button id="googleLoginBtn" class="button button-primary button-small">Login</button>
+        </div>
+        
+        <div id="userSection" class="hidden user-profile">
+          <img id="userAvatar" class="user-avatar" src="" alt="">
+          <span id="userName" class="user-name"></span>
+          <button id="logoutBtn" class="button button-small button-danger" style="margin-left:8px;">Exit</button>
+        </div>
+      </div>
+    </header>
+
+    <div id="loginPrompt" class="glass-card hidden" style="padding: 40px; text-align: center;">
+      <div style="font-size: 3rem; margin-bottom: 16px;">🔐</div>
+      <h2>Please Login</h2>
+      <p style="color: var(--text-muted);">Sync your courses and tasks across all your devices.</p>
+    </div>
+
+    <div id="mainContent" class="hidden">
+      
+      <div class="dashboard-grid">
+        
+        <div id="currentTaskCard" class="glass-card current-task-card task-bg-purple">
+          </div>
+
+        <div id="pomodoroCard" class="glass-card pomodoro-card">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+             <span class="timer-phase work">Work Time</span>
+             <button class="button button-ghost button-small" onclick="window.togglePomodoroSettings()">⚙️</button>
+          </div>
+          <div class="pomodoro-display" id="timerDisplay">25:00</div>
+          
+          <div id="pomodoroSettings" class="hidden" style="margin-bottom:16px; background:rgba(0,0,0,0.05); padding:10px; border-radius:8px;">
+            <div style="display:flex; gap:10px;">
+                <label>Work: <input type="number" id="workDuration" value="25" style="width:50px; border:none; border-radius:4px; padding:4px;"></label>
+                <label>Break: <input type="number" id="breakDuration" value="5" style="width:50px; border:none; border-radius:4px; padding:4px;"></label>
+            </div>
+          </div>
+
+          <div class="pomodoro-controls">
+            <button id="startTimer" class="button button-primary">Start</button>
+            <button id="resetTimer" class="button button-ghost">Reset</button>
+          </div>
+          <div style="height:6px; width:100%; background:rgba(0,0,0,0.1); margin-top:20px; border-radius:3px; overflow:hidden;">
+             <div id="timerProgressBar" style="height:100%; width:0%; background:var(--primary); transition: width 1s linear;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h2 class="section-title">📚 Courses</h2>
+        <button class="button button-primary button-small" onclick="document.getElementById('addCourseForm').classList.toggle('hidden')">+ New</button>
+      </div>
+
+      <div id="addCourseForm" class="glass-card hidden" style="padding:20px; margin-bottom:24px;">
+        <div style="display:grid; grid-template-columns: 2fr 1fr auto; gap:12px;">
+            <input type="text" id="newCourseName" class="input-field" placeholder="Course Name">
+            <input type="number" id="newCourseLectures" class="input-field" placeholder="Target #">
+            <button onclick="window.addCourse()" class="button button-success">Add</button>
+        </div>
+      </div>
+
+      <div id="coursesContainer"></div>
+      
+      <div style="text-align:center; margin-top:40px; color:var(--text-muted); font-size:0.8rem;">
+        Study Spark Cloud • Auto-Sync Enabled
+      </div>
+
+    </div>
+  </div>
+
+  <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+        // ============================================
+        // 🔴 PASTE YOUR FIREBASE CONFIG HERE BELOW 🔴
+        // ============================================
+    const firebaseConfig = {
+  apiKey: "AIzaSyCu6cbaEw4BzXvF8rGx94h6WHarEFH9Z-k",
+  authDomain: "coursesprogress-5658f.firebaseapp.com",
+  projectId: "coursesprogress-5658f",
+  storageBucket: "coursesprogress-5658f.firebasestorage.app",
+  messagingSenderId: "572695866101",
+  appId: "1:572695866101:web:bb6dc8058387358b7773bc",
+  measurementId: "G-XD8W9V1XPE"
+};
+        // ============================================
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
+
+        // State
+        let currentUser = null;
+        let courses = [], todos = [], currentTaskId = null;
+        let selectedColor = 'red';
+        
+        // Timer
+        let timerInterval, timeLeft, isTimerRunning = false, isWorkPhase = true;
+
+        // UI Refs
+        const loginBtn = document.getElementById('googleLoginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const loginSection = document.getElementById('loginSection');
+        const userSection = document.getElementById('userSection');
+        const mainContent = document.getElementById('mainContent');
+        const loginPrompt = document.getElementById('loginPrompt');
+        const authOverlay = document.getElementById('authOverlay');
+
+        // Auth Listeners
+        loginBtn.onclick = () => signInWithPopup(auth, provider);
+        logoutBtn.onclick = () => signOut(auth).then(()=>window.location.reload());
+
+        onAuthStateChanged(auth, (user) => {
+            authOverlay.style.opacity = '0';
+            setTimeout(() => authOverlay.classList.add('hidden'), 500);
+
+            if (user) {
+                currentUser = user;
+                loginSection.classList.add('hidden');
+                userSection.classList.remove('hidden');
+                mainContent.classList.remove('hidden');
+                loginPrompt.classList.add('hidden');
+                document.getElementById('userName').textContent = user.displayName.split(' ')[0]; // First name only
+                document.getElementById('userAvatar').src = user.photoURL;
+
+                // DB Sync
+                onSnapshot(doc(db, "users", user.uid), (docSnap) => {
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        courses = data.courses || [];
+                        todos = data.todos || [];
+                        currentTaskId = data.currentTaskId || null;
+                        renderCourses(); renderTodos(); renderCurrentTask();
+                    } else {
+                        saveDataToCloud(); // Init new user
+                    }
+                });
+            } else {
+                currentUser = null;
+                loginSection.classList.remove('hidden');
+                userSection.classList.add('hidden');
+                mainContent.classList.add('hidden');
+                loginPrompt.classList.remove('hidden');
+            }
+        });
+
+        async function saveDataToCloud() {
+            if (!currentUser) return;
+            await setDoc(doc(db, "users", currentUser.uid), {
+                courses, todos, currentTaskId, lastUpdated: new Date().toISOString()
+            }, { merge: true });
+        }
+
+        // --- GLOBAL ACTIONS ---
+        window.generateId = () => '_' + Math.random().toString(36).substr(2, 9);
+        
+        // Audio
+        let audioCtx;
+        window.getAudioContext = () => { if(!audioCtx) audioCtx=new(window.AudioContext||window.webkitAudioContext)(); return audioCtx; };
+        window.playSound = (type) => {
+            const ctx = window.getAudioContext();
+            if(!ctx || ctx.state === 'suspended') ctx?.resume();
+            if(!ctx) return;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain); gain.connect(ctx.destination);
+            gain.gain.setValueAtTime(0, ctx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.01);
+            
+            if(type==='add') { osc.frequency.setValueAtTime(600, ctx.currentTime); }
+            else if(type==='complete') { osc.frequency.setValueAtTime(880, ctx.currentTime); }
+            else { osc.frequency.setValueAtTime(300, ctx.currentTime); }
+            
+            osc.start(ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.15);
+            osc.stop(ctx.currentTime + 0.15);
+        };
+
+        // Course Logic
+        window.addCourse = () => {
+            const name = document.getElementById('newCourseName').value.trim();
+            const target = document.getElementById('newCourseLectures').value;
+            if(!name) return;
+            courses.unshift({
+                id: window.generateId(), name, targetLectures: parseInt(target)||0,
+                lectures: [], homeworks: [], notes: "", dateAdded: new Date().toISOString()
+            });
+            document.getElementById('newCourseName').value = '';
+            document.getElementById('addCourseForm').classList.add('hidden');
+            saveDataToCloud();
+        };
+
+        window.deleteCourse = (id) => { if(confirm('Delete course?')) { courses = courses.filter(c=>c.id!==id); saveDataToCloud(); }};
+        
+        window.toggleCourse = (id) => {
+            const card = document.getElementById(`course-${id}`);
+            card.classList.toggle('expanded');
+        };
+
+        window.addLecture = (id) => {
+           const val = prompt("Lecture Name:");
+           if(val) { courses.find(c=>c.id===id).lectures.push({id:window.generateId(), name:val, watched:false}); saveDataToCloud(); }
+        };
+
+        window.toggleLecture = (cid, lid) => {
+            const l = courses.find(c=>c.id===cid).lectures.find(l=>l.id===lid);
+            l.watched = !l.watched; if(l.watched) window.playSound('complete'); saveDataToCloud();
+        };
+
+        window.addHomework = (id) => {
+           const val = prompt("Homework Description:");
+           if(val) { courses.find(c=>c.id===id).homeworks.push({id:window.generateId(), description:val, completed:false}); saveDataToCloud(); }
+        };
+
+        window.toggleHomework = (cid, hid) => {
+            const h = courses.find(c=>c.id===cid).homeworks.find(h=>h.id===hid);
+            h.completed = !h.completed; if(h.completed) window.playSound('complete'); saveDataToCloud();
+        };
+
+        window.saveNotes = (cid, val) => {
+            courses.find(c=>c.id===cid).notes = val;
+            saveDataToCloud();
+        };
+
+        // Todo Logic
+        window.addTodo = (text, color, days) => {
+            const due = days ? new Date(Date.now() + days*86400000).toISOString() : null;
+            const task = { id: window.generateId(), text, color, completed: false, dateAdded: new Date().toISOString(), dueDate: due };
+            todos.unshift(task);
+            if(!currentTaskId) currentTaskId = task.id;
+            window.playSound('add'); saveDataToCloud();
+        };
+
+        window.toggleTodo = (id) => {
+            const t = todos.find(x => x.id === id);
+            t.completed = !t.completed;
+            if(t.completed) {
+                window.playSound('complete');
+                if(currentTaskId === id) currentTaskId = todos.find(x => !x.completed)?.id || null;
+            }
+            saveDataToCloud();
+        };
+
+        window.deleteTodo = (id) => {
+            todos = todos.filter(x => x.id !== id);
+            if(currentTaskId === id) currentTaskId = todos.find(x => !x.completed)?.id || null;
+            saveDataToCloud();
+        };
+
+        window.setCurrentTask = (id) => { currentTaskId = id; saveDataToCloud(); };
+        window.selectRandomTask = () => {
+             const pending = todos.filter(t=>!t.completed);
+             if(!pending.length) return alert("No tasks!");
+             currentTaskId = pending[Math.floor(Math.random()*pending.length)].id;
+             saveDataToCloud();
+        };
+
+        // UI Renderers
+        function renderCourses() {
+            const con = document.getElementById('coursesContainer');
+            con.innerHTML = courses.map(c => {
+                const watched = c.lectures.filter(l=>l.watched).length;
+                const progress = c.targetLectures ? Math.round((watched/c.targetLectures)*100) : 0;
+                
+                return `
+                <div class="glass-card course-card" id="course-${c.id}">
+                    <div class="course-header" onclick="window.toggleCourse('${c.id}')">
+                        <div>
+                            <h3 class="course-title">${c.name}</h3>
+                            <div class="course-meta">${watched}/${c.targetLectures} Lectures • ${progress}% Complete</div>
+                        </div>
+                        <div style="font-size:1.2rem; opacity:0.5;">⌄</div>
+                    </div>
+                    <div class="course-details">
+                        <div class="details-inner">
+                            <div style="margin-bottom:20px;">
+                                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                                    <strong>Lectures</strong>
+                                    <button class="button button-small button-primary" onclick="window.addLecture('${c.id}')">+ Add</button>
+                                </div>
+                                ${c.lectures.map(l => `
+                                    <div class="list-item ${l.watched?'completed':''}">
+                                        <input type="checkbox" ${l.watched?'checked':''} onclick="window.toggleLecture('${c.id}','${l.id}')">
+                                        <span style="flex:1">${l.name}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            
+                            <div style="margin-bottom:20px;">
+                                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                                    <strong>Homework</strong>
+                                    <button class="button button-small button-primary" onclick="window.addHomework('${c.id}')">+ Add</button>
+                                </div>
+                                ${c.homeworks.map(h => `
+                                    <div class="list-item ${h.completed?'completed':''}">
+                                        <input type="checkbox" ${h.completed?'checked':''} onclick="window.toggleHomework('${c.id}','${h.id}')">
+                                        <span style="flex:1">${h.description}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+
+                            <textarea class="textarea-field" placeholder="Course notes..." onblur="window.saveNotes('${c.id}', this.value)">${c.notes||''}</textarea>
+                            <button class="button button-small button-danger" style="margin-top:16px;" onclick="window.deleteCourse('${c.id}')">Delete Course</button>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function renderTodos() {
+            document.getElementById('todoList').innerHTML = todos.map(t => `
+                <li class="todo-item task-bg-${t.color} ${t.completed?'completed':''}">
+                    <div class="todo-check" onclick="window.toggleTodo('${t.id}')">${t.completed?'✓':''}</div>
+                    <div style="flex:1; cursor:pointer;" onclick="window.setCurrentTask('${t.id}')">
+                        <div style="font-weight:600; font-size:0.95rem;">${t.text}</div>
+                        ${t.dueDate ? `<div style="font-size:0.75rem; opacity:0.8;">Due: ${new Date(t.dueDate).toLocaleDateString()}</div>` : ''}
+                    </div>
+                    <button onclick="window.deleteTodo('${t.id}')" style="background:none; border:none; color:white; opacity:0.7; cursor:pointer;">✕</button>
+                </li>
+            `).join('');
+        }
+
+        function renderCurrentTask() {
+            const t = todos.find(x => x.id === currentTaskId);
+            const card = document.getElementById('currentTaskCard');
+            
+            if (!t || t.completed) {
+                card.className = 'glass-card current-task-card task-bg-gray';
+                card.innerHTML = `<div style="text-align:center; margin:auto; opacity:0.8;"><h3>🎯 No Active Task</h3><p>Select a task from the sidebar to focus.</p></div>
+                                  <div class="current-task-actions"><button class="button button-ghost" style="color:white; border-color:white; width:100%;" onclick="window.selectRandomTask()">Pick Random</button></div>`;
+            } else {
+                card.className = `glass-card current-task-card task-bg-${t.color}`;
+                card.innerHTML = `
+                    <div>
+                        <div class="current-task-label">Now Focusing On</div>
+                        <div class="current-task-title">${t.text}</div>
+                    </div>
+                    <div class="current-task-actions">
+                        <button class="button button-ghost" style="color:white; border-color:white; flex:1;" onclick="window.toggleTodo('${t.id}')">Complete</button>
+                    </div>`;
+            }
+        }
+
+        // --- Sidebar Logic ---
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const openSidebar = () => { sidebar.classList.add('open'); overlay.classList.add('open'); };
+        const closeSidebar = () => { sidebar.classList.remove('open'); overlay.classList.remove('open'); };
+        
+        document.getElementById('sidebarToggle').onclick = openSidebar;
+        document.getElementById('sidebarClose').onclick = closeSidebar;
+        overlay.onclick = closeSidebar;
+
+        // --- Color Picker ---
+        document.querySelectorAll('.color-circle').forEach(c => {
+            c.onclick = () => {
+                document.querySelectorAll('.color-circle').forEach(x=>x.classList.remove('selected'));
+                c.classList.add('selected'); selectedColor = c.dataset.color;
+            }
+        });
+
+        // --- Form Submit ---
+        document.getElementById('addTodoForm').onsubmit = (e) => {
+            e.preventDefault();
+            const txt = document.getElementById('todoInput').value;
+            const due = document.getElementById('todoDueInput').value;
+            if(txt) { window.addTodo(txt, selectedColor, due); document.getElementById('todoInput').value=''; }
+        };
+
+        // --- Pomodoro ---
+        window.togglePomodoroSettings = () => document.getElementById('pomodoroSettings').classList.toggle('hidden');
+        
+        document.getElementById('startTimer').onclick = function() {
+            const btn = this;
+            if(!isTimerRunning) {
+                if(!timeLeft) timeLeft = document.getElementById('workDuration').value*60;
+                isTimerRunning=true; btn.textContent='Pause';
+                timerInterval = setInterval(() => {
+                   if(timeLeft>0) {
+                       timeLeft--;
+                       const min=Math.floor(timeLeft/60).toString().padStart(2,'0'), sec=(timeLeft%60).toString().padStart(2,'0');
+                       document.getElementById('timerDisplay').innerText=`${min}:${sec}`;
+                       const total = (isWorkPhase?document.getElementById('workDuration').value:document.getElementById('breakDuration').value)*60;
+                       document.getElementById('timerProgressBar').style.width = `${((total-timeLeft)/total)*100}%`;
+                   } else {
+                       isWorkPhase = !isWorkPhase;
+                       document.querySelector('.timer-phase').textContent = isWorkPhase?'Work Time':'Break Time';
+                       timeLeft = (isWorkPhase?document.getElementById('workDuration').value:document.getElementById('breakDuration').value)*60;
+                       window.playSound(isWorkPhase?'complete':'add');
+                   }
+                }, 1000);
+            } else {
+                isTimerRunning=false; btn.textContent='Resume'; clearInterval(timerInterval);
+            }
+        };
+
+        document.getElementById('resetTimer').onclick = () => {
+             clearInterval(timerInterval); isTimerRunning=false; isWorkPhase=true;
+             document.getElementById('startTimer').textContent='Start';
+             timeLeft = document.getElementById('workDuration').value*60;
+             document.getElementById('timerDisplay').innerText = `${Math.floor(timeLeft/60)}:00`;
+             document.getElementById('timerProgressBar').style.width='0%';
+             document.querySelector('.timer-phase').textContent='Work Time';
+        };
+
+        // Theme Toggle
+        document.getElementById('themeToggle').onclick = () => {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            document.getElementById('themeToggle').textContent = isDark ? '🌙' : '☀️';
+            localStorage.setItem('theme', isDark?'dark':'light');
+        };
+        if(localStorage.getItem('theme')==='dark') { document.body.classList.add('dark-mode'); document.getElementById('themeToggle').textContent='🌙'; }
+    </script>
+</body>
+</html>
