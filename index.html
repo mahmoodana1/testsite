@@ -1,249 +1,111 @@
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8" />
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
-
     <meta name="theme-color" content="#F5F5F7">
-
     <title>Study Spark | Ultimate Workspace</title>
-
-    
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
-
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-
-    
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
-
-
     <style>
 
         /* -------------------------------------------------------------------------- */
-
         /* VARIABLES                                                                  */
-
         /* -------------------------------------------------------------------------- */
-
         :root {
-
             /* Light Mode (Standard) */
-
             --bg-body: #F5F5F7;
-
             --bg-sidebar: #FFFFFF;
-
             --bg-card: #FFFFFF;
-
             --bg-glass: rgba(255, 255, 255, 0.75);
-
             --bg-glass-border: 1px solid rgba(255, 255, 255, 0.6);
-
             --bg-input: rgba(0, 0, 0, 0.04);
-
             --bg-hover: rgba(0, 0, 0, 0.03);
-
-            
-
             --text-primary: #1D1D1F;
-
             --text-secondary: #86868B;
-
             --text-tertiary: #B0B0B5;
-
-            
-
             --border-color: rgba(0,0,0,0.06);
-
-
             /* Accents */
-
             --accent-blue: #0071e3;
-
             --accent-blue-soft: rgba(0, 113, 227, 0.15);
-
             --accent-purple: #5e5ce6;
-
             --accent-green: #34c759;
-
             --accent-green-soft: rgba(52, 199, 89, 0.15);
-
             --accent-orange: #ff9f0a;
-
             --accent-red: #ff3b30;
-
-
             /* Shadows & Effects */
-
             --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-
             --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
-
             --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.12);
-
             --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.05);
-
-            
-
             /* Dimensions */
-
             --radius-sm: 8px;
-
             --radius-md: 16px;
-
             --radius-lg: 24px;
-
             --header-height: 80px;
-
             --sidebar-width: 400px;
-
-            
-
             /* Animations */
-
             --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-
             --ease-smooth: cubic-bezier(0.2, 0.8, 0.2, 1);
-
         }
-
-
         /* -------------------------------------------------------------------------- */
-
         /* DARK MODE (HIGH CONTRAST OLED)                                             */
-
         /* -------------------------------------------------------------------------- */
-
         body.dark-mode {
-
             /* Backgrounds: Deep, rich blacks for high contrast */
-
             --bg-body: #050505; 
-
             --bg-sidebar: #121212;
-
             --bg-card: #18181A;
-
             --bg-glass: rgba(20, 20, 20, 0.85);
-
             --bg-glass-border: 1px solid rgba(255, 255, 255, 0.15);
-
-            
-
             /* Inputs */
-
             --bg-input: #262626;
-
             --bg-hover: #333333;
-
-            
-
             /* Text: All White/Bright to avoid visibility issues */
-
             --text-primary: #FFFFFF;
-
-            --text-secondary: #E5E5E5; /* Almost white */
-
-            --text-tertiary: #A0A0A0; /* Distinctly visible gray */
-
-            
-
+            --text-secondary: #E5E5E5;
+            --text-tertiary: #A0A0A0;
             /* Borders: More visible in dark mode to define shapes */
-
             --border-color: #333333;
-
-            
-
             /* Accents: Slightly brighter */
-
             --accent-blue: #409CFF;
-
             --accent-blue-soft: rgba(64, 156, 255, 0.25);
-
             --accent-purple: #BF5AF2;
-
             --accent-green: #30D158;
-
             --accent-green-soft: rgba(48, 209, 88, 0.25);
-
             --accent-orange: #FF9F0A;
-
             --accent-red: #FF453A;
-
-            
-
             --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.5);
-
             --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.7);
-
         }
-
-
         /* -------------------------------------------------------------------------- */
-
         /* RESET                                                                      */
-
         /* -------------------------------------------------------------------------- */
-
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
-
-        
-
         html, body {
-
             margin: 0; padding: 0;
-
             width: 100%; height: 100%;
-
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-
             background-color: var(--bg-body);
-
             color: var(--text-primary);
-
             transition: background-color 0.3s ease, color 0.3s ease;
-
             overflow: hidden;
-
         }
-
-
         input, button, textarea { font-family: inherit; }
-
         a { text-decoration: none; color: inherit; }
-
         ul, li { list-style: none; padding: 0; margin: 0; }
-
         h1, h2, h3, h4, h5, h6, p { margin: 0; }
-
-
         /* Custom Scrollbar */
-
         ::-webkit-scrollbar { width: 6px; height: 6px; }
-
         ::-webkit-scrollbar-track { background: transparent; }
-
         ::-webkit-scrollbar-thumb { background: var(--text-tertiary); border-radius: 10px; }
-
         ::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
-
-
         /* Input Number Reset */
-
         input[type=number]::-webkit-inner-spin-button, 
-
         input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 
 
