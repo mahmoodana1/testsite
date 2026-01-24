@@ -1170,27 +1170,29 @@
             if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
         }
 
-const toggleSidebar = () => {
-    // Check if we are on Mobile or PC based on window width
-    if (window.innerWidth > 900) {
-        // PC MODE: Toggle the grid layout class
-        getEl('appLayout').classList.toggle('collapsed');
-        
-        // Optional: Rotate the toggle icon when collapsed
-        const btn = getEl('sidebarToggle');
-        if (getEl('appLayout').classList.contains('collapsed')) {
-            btn.style.transform = "rotate(180deg)";
-        } else {
-            btn.style.transform = "rotate(0deg)";
-        }
-    } else {
-        // MOBILE MODE: Use existing overlay logic
-        const sidebar = getEl('sidebar');
-        const overlay = getEl('sidebarOverlay');
-        sidebar.classList.toggle('open');
-        overlay.classList.toggle('active');
-    }
-};
+        const toggleSidebar = () => {
+            // Check if we are on Mobile or PC based on window width
+            if (window.innerWidth > 900) {
+                // PC MODE: Toggle the grid layout class
+                getEl('appLayout').classList.toggle('collapsed');
+                
+                // Optional: Rotate the toggle icon when collapsed
+                const btn = getEl('sidebarToggle');
+                if (getEl('appLayout').classList.contains('collapsed')) {
+                    btn.style.transform = "rotate(180deg)";
+                } else {
+                    btn.style.transform = "rotate(0deg)";
+                }
+            } else {
+                // MOBILE MODE: Use existing overlay logic
+                const sidebar = getEl('sidebar');
+                const overlay = getEl('sidebarOverlay');
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('active');
+            }
+        };
+
+        function setupEventListeners() {
             getEl('sidebarToggle').onclick = toggleSidebar;
             getEl('sidebarClose').onclick = toggleSidebar;
             getEl('sidebarOverlay').onclick = toggleSidebar;
