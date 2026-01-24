@@ -542,7 +542,7 @@
         }
 
         /* -------------------------------------------------------------------------- */
-        /* COURSE MODAL (RESTRUCTURED)                                                */
+        /* COURSE MODAL (RESTRUCTURED)                                               */
         /* -------------------------------------------------------------------------- */
         .course-modal-overlay {
             position: fixed;
@@ -1510,6 +1510,7 @@
                     mainIn.onkeydown = (e) => {
                         if(e.key === 'Enter') {
                             e.preventDefault();
+                            e.target.blur(); // Triggers save before adding new
                             addGoal(courseId, cat.id);
                         }
                     };
