@@ -1719,9 +1719,48 @@
     }
 
     /* RENDERING */
-    function renderAll() {
-      renderTasks(); renderFocus(); renderCourses(); renderStats();
-      if (state.currentCourseId) window.openCourseModal(state.currentCourseId);
+    function renderFocus() {
+      const hero = getEl('focusHero');
+      // Find the active task
+      const task = state.todos.find(t => t.id === state.focusId && !t.completed);
+
+      // If no task is selected
+      if (!task) {
+        hero.innerHTML = `
+                    <div style="opacity:0.5;">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                    </div>
+                    <h2 class="text-h2" style="margin-top:16px;">No Active Focus</h2>
+                    <p class="text-body" style="margin-top:8px;">Select a task from the sidebar to begin.</p>
+                `;
+        return;
+      }
+
+      // Get color
+      const color = colors[task.color] || colors.blue;
+
+      // --- FIX IS HERE ---
+      // We check: Does task.days exist? 
+      // If YES: We create the string " • 2d LEFT"
+      // If NO: We set it to an empty string ""
+      const daysInfo = task.days ? ` • ${task.days} LEFT` : '';
+
+      hero.innerHTML = `
+                <div class="focus-progress-bar" style="background:${color}; width:100%;"></div>
+                
+                <div class="focus-label" style="color:${color};">CURRENT PRIORITY${daysInfo}</div>
+                
+                <h2 class="focus-title animate-in">${task.text}</h2>
+                <div class="focus-subtitle">Stay strictly on this task until completion.</div>
+                <button type="button" class="btn-primary" style="margin-top:32px; background:${color}; box-shadow:0 8px 20px -4px ${color}80;">
+                    Complete Task
+                </button>
+            `;
+
+      hero.querySelector('button').onclick = () => {
+        confetti({particleCount: 100, spread: 70, origin: {y: 0.6}});
+        toggleTask(task.id);
+      };
     }
 
     function renderTasks() {
