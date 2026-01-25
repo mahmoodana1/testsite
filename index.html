@@ -304,8 +304,31 @@
             background: inherit; opacity: 0.5; filter: blur(4px); z-index: -1;
         }
 
-        /* Task List */
-        .task-list-wrapper { flex: 1; overflow-y: auto; padding-right: 4px; }
+        /* Task List Container (Scrollable Logic) */
+        .task-list-wrapper { 
+            flex: 1; 
+            padding-right: 4px; 
+            /* Ensure container has flex layout to manage the two lists */
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Hide main scroll, we scroll sub-lists */
+        }
+        
+        /* UPDATED: Limit visible tasks (approx 5 items) on PC */
+        #taskList {
+            max-height: 380px; 
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+        
+        /* UPDATED: Limit visible completed tasks */
+        #completedList {
+            max-height: 380px;
+            overflow-y: auto;
+            padding-right: 4px;
+            margin-top: 12px;
+            display: none;
+        }
         
         /* UPDATED TASK TAB STYLE */
         .task-item {
@@ -408,6 +431,7 @@
             border: none; cursor: pointer;
             transition: all 0.2s;
             display: flex; align-items: center; gap: 8px;
+            height: 42px; /* Fixed height for alignment */
         }
         .auth-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); opacity: 0.9; }
 
@@ -567,7 +591,7 @@
         }
 
         /* -------------------------------------------------------------------------- */
-        /* COURSE MODAL (RESTRUCTURED)                                               */
+        /* COURSE MODAL (RESTRUCTURED)                                      */
         /* -------------------------------------------------------------------------- */
         .course-modal-overlay {
             position: fixed;
@@ -939,6 +963,11 @@
             .btn-icon, .btn-ghost, .btn-primary { min-height: 44px; }
             .btn-new-course { min-height: 48px; }
             .task-item { padding: 20px; }
+            
+            /* UPDATE: 3 items max on phone (approx 230px) */
+            #taskList, #completedList {
+                max-height: 230px;
+            }
         }
     </style>
 </head>
@@ -1008,14 +1037,11 @@
                         <span class="text-xs">COMPLETED HISTORY</span>
                         <span id="completedArrow">▼</span>
                     </div>
-                    <div id="completedList" style="display:none; margin-top:12px;"></div>
+                    <div id="completedList"></div>
                 </div>
             </div>
-
-            <div style="margin-top:auto; padding-top:20px; border-top:1px solid var(--border-color); display:flex; justify-content:center;">
-                <button type="button" class="btn-ghost" id="themeToggle">◐ Switch Theme</button>
-            </div>
-        </aside>
+            
+            </aside>
 
         <main class="main-content">
             <header class="top-bar">
@@ -1028,10 +1054,16 @@
                         <h1 class="text-h1" id="greeting">Good Morning</h1>
                     </div>
                 </div>
-                <button type="button" class="auth-btn" id="loginBtn">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-                    Sign In
-                </button>
+                
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <button type="button" class="btn-ghost" id="themeToggle" style="padding: 10px; border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    </button>
+                    <button type="button" class="auth-btn" id="loginBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                        Sign In
+                    </button>
+                </div>
             </header>
 
             <section class="focus-hero" id="focusHero">
@@ -1293,7 +1325,9 @@
         onAuthStateChanged(auth, (user) => {
             state.user = user;
             if (user) {
-                getEl('loginBtn').innerHTML = `<img src="${user.photoURL}" style="width:20px; height:20px; border-radius:50%; margin-right:8px;"> Sign Out`;
+                // CHANGED: Simple 1 color modern icon for sign out
+                getEl('loginBtn').innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>`;
+                getEl('loginBtn').title = "Sign Out";
                 getEl('loginBtn').onclick = () => signOut(auth);
                 
                 onSnapshot(doc(db, 'users', user.uid), (docSnap) => {
@@ -1315,7 +1349,7 @@
                     }
                 });
             } else {
-                getEl('loginBtn').innerHTML = 'Sign In';
+                getEl('loginBtn').innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> Sign In`;
                 getEl('loginBtn').onclick = () => signInWithPopup(auth, provider);
                 renderAll();
             }
