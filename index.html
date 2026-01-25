@@ -110,39 +110,43 @@
         }
 
         /* -------------------------------------------------------------------------- */
-        /* DARK MODE (HIGH CONTRAST OLED)                                     */
+        /* DARK MODE (Dracula / Catppuccin Mocha Inspired)                            */
         /* -------------------------------------------------------------------------- */
         body.dark-mode {
-            /* Backgrounds: Deep, rich blacks for high contrast */
-            --bg-body: #000000; 
-            --bg-sidebar: #121212;
-            --bg-card: #1C1C1E;
-            --bg-glass: rgba(20, 20, 20, 0.85);
-            --bg-glass-border: 1px solid rgba(255, 255, 255, 0.15);
+            /* Backgrounds: Smooth deep blue-grays instead of harsh blacks */
+            --bg-body: #1e1e2e; /* Catppuccin Base */
+            --bg-sidebar: #181825; /* Catppuccin Mantle */
+            --bg-card: #11111b; /* Catppuccin Crust */
+            --bg-glass: rgba(30, 30, 46, 0.85);
+            --bg-glass-border: 1px solid rgba(255, 255, 255, 0.08);
             
             /* Inputs */
-            --bg-input: #2C2C2E;
-            --bg-hover: #3A3A3C;
+            --bg-input: #313244; /* Surface0 */
+            --bg-hover: #45475a; /* Surface1 */
             
-            /* Text */
-            --text-primary: #FFFFFF;
-            --text-secondary: #E5E5E5;
-            --text-tertiary: #8E8E93;
+            /* Text - Pastels */
+            --text-primary: #cdd6f4; /* Text */
+            --text-secondary: #a6adc8; /* Subtext0 */
+            --text-tertiary: #6c7086; /* Overlay0 */
             
             /* Borders */
-            --border-color: #38383A;
+            --border-color: #313244; /* Surface0 */
             
-            /* Accents */
-            --accent-blue: #0A84FF;
-            --accent-blue-soft: rgba(10, 132, 255, 0.25);
-            --accent-purple: #BF5AF2;
-            --accent-green: #30D158;
-            --accent-green-soft: rgba(48, 209, 88, 0.25);
-            --accent-orange: #FF9F0A;
-            --accent-red: #FF453A;
+            /* Accents - Vibrant Pastels */
+            --accent-blue: #89b4fa; /* Blue */
+            --accent-blue-soft: rgba(137, 180, 250, 0.15);
             
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.5);
-            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.7);
+            --accent-purple: #cba6f7; /* Mauve */
+            --accent-green: #a6e3a1; /* Green */
+            --accent-green-soft: rgba(166, 227, 161, 0.15);
+            
+            --accent-orange: #fab387; /* Peach */
+            --accent-red: #f38ba8; /* Red */
+            
+            /* Shadows - Softer shadows for dark mode */
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.6);
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.8);
         }
 
         /* -------------------------------------------------------------------------- */
@@ -1553,8 +1557,11 @@
                     addGoal(courseId, cat.id);
                 };
 
+                // UPDATED: Confirmation before deleting category
                 section.querySelector('[data-action="delete-cat"]').onclick = () => {
-                    deleteCategory(courseId, cat.id);
+                    if(confirm("Are you sure you want to delete this category and all its goals?")) {
+                        deleteCategory(courseId, cat.id);
+                    }
                 };
 
                 const goalsCont = section.querySelector('.goals-container');
@@ -1579,6 +1586,8 @@
                     
                     const mainIn = gItem.querySelector('.goal-main-input');
                     mainIn.onblur = () => updateGoal(courseId, cat.id, goal.id, { title: mainIn.value }, false);
+                    
+                    // UPDATED: Enter Key creates new goal and focuses it
                     mainIn.onkeydown = (e) => {
                         if(e.key === 'Enter') {
                             e.preventDefault();
