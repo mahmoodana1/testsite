@@ -2047,7 +2047,7 @@
       const btn = getEl('startTimerBtn'); btn.innerText = "Start Focus"; btn.style.background = "var(--text-primary)";
     }
     function showToast(msg) {getEl('toastMsg').innerText = msg; getEl('toast').classList.add('active'); setTimeout(hideToast, 4000);}
-    function hideToast() {getEl('toast').classList.remove('active'); setTimeout(() => {state.lastUndo = null;}, 500);}
+    function hideToast() {getEl('toast').classList.remove('active'); setTimeout(() => {state.lastUndo = null;}, 600);}
 
     init();
   </script>
