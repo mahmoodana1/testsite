@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
-    <meta name="theme-color" content="#eff1f5">
+    <meta name="theme-color" content="#F2F2F7">
     <title>Study Spark | Ultimate Workspace</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,85 +16,84 @@
 
     <style>
         /* -------------------------------------------------------------------------- */
-        /* VARIABLES (CATPPUCCIN PALETTE)                                            */
+        /* VARIABLES                                                                  */
         /* -------------------------------------------------------------------------- */
         :root {
-            /* LIGHT MODE (Catppuccin Latte) */
-            --bg-body: #eff1f5;       /* Base */
-            --bg-sidebar: #e6e9ef;    /* Mantle */
-            --bg-card: #ffffff;       /* Crust/White */
-            --bg-glass: rgba(239, 241, 245, 0.85);
-            --bg-glass-border: 1px solid rgba(0, 0, 0, 0.05);
+            /* LIGHT MODE: APPLE GLASSY AESTHETIC */
+            --bg-body: #F2F2F7;         /* Apple System Gray 6 */
+            --bg-sidebar: rgba(255, 255, 255, 0.7); /* Translucent for blur */
+            --bg-card: rgba(255, 255, 255, 0.65);   /* Translucent for blur */
+            --bg-glass: rgba(255, 255, 255, 0.8);
             
-            --bg-input: #ccd0da;      /* Surface0 */
-            --bg-hover: #bcc0cc;      /* Surface1 */
+            /* "Black Edges" - crisper borders for light mode */
+            --bg-glass-border: 1px solid rgba(0, 0, 0, 0.12);
+            --border-color: rgba(0, 0, 0, 0.12); 
             
-            --text-primary: #4c4f69;  /* Text */
-            --text-secondary: #6c6f85;/* Subtext0 */
-            --text-tertiary: #9ca0b0; /* Overlay0 */
+            --bg-input: rgba(0, 0, 0, 0.05);
+            --bg-hover: rgba(0, 0, 0, 0.08);
             
-            --border-color: rgba(0,0,0,0.06);
-
-            /* Accents (Latte) - Unified Palette Logic */
+            --text-primary: #1d1d1f;
+            --text-secondary: #86868b;
+            --text-tertiary: #aeaeb2;
+            
+            /* Catppuccin Latte Accents (Vibrant in Light Mode) */
             --accent-blue: #1e66f5;
-            --accent-blue-soft: rgba(30, 102, 245, 0.15);
-            
+            --accent-blue-soft: rgba(30, 102, 245, 0.12);
             --accent-purple: #8839ef;
             --accent-green: #40a02b;
             --accent-green-soft: rgba(64, 160, 43, 0.15);
-            
             --accent-orange: #fe640b;
             --accent-red: #d20f39;
             
-            /* Shadows */
+            /* Premium Soft Shadows */
             --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
-            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.12);
-            --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 12px 24px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 24px 48px rgba(0, 0, 0, 0.1);
+            --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.08);
             
             --radius-sm: 8px;
-            --radius-md: 16px;
-            --radius-lg: 24px;
+            --radius-md: 18px;
+            --radius-lg: 28px;
             --sidebar-width: 400px;
             
             --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --blur-amt: 20px; /* Glass strength */
         }
 
-        /* DARK MODE (Catppuccin Mocha) */
+        /* DARK MODE: CATPPUCCIN MOCHA */
         body.dark-mode {
-            --bg-body: #1e1e2e;       /* Base */
-            --bg-sidebar: #181825;    /* Mantle */
-            --bg-card: #11111b;       /* Crust */
+            --bg-body: #1e1e2e;
+            --bg-sidebar: #181825; /* Solid backgrounds in dark mode usually look better than blur */
+            --bg-card: #11111b;
             --bg-glass: rgba(30, 30, 46, 0.85);
             --bg-glass-border: 1px solid rgba(255, 255, 255, 0.08);
             
-            --bg-input: #313244;      /* Surface0 */
-            --bg-hover: #45475a;      /* Surface1 */
+            --bg-input: #313244;
+            --bg-hover: #45475a;
             
-            --text-primary: #cdd6f4;  /* Text */
-            --text-secondary: #a6adc8;/* Subtext0 */
-            --text-tertiary: #6c7086; /* Overlay0 */
+            --text-primary: #cdd6f4;
+            --text-secondary: #a6adc8;
+            --text-tertiary: #6c7086;
             
             --border-color: #313244;
             
-            /* Accents (Mocha) - Matching Hue/Vibe */
             --accent-blue: #89b4fa;
             --accent-blue-soft: rgba(137, 180, 250, 0.15);
-            
             --accent-purple: #cba6f7;
             --accent-green: #a6e3a1;
             --accent-green-soft: rgba(166, 227, 161, 0.15);
-            
             --accent-orange: #fab387;
             --accent-red: #f38ba8;
             
             --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
             --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.6);
             --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.8);
+            
+            --blur-amt: 0px; /* Disable heavy blur in dark mode for crispness */
         }
 
         /* -------------------------------------------------------------------------- */
-        /* RESET                                                                  */
+        /* RESET                                                                      */
         /* -------------------------------------------------------------------------- */
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         
@@ -121,16 +120,25 @@
         /* -------------------------------------------------------------------------- */
         /* TYPOGRAPHY                                                                 */
         /* -------------------------------------------------------------------------- */
-        .text-h1 { font-size: 2.5rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; }
-        .text-h2 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; }
+        .text-h1 { font-size: 2.5rem; font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; }
+        .text-h2 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.01em; }
         .text-h3 { font-size: 1.2rem; font-weight: 600; letter-spacing: -0.01em; }
         .text-body { font-size: 1rem; line-height: 1.5; color: var(--text-secondary); }
         .text-sm { font-size: 0.875rem; }
         .text-xs { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
         
         /* -------------------------------------------------------------------------- */
-        /* ANIMATIONS & LAYOUT                                                        */
+        /* LAYOUT & ANIMATIONS                                                        */
         /* -------------------------------------------------------------------------- */
+        .app-layout {
+            display: grid;
+            grid-template-columns: var(--sidebar-width) 1fr;
+            height: 100vh; width: 100vw; overflow: hidden;
+            transition: grid-template-columns 0.4s var(--ease-spring);
+        }
+        .app-layout.collapsed { grid-template-columns: 0px 1fr; }
+        .app-layout.collapsed .sidebar { opacity: 0; transform: translateX(-20px); pointer-events: none; }
+
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes highlightPulse { 
@@ -142,21 +150,17 @@
         .animate-in { animation: fadeInUp 0.5s var(--ease-spring) forwards; }
         .animate-spin { animation: spin 1s linear infinite; }
         .highlight-task { animation: highlightPulse 0.8s ease-in-out; border-color: var(--accent-blue) !important; }
-        
-        .app-layout {
-            display: grid;
-            grid-template-columns: var(--sidebar-width) 1fr;
-            height: 100vh; width: 100vw; overflow: hidden;
-            transition: grid-template-columns 0.4s var(--ease-spring);
-        }
-        .app-layout.collapsed { grid-template-columns: 0px 1fr; }
-        .app-layout.collapsed .sidebar { opacity: 0; transform: translateX(-20px); pointer-events: none; }
 
         /* -------------------------------------------------------------------------- */
-        /* SIDEBAR                                                                    */
+        /* SIDEBAR (GLASSY)                                                           */
         /* -------------------------------------------------------------------------- */
         .sidebar {
-            background: var(--bg-sidebar); border-right: 1px solid var(--border-color);
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            /* GLASS EFFECT */
+            backdrop-filter: blur(var(--blur-amt));
+            -webkit-backdrop-filter: blur(var(--blur-amt));
+            
             height: 100%; display: flex; flex-direction: column; padding: 32px;
             z-index: 50; transition: transform 0.4s var(--ease-spring), opacity 0.3s;
             position: relative; overflow: hidden;
@@ -173,12 +177,14 @@
         .btn-random:hover { background: var(--text-primary); color: var(--bg-body); border-color: var(--text-primary); }
 
         .task-input-container {
-            background: var(--bg-body); border-radius: var(--radius-md); padding: 16px;
+            background: var(--bg-card); /* Use card bg for glass effect */
+            backdrop-filter: blur(var(--blur-amt));
+            border-radius: var(--radius-md); padding: 16px;
             border: 1px solid var(--border-color); transition: all 0.3s ease;
             box-shadow: var(--shadow-sm); margin-bottom: 24px;
         }
         .task-input-container:focus-within {
-            background: var(--bg-card); border-color: var(--accent-blue);
+            border-color: var(--accent-blue);
             box-shadow: 0 0 0 4px var(--accent-blue-soft);
         }
 
@@ -207,21 +213,18 @@
         }
         .color-dot:hover { transform: scale(1.2); }
         .color-dot.active { transform: scale(1.25); border-color: var(--text-primary); }
-        .color-dot::after {
-            content: ''; position: absolute; inset: 0; border-radius: 50%;
-            background: inherit; opacity: 0.5; filter: blur(4px); z-index: -1;
-        }
-
-        .task-list-wrapper { flex: 1; padding-right: 4px; display: flex; flex-direction: column; overflow: hidden; }
         
-        /* SCROLLABLE LISTS */
+        .task-list-wrapper { flex: 1; padding-right: 4px; display: flex; flex-direction: column; overflow: hidden; }
         #taskList, #completedList { overflow-y: auto; padding-right: 4px; }
         #taskList { max-height: 380px; }
         #completedList { max-height: 380px; margin-top: 12px; display: none; }
 
-        /* TASK ITEM STYLE */
+        /* GLASSY TASK ITEM */
         .task-item {
-            display: flex; align-items: center; gap: 14px; background: var(--bg-card);
+            display: flex; align-items: center; gap: 14px;
+            background: var(--bg-card);
+            backdrop-filter: blur(var(--blur-amt));
+            
             padding: 18px; margin-bottom: 12px; border-radius: var(--radius-md);
             border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);
             transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1); cursor: grab;
@@ -248,7 +251,6 @@
         .task-item:hover .task-text { white-space: normal; overflow: visible; word-break: break-word; }
         .task-meta { font-size: 0.75rem; color: var(--text-tertiary); display: flex; align-items: center; gap: 6px; }
 
-        /* UPDATE: TASK DELETE BUTTON VISIBILITY */
         .btn-delete-task {
             opacity: 0.6; border: none; background: transparent;
             color: var(--text-secondary); width: 32px; height: 32px;
@@ -305,9 +307,13 @@
         .focus-title { font-size: 2.5rem; font-weight: 800; margin-bottom: 8px; line-height: 1.2; }
         .focus-subtitle { font-size: 1.1rem; color: var(--text-secondary); max-width: 600px; }
 
+        /* GLASSY CARDS */
         .bento-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-bottom: 48px; }
         .bento-card {
-            background: var(--bg-sidebar); border-radius: var(--radius-lg); padding: 24px;
+            background: var(--bg-card);
+            backdrop-filter: blur(var(--blur-amt));
+            
+            border-radius: var(--radius-lg); padding: 24px;
             border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); display: flex;
             flex-direction: column; justify-content: center; transition: all 0.3s;
         }
@@ -340,7 +346,10 @@
 
         .courses-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
         .course-card-compact {
-            background: var(--bg-card); border-radius: var(--radius-md); padding: 24px;
+            background: var(--bg-card); 
+            backdrop-filter: blur(var(--blur-amt));
+            
+            border-radius: var(--radius-md); padding: 24px;
             box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); cursor: pointer;
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); position: relative; overflow: hidden;
         }
