@@ -26,15 +26,15 @@
       /* LIGHT MODE: APPLE GLASSY AESTHETIC */
       --bg-body: #F2F2F7;
       /* Apple System Gray 6 */
-      --bg-sidebar: rgba(255, 255, 255, 0.7);
+      --bg-sidebar: rgba(255, 255, 255, 0.5);
       /* Translucent for blur */
-      --bg-card: rgba(255, 255, 255, 0.65);
+      --bg-card: rgba(255, 255, 255, 0.6);
       /* Translucent for blur */
-      --bg-glass: rgba(255, 255, 255, 0.8);
+      --bg-glass: rgba(255, 255, 255, 0.7);
 
       /* "Black Edges" - crisper borders for light mode */
-      --bg-glass-border: 2px solid rgba(0, 0, 0, 0.18);
-      --border-color: rgba(0, 0, 0, 0.2);
+      --bg-glass-border: 1px solid rgba(0, 0, 0, 0.12);
+      --border-color: rgba(0, 0, 0, 0.12);
 
       --bg-input: rgba(0, 0, 0, 0.05);
       --bg-hover: rgba(0, 0, 0, 0.08);
@@ -43,13 +43,22 @@
       --text-secondary: #86868b;
       --text-tertiary: #aeaeb2;
 
-      /* LIVELY / ELECTRIC POP PALETTE */
+      /* Catppuccin Latte Accents (Vibrant in Light Mode) */
+      /* A punchy, electric blue */
       --accent-blue: #3A86FF;
       --accent-blue-soft: rgba(58, 134, 255, 0.15);
+
+      /* A vibrant violet (less dark than before) */
       --accent-purple: #8338EC;
+
+      /* A bright mint/emerald green (much livelier than forest green) */
       --accent-green: #06D6A0;
       --accent-green-soft: rgba(6, 214, 160, 0.15);
+
+      /* A high-visibility bright orange */
       --accent-orange: #FF9F1C;
+
+      /* A poppy, slightly pinkish red (more modern/lively than brick red) */
       --accent-red: #FF3366;
 
       /* Premium Soft Shadows */
@@ -1719,48 +1728,9 @@
     }
 
     /* RENDERING */
-    function renderFocus() {
-      const hero = getEl('focusHero');
-      // Find the active task
-      const task = state.todos.find(t => t.id === state.focusId && !t.completed);
-
-      // If no task is selected
-      if (!task) {
-        hero.innerHTML = `
-                    <div style="opacity:0.5;">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                    </div>
-                    <h2 class="text-h2" style="margin-top:16px;">No Active Focus</h2>
-                    <p class="text-body" style="margin-top:8px;">Select a task from the sidebar to begin.</p>
-                `;
-        return;
-      }
-
-      // Get color
-      const color = colors[task.color] || colors.blue;
-
-      // --- FIX IS HERE ---
-      // We check: Does task.days exist? 
-      // If YES: We create the string " • 2d LEFT"
-      // If NO: We set it to an empty string ""
-      const daysInfo = task.days ? ` • ${task.days} LEFT` : '';
-
-      hero.innerHTML = `
-                <div class="focus-progress-bar" style="background:${color}; width:100%;"></div>
-                
-                <div class="focus-label" style="color:${color};">CURRENT PRIORITY${daysInfo}</div>
-                
-                <h2 class="focus-title animate-in">${task.text}</h2>
-                <div class="focus-subtitle">Stay strictly on this task until completion.</div>
-                <button type="button" class="btn-primary" style="margin-top:32px; background:${color}; box-shadow:0 8px 20px -4px ${color}80;">
-                    Complete Task
-                </button>
-            `;
-
-      hero.querySelector('button').onclick = () => {
-        confetti({particleCount: 100, spread: 70, origin: {y: 0.6}});
-        toggleTask(task.id);
-      };
+    function renderAll() {
+      renderTasks(); renderFocus(); renderCourses(); renderStats();
+      if (state.currentCourseId) window.openCourseModal(state.currentCourseId);
     }
 
     function renderTasks() {
