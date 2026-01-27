@@ -1551,6 +1551,12 @@
         <input type="number" id="customWorkDur" value="25"
           style="width:100%; padding:12px; border-radius:8px; border:1px solid var(--bg-input); background:var(--bg-body); color:var(--text-primary); font-size:1.1rem;">
       </div>
+      <div style="margin-bottom:20px;">
+        <label class="text-xs" style="color:var(--text-secondary); display:block; margin-bottom:8px;">REST DURATION
+          (MIN)</label>
+        <input type="number" id="customRestDur" value="5"
+          style="width:100%; padding:12px; border-radius:8px; border:1px solid var(--bg-input); background:var(--bg-body); color:var(--text-primary); font-size:1.1rem;">
+      </div>
       <div style="display:flex; justify-content:flex-end; gap:12px;">
         <button type="button" class="btn-ghost" onclick="toggleModal('timerModal')">Cancel</button>
         <button type="button" class="btn-primary" onclick="saveTimerSettings()">Save</button>
@@ -1584,7 +1590,7 @@
       todos: [],
       courses: [],
       focusId: null,
-      timer: {isRunning: false, timeLeft: 1500, duration: 25},
+      timer: {isRunning: false, timeLeft: 1500, workDur: 25, restDur: 5, mode: 'work'}, // UPDATED STATE
       lastUndo: null,
       isLocalUpdate: false,
       currentCourseId: null
@@ -2016,36 +2022,92 @@
       if (list.style.display === 'none') {list.style.display = 'block'; arrow.innerText = '▲';}
       else {list.style.display = 'none'; arrow.innerText = '▼';}
     };
-    window.setTimer = (min) => {state.timer.duration = min; resetTimer();}
+    
+    // UPDATED TIMER LOGIC
+    window.setTimer = (min) => {
+      // Heuristic: If min is 5 or 15, treat as Rest/Break, otherwise Work
+      clearInterval(timerInterval);
+      state.timer.isRunning = false;
+      state.timer.timeLeft = min * 60;
+      
+      if (min === 5 || min === 15) {
+        state.timer.mode = 'rest';
+        state.timer.restDur = min; 
+        getEl('startTimerBtn').innerText = "Start Rest";
+        getEl('timerDisplay').style.color = "var(--accent-green)";
+      } else {
+        state.timer.mode = 'work';
+        state.timer.workDur = min;
+        getEl('startTimerBtn').innerText = "Start Focus";
+        getEl('timerDisplay').style.color = "";
+      }
+      getEl('timerDisplay').innerText = formatTime(state.timer.timeLeft);
+    }
+
     window.saveTimerSettings = () => {
-      const d = parseInt(getEl('customWorkDur').value);
-      if (d > 0) state.timer.duration = d;
+      const work = parseInt(getEl('customWorkDur').value);
+      const rest = parseInt(getEl('customRestDur').value);
+      if (work > 0) state.timer.workDur = work;
+      if (rest > 0) state.timer.restDur = rest;
       resetTimer(); window.toggleModal('timerModal');
     };
+
     let timerInterval;
     function toggleTimer() {
       const btn = getEl('startTimerBtn');
       if (state.timer.isRunning) {
-        clearInterval(timerInterval); state.timer.isRunning = false; btn.innerText = "Resume"; btn.style.background = "var(--accent-green)";
+        clearInterval(timerInterval); state.timer.isRunning = false; btn.innerText = "Resume";
       } else {
-        if (state.timer.timeLeft === undefined) state.timer.timeLeft = state.timer.duration * 60;
-        state.timer.isRunning = true; btn.innerText = "Pause"; btn.style.background = "var(--accent-orange)";
+        if (state.timer.timeLeft === undefined || state.timer.timeLeft <= 0) {
+             state.timer.timeLeft = state.timer.mode === 'work' ? state.timer.workDur * 60 : state.timer.restDur * 60;
+        }
+        state.timer.isRunning = true; btn.innerText = "Pause";
+        
         timerInterval = setInterval(() => {
           if (state.timer.timeLeft > 0) {
             state.timer.timeLeft--; getEl('timerDisplay').innerText = formatTime(state.timer.timeLeft);
           } else {
+            // TIMER DONE
             clearInterval(timerInterval); state.timer.isRunning = false;
+            
+            // PLAY SOUND
             new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg').play();
-            alert("Focus Session Complete!"); resetTimer();
+            
+            // SWITCH MODE LOGIC
+            if (state.timer.mode === 'work') {
+                // WORK DONE -> SWITCH TO REST
+                state.timer.mode = 'rest';
+                state.timer.timeLeft = state.timer.restDur * 60;
+                showToast("Great job! Take a break.");
+                btn.innerText = "Start Rest";
+                getEl('timerDisplay').style.color = "var(--accent-green)";
+            } else {
+                // REST DONE -> SWITCH TO WORK
+                state.timer.mode = 'work';
+                state.timer.timeLeft = state.timer.workDur * 60;
+                showToast("Break over. Let's focus.");
+                btn.innerText = "Start Focus";
+                getEl('timerDisplay').style.color = "";
+            }
+            getEl('timerDisplay').innerText = formatTime(state.timer.timeLeft);
           }
         }, 1000);
       }
     }
+
     function resetTimer() {
-      clearInterval(timerInterval); state.timer.isRunning = false; state.timer.timeLeft = state.timer.duration * 60;
+      clearInterval(timerInterval); 
+      state.timer.isRunning = false; 
+      state.timer.mode = 'work'; // Always reset to Work mode
+      state.timer.timeLeft = state.timer.workDur * 60;
+      
       getEl('timerDisplay').innerText = formatTime(state.timer.timeLeft);
-      const btn = getEl('startTimerBtn'); btn.innerText = "Start Focus"; btn.style.background = "var(--text-primary)";
+      getEl('timerDisplay').style.color = "";
+      const btn = getEl('startTimerBtn'); 
+      btn.innerText = "Start Focus"; 
+      btn.style.background = "var(--text-primary)";
     }
+    
     function showToast(msg) {getEl('toastMsg').innerText = msg; getEl('toast').classList.add('active'); setTimeout(hideToast, 4000);}
     function hideToast() {getEl('toast').classList.remove('active'); setTimeout(() => {state.lastUndo = null;}, 600);}
 
