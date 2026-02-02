@@ -1945,6 +1945,21 @@
       if (t) {
         t.completed = !t.completed;
         if (t.completed) {confetti({particleCount: 50, spread: 60, origin: {y: 0.7}}); if (state.focusId === id) state.focusId = null;}
+        
+        // If this task is linked to a course goal, toggle that too
+        if (t.linkedGoalId && t.linkedCourseId && t.linkedCategoryId) {
+          const c = state.courses.find(x => x.id === t.linkedCourseId);
+          if (c) {
+            const cat = c.categories.find(x => x.id === t.linkedCategoryId);
+            if (cat) {
+              const g = cat.goals.find(x => x.id === t.linkedGoalId);
+              if (g) {
+                g.completed = t.completed;
+              }
+            }
+          }
+        }
+        
         saveData();
       }
     }
@@ -1993,7 +2008,21 @@
       const c = state.courses.find(x => x.id === cid);
       const cat = c.categories.find(x => x.id === catId);
       const g = cat.goals.find(x => x.id === gid);
-      if (g) {g.completed = !g.completed; if (g.completed) confetti({particleCount: 30, spread: 40, origin: {x: 0.5, y: 0.5}}); saveData();}
+      if (g) {
+        g.completed = !g.completed; 
+        if (g.completed) confetti({particleCount: 30, spread: 40, origin: {x: 0.5, y: 0.5}});
+        
+        // If this goal is linked to a task, toggle that too
+        if (g.linkedTaskId) {
+          const t = state.todos.find(x => x.id === g.linkedTaskId);
+          if (t) {
+            t.completed = g.completed;
+            if (t.completed && state.focusId === t.id) state.focusId = null;
+          }
+        }
+        
+        saveData();
+      }
     }
     function deleteGoal(cid, catId, gid) {
       const c = state.courses.find(x => x.id === cid);
@@ -2004,8 +2033,9 @@
       const c = state.courses.find(x => x.id === cid);
       const cat = c.categories.find(x => x.id === catId);
       const g = cat.goals.find(x => x.id === gid);
-      state.todos.push({id: generateId(), text: `[${c.name}] ${g.title}`, days: 0, color: activeColor, completed: false, createdAt: new Date().toISOString()});
-      cat.goals = cat.goals.filter(x => x.id !== gid);
+      const taskId = generateId();
+      state.todos.push({id: taskId, text: `[${c.name}] ${g.title}`, days: 0, color: activeColor, completed: g.completed, createdAt: new Date().toISOString(), linkedGoalId: gid, linkedCourseId: cid, linkedCategoryId: catId});
+      g.linkedTaskId = taskId;
       showToast("Converted to Task"); saveData();
     }
 
