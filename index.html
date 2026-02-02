@@ -2326,9 +2326,10 @@
         document.body.classList.remove(`theme-${theme}`);
       });
       
-      // Apply new theme
+      // Apply new theme and save to localStorage
       if (themeName === 'custom') {
         applyCustomTheme();
+        localStorage.setItem('theme', 'custom');
       } else {
         document.body.classList.add(`theme-${themeName}`);
         localStorage.setItem('theme', themeName);
@@ -2367,8 +2368,6 @@
       root.style.setProperty('--border-color', adjustColorBrightness(theme.bgInput, 5));
       root.style.setProperty('--bg-sidebar', theme.bgCard);
       root.style.setProperty('--bg-glass', hexToRgba(theme.bgBody, 0.85));
-      
-      localStorage.setItem('theme', 'custom');
     }
 
     function hexToRgba(hex, alpha) {
@@ -2381,13 +2380,11 @@
     function adjustColorBrightness(hex, percent) {
       const num = parseInt(hex.replace('#', ''), 16);
       const amt = Math.round(2.55 * percent);
-      const R = (num >> 16) + amt;
-      const G = (num >> 8 & 0x00FF) + amt;
-      const B = (num & 0x0000FF) + amt;
-      return '#' + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
-        (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
-        (B < 255 ? B < 1 ? 0 : B : 255))
-        .toString(16).slice(1);
+      const clamp = (val) => Math.max(0, Math.min(255, val));
+      const R = clamp((num >> 16) + amt);
+      const G = clamp((num >> 8 & 0x00FF) + amt);
+      const B = clamp((num & 0x0000FF) + amt);
+      return '#' + (0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1);
     }
 
     const toggleSidebar = () => {
@@ -2960,6 +2957,8 @@
         'customAccentBlue', 'customAccentGreen', 'customAccentOrange', 'customAccentRed'
       ];
       
+      const isValidHexColor = (value) => /^#[0-9A-F]{6}$/i.test(value);
+      
       colorFields.forEach(fieldId => {
         const colorInput = getEl(fieldId);
         const hexInput = getEl(fieldId + 'Hex');
@@ -2972,7 +2971,7 @@
         
         // Update color picker when hex input changes
         hexInput.oninput = () => {
-          if (/^#[0-9A-F]{6}$/i.test(hexInput.value)) {
+          if (isValidHexColor(hexInput.value)) {
             colorInput.value = hexInput.value;
             previewCustomTheme();
           }
