@@ -23,53 +23,53 @@
     /* VARIABLES                                                                  */
     /* -------------------------------------------------------------------------- */
     :root {
-      /* LIGHT MODE: APPLE GLASSY AESTHETIC */
-      --bg-body: #FDFDFD;
-      /* Apple System Gray 6 */
-      --bg-sidebar: rgba(255, 255, 255, 0.8);
-      /* Translucent for blur */
-      --bg-card: rgba(255, 255, 255, 0.999);
-      /* Translucent for blur */
-      --bg-glass: rgba(255, 255, 255, 0.7);
+      /* LIGHT MODE: MODERN VIBRANT AESTHETIC */
+      --bg-body: #F8F9FA;
+      /* Slightly warmer than pure white */
+      --bg-sidebar: rgba(255, 255, 255, 0.95);
+      /* More solid for better contrast */
+      --bg-card: rgba(255, 255, 255, 0.98);
+      /* Crisp white cards */
+      --bg-glass: rgba(255, 255, 255, 0.85);
 
-      /* "Black Edges" - crisper borders for light mode */
-      --bg-glass-border: 1px solid rgba(0, 0, 0, 0.3);
-      --border-color: rgba(0, 0, 0, 0.2);
+      /* Refined borders for modern look */
+      --bg-glass-border: 1px solid rgba(0, 0, 0, 0.08);
+      --border-color: rgba(0, 0, 0, 0.1);
 
-      --bg-input: rgba(0, 0, 0, 0.05);
-      --bg-hover: rgba(0, 0, 0, 0.08);
+      --bg-input: rgba(0, 0, 0, 0.04);
+      --bg-hover: rgba(0, 0, 0, 0.06);
 
-      --text-primary: #1d1d1f;
-      --text-secondary: #86868b;
-      --text-tertiary: #aeaeb2;
+      --text-primary: #1a1a1a;
+      --text-secondary: #6b7280;
+      --text-tertiary: #9ca3af;
 
-      /* Catppuccin Latte Accents (Vibrant in Light Mode) */
-      /* A punchy, electric blue */
-      --accent-blue: #3A86FF;
-      --accent-blue-soft: rgba(58, 134, 255, 0.15);
+      /* Vibrant Modern Accents */
+      /* Electric blue - more saturated */
+      --accent-blue: #2563EB;
+      --accent-blue-soft: rgba(37, 99, 235, 0.12);
 
-      /* A vibrant violet (less dark than before) */
-      --accent-purple: #8338EC;
+      /* Rich purple */
+      --accent-purple: #7C3AED;
 
-      /* A bright mint/emerald green (much livelier than forest green) */
-      --accent-green: #06D6A0;
-      --accent-green-soft: rgba(6, 214, 160, 0.15);
+      /* Bright teal/cyan green */
+      --accent-green: #10B981;
+      --accent-green-soft: rgba(16, 185, 129, 0.12);
 
-      /* A high-visibility bright orange */
-      --accent-orange: #FF9F1C;
+      /* Vibrant orange */
+      --accent-orange: #F59E0B;
 
-      /* A poppy, slightly pinkish red (more modern/lively than brick red) */
-      --accent-red: #FF3366;
+      /* Modern pink-red */
+      --accent-red: #EF4444;
 
-      /* Premium Soft Shadows */
-      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-      --shadow-md: 0 12px 24px rgba(0, 0, 0, 0.06);
-      --shadow-lg: 0 24px 48px rgba(0, 0, 0, 0.1);
-      --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.08);
+      /* Enhanced Shadows for depth */
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+      --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.06);
 
       --radius-sm: 8px;
-      --radius-md: 18px;
-      --radius-lg: 28px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
       --sidebar-width: 400px;
 
       --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -1482,18 +1482,37 @@
         </div>
 
         <div class="bento-card">
-          <span class="text-xs" style="color:var(--text-tertiary)">TODAY'S MOMENTUM</span>
-          <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:16px;">
-            <div style="display:flex; justify-content:space-between; align-items:flex-end;">
-              <span class="text-h1" id="progressPercent">0%</span>
-              <span class="text-body" id="progressText">0/0 Tasks</span>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
+            <span class="text-xs" style="color:var(--text-tertiary)">DAILY GOAL</span>
+            <div style="display:flex; align-items:center; gap:8px;" role="status" aria-label="Streak indicator">
+              <span class="text-xs" style="color:var(--text-tertiary)" aria-hidden="true">🔥</span>
+              <span class="text-body" id="streakCount" style="font-weight:600; color:var(--accent-orange);">0</span>
+              <span class="text-xs" style="color:var(--text-tertiary)">DAY STREAK</span>
             </div>
-            <div style="width:100%; height:8px; background:var(--bg-input); border-radius:10px; overflow:hidden;">
-              <div id="progressBar"
-                style="width:0%; height:100%; background:var(--accent-green); transition: width 0.8s var(--ease-spring);">
+          </div>
+          <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+              <div style="flex:1;">
+                <div style="display:flex; align-items:baseline; gap:8px; margin-bottom:8px;">
+                  <span class="text-h1" id="progressPercent">0%</span>
+                  <span class="text-body" id="progressText">0/0 Tasks</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span class="text-sm" style="color:var(--text-secondary);">Goal:</span>
+                  <input type="number" id="dailyGoalInput" min="1" max="50" value="5" 
+                    aria-label="Daily goal number of tasks"
+                    style="width:60px; padding:4px 8px; border-radius:6px; border:1px solid var(--border-color); background:var(--bg-input); color:var(--text-primary); font-size:0.9rem; text-align:center;"
+                    placeholder="5">
+                  <span class="text-sm" style="color:var(--text-secondary);">tasks/day</span>
+                </div>
               </div>
             </div>
-            <p class="text-sm" style="color:var(--text-secondary);" id="progressQuote">Start small, achieve big.</p>
+            <div style="width:100%; height:10px; background:var(--bg-input); border-radius:10px; overflow:hidden; position:relative;">
+              <div id="progressBar"
+                style="width:0%; height:100%; background:linear-gradient(90deg, var(--accent-green), var(--accent-blue)); transition: width 0.8s var(--ease-spring); box-shadow: 0 0 10px rgba(6, 214, 160, 0.3);">
+              </div>
+            </div>
+            <p class="text-sm" style="color:var(--text-secondary);" id="progressQuote">Set your daily goal and build your streak! 🚀</p>
           </div>
         </div>
       </div>
@@ -1587,7 +1606,11 @@
       timer: {isRunning: false, timeLeft: 1500, duration: 25},
       lastUndo: null,
       isLocalUpdate: false,
-      currentCourseId: null
+      currentCourseId: null,
+      dailyGoal: 5,
+      streak: 0,
+      lastCompletionDate: null,
+      todayCompletedCount: 0
     };
 
     const colors = {
@@ -1597,6 +1620,76 @@
 
     let activeColor = 'blue';
     let focusTarget = null;
+    
+    const MAX_DAILY_GOAL = 50;
+    
+    /* HELPER FUNCTIONS */
+    function getTodayString() {
+      return new Date().toDateString();
+    }
+    
+    function getYesterdayString() {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      return yesterday.toDateString();
+    }
+    
+    function getTodayCompletedCount() {
+      const today = getTodayString();
+      return state.todos.filter(t => {
+        if (!t.completed || !t.completedAt) return false;
+        const completedDate = new Date(t.completedAt).toDateString();
+        return completedDate === today;
+      }).length;
+    }
+    
+    /* STREAK MANAGEMENT */
+    function updateStreak() {
+      const today = getTodayString();
+      const todayCompleted = getTodayCompletedCount();
+      
+      // Check if daily goal is met
+      if (todayCompleted >= state.dailyGoal) {
+        const lastDate = state.lastCompletionDate ? new Date(state.lastCompletionDate).toDateString() : null;
+        
+        if (lastDate !== today) {
+          // Check if this is a consecutive day
+          if (lastDate) {
+            const yesterdayStr = getYesterdayString();
+            
+            if (lastDate === yesterdayStr) {
+              // Consecutive day - increment streak
+              state.streak = (state.streak || 0) + 1;
+            } else {
+              // Streak broken - reset to 1
+              state.streak = 1;
+            }
+          } else {
+            // First time - start streak
+            state.streak = 1;
+          }
+          
+          state.lastCompletionDate = new Date().toISOString();
+          
+          if (state.streak > 1) {
+            showToast(`🔥 ${state.streak} day streak! Keep it up!`);
+          }
+        }
+      }
+    }
+    
+    function checkStreakExpiration() {
+      if (state.lastCompletionDate) {
+        const lastDate = new Date(state.lastCompletionDate).toDateString();
+        const today = getTodayString();
+        const yesterdayStr = getYesterdayString();
+        
+        // If last completion was more than yesterday, reset streak
+        if (lastDate !== today && lastDate !== yesterdayStr) {
+          state.streak = 0;
+        }
+      }
+    }
 
     /* HELPERS */
     const getEl = (id) => document.getElementById(id);
@@ -1617,6 +1710,10 @@
         getEl('greeting').innerText = hr < 12 ? 'Good Morning' : hr < 18 ? 'Good Afternoon' : 'Good Evening';
       };
       updateTime(); setInterval(updateTime, 60000);
+      
+      // Check streak expiration
+      checkStreakExpiration();
+      
       setupEventListeners();
       new Sortable(getEl('taskList'), {
         animation: 150, ghostClass: 'sortable-ghost', delay: 100,
@@ -1681,6 +1778,18 @@
 
       getEl('startTimerBtn').onclick = toggleTimer;
       getEl('resetTimerBtn').onclick = resetTimer;
+      
+      // Daily goal input handler
+      getEl('dailyGoalInput').onchange = () => {
+        const value = parseInt(getEl('dailyGoalInput').value);
+        if (value > 0 && value <= MAX_DAILY_GOAL) {
+          state.dailyGoal = value;
+          saveData();
+          showToast(`Daily goal set to ${value} tasks!`);
+        } else {
+          getEl('dailyGoalInput').value = state.dailyGoal;
+        }
+      };
 
       getEl('toastUndo').onclick = () => {
         if (state.lastUndo) {
@@ -1705,9 +1814,17 @@
             state.todos = d.todos || [];
             state.courses = d.courses || [];
             state.focusId = d.focusId || null;
+            state.dailyGoal = d.dailyGoal || 5;
+            state.streak = d.streak || 0;
+            state.lastCompletionDate = d.lastCompletionDate || null;
+            getEl('dailyGoalInput').value = state.dailyGoal;
+            checkStreakExpiration();
             renderAll();
           } else {
-            state.todos = []; state.courses = []; state.focusId = null; renderAll();
+            state.todos = []; state.courses = []; state.focusId = null; 
+            state.dailyGoal = 5; state.streak = 0; state.lastCompletionDate = null;
+            getEl('dailyGoalInput').value = state.dailyGoal;
+            renderAll();
           }
         });
       } else {
@@ -1722,7 +1839,13 @@
       if (state.user) {
         state.isLocalUpdate = true;
         setDoc(doc(db, 'users', state.user.uid), {
-          todos: state.todos, courses: state.courses, focusId: state.focusId, lastUpdated: new Date().toISOString()
+          todos: state.todos, 
+          courses: state.courses, 
+          focusId: state.focusId, 
+          dailyGoal: state.dailyGoal,
+          streak: state.streak,
+          lastCompletionDate: state.lastCompletionDate,
+          lastUpdated: new Date().toISOString()
         }, {merge: true}).catch(error => console.error("Cloud save failed:", error));
       }
     }
@@ -1803,15 +1926,36 @@
     }
 
     function renderStats() {
-      const total = state.todos.length;
-      const done = state.todos.filter(t => t.completed).length;
-      const pct = total === 0 ? 0 : Math.round((done / total) * 100);
+      // Calculate today's completed tasks
+      const todayCompleted = getTodayCompletedCount();
+      
+      state.todayCompletedCount = todayCompleted;
+      const goal = state.dailyGoal || 5;
+      const pct = Math.min(Math.round((todayCompleted / goal) * 100), 100);
+      
       getEl('progressPercent').innerText = `${pct}%`;
-      getEl('progressText').innerText = `${done}/${total} Tasks`;
+      getEl('progressText').innerText = `${todayCompleted}/${goal}`;
       getEl('progressBar').style.width = `${pct}%`;
-      const quotes = ["Keep pushing.", "Momentum is key.", "One step at a time.", "You're doing great."];
-      if (pct === 100) getEl('progressQuote').innerText = "All done! Amazing work.";
-      else getEl('progressQuote').innerText = quotes[Math.floor(Math.random() * quotes.length)];
+      getEl('streakCount').innerText = state.streak || 0;
+      
+      const quotes = [
+        "Keep the momentum going! 💪",
+        "One task at a time! ⭐",
+        "You're making progress! 🎯",
+        "Stay focused, stay strong! 🔥"
+      ];
+      
+      if (pct >= 100) {
+        getEl('progressQuote').innerText = "🎉 Daily goal achieved! Incredible work!";
+      } else if (pct >= 75) {
+        getEl('progressQuote').innerText = "Almost there! Keep pushing! 🚀";
+      } else if (pct >= 50) {
+        getEl('progressQuote').innerText = "You're halfway there! 💫";
+      } else if (todayCompleted > 0) {
+        getEl('progressQuote').innerText = "Great start! Keep going! ✨";
+      } else {
+        getEl('progressQuote').innerText = quotes[Math.floor(Math.random() * quotes.length)];
+      }
     }
 
     function renderCourses() {
@@ -1944,7 +2088,16 @@
       const t = state.todos.find(x => x.id === id);
       if (t) {
         t.completed = !t.completed;
-        if (t.completed) {confetti({particleCount: 50, spread: 60, origin: {y: 0.7}}); if (state.focusId === id) state.focusId = null;}
+        if (t.completed) {
+          t.completedAt = new Date().toISOString();
+          confetti({particleCount: 50, spread: 60, origin: {y: 0.7}}); 
+          if (state.focusId === id) state.focusId = null;
+          
+          // Update streak
+          updateStreak();
+        } else {
+          t.completedAt = null;
+        }
         
         // If this task is linked to a course goal, toggle that too
         if (t.linkedGoalId && t.linkedCourseId && t.linkedCategoryId) {
