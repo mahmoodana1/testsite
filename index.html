@@ -10,6 +10,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -351,7 +352,7 @@
       padding: 0;
       width: 100%;
       height: 100%;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
       background-color: var(--bg-body);
       color: var(--text-primary);
       transition: background-color 0.3s ease, color 0.3s ease;
@@ -1174,7 +1175,7 @@
       color: var(--text-primary);
       padding: 4px 0;
       border-radius: 4px;
-      font-family: 'Inter', sans-serif;
+      font-family: 'Space Grotesk', sans-serif;
     }
 
     .course-modal-title-input:focus {
@@ -1644,6 +1645,36 @@
       background: var(--border-color);
       margin: 4px 0;
     }
+    
+    /* Custom Theme Items */
+    .custom-theme-item {
+      display: flex;
+      align-items: center;
+      position: relative;
+      gap: 4px;
+    }
+    
+    .custom-theme-item .theme-option {
+      flex: 1;
+    }
+    
+    .custom-theme-delete {
+      padding: 8px;
+      background: transparent;
+      border: none;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      font-size: 20px;
+      line-height: 1;
+      transition: all 0.2s;
+      border-radius: 4px;
+      margin-right: 8px;
+    }
+    
+    .custom-theme-delete:hover {
+      background: var(--accent-red);
+      color: white;
+    }
 
     /* Custom Theme Creator Modal */
     .custom-theme-modal {
@@ -1915,6 +1946,7 @@
                 <span>Tokyo Night</span>
               </button>
               <div class="theme-divider"></div>
+              <div id="customThemesList"></div>
               <button class="theme-option" id="customThemeBtn">
                 <div class="theme-color-preview" style="background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #f7b731);"></div>
                 <span>✨ Create Custom Theme</span>
@@ -2091,6 +2123,11 @@
         <button type="button" class="course-modal-close" onclick="closeCustomThemeModal()">✕</button>
       </div>
       <div class="custom-theme-body">
+        <div class="color-picker-group">
+          <label class="color-picker-label">Theme Name</label>
+          <input type="text" id="customThemeName" class="course-modal-title-input" placeholder="My Awesome Theme" style="width: 100%; margin-bottom: 16px;">
+        </div>
+        
         <div class="preview-box">
           <div class="preview-text preview-primary">Preview: Primary Text</div>
           <div class="preview-text preview-secondary">Preview: Secondary Text</div>
@@ -2294,6 +2331,10 @@
         animation: 150, ghostClass: 'sortable-ghost', delay: 100,
         onEnd: (evt) => reorderTasks(evt.oldIndex, evt.newIndex)
       });
+      
+      // Render saved custom themes
+      renderCustomThemesList();
+      
       if (localStorage.getItem('theme')) {
         applyTheme(localStorage.getItem('theme'));
       } else {
@@ -2324,7 +2365,12 @@
       });
       
       // Apply new theme and save to localStorage
-      if (themeName === 'custom') {
+      if (themeName.startsWith('custom-')) {
+        // Extract theme name from 'custom-ThemeName'
+        const customThemeName = themeName.substring(7);
+        applyNamedCustomTheme(customThemeName);
+        localStorage.setItem('theme', themeName);
+      } else if (themeName === 'custom') {
         applyCustomTheme();
         localStorage.setItem('theme', 'custom');
       } else {
@@ -2900,22 +2946,26 @@
     };
 
     /* CUSTOM THEME MODAL */
-    window.openCustomThemeModal = () => {
-      // Load current custom theme or defaults
-      const customTheme = localStorage.getItem('customTheme');
-      if (customTheme) {
-        const theme = JSON.parse(customTheme);
-        setColorPicker('customBgBody', theme.bgBody);
-        setColorPicker('customBgCard', theme.bgCard);
-        setColorPicker('customBgInput', theme.bgInput);
-        setColorPicker('customTextPrimary', theme.textPrimary);
-        setColorPicker('customTextSecondary', theme.textSecondary);
-        setColorPicker('customAccentBlue', theme.accentBlue);
-        setColorPicker('customAccentGreen', theme.accentGreen);
-        setColorPicker('customAccentOrange', theme.accentOrange);
-        setColorPicker('customAccentRed', theme.accentRed);
+    window.openCustomThemeModal = (themeName = null) => {
+      // Load specific custom theme or defaults
+      if (themeName) {
+        const customThemes = JSON.parse(localStorage.getItem('customThemes') || '[]');
+        const theme = customThemes.find(t => t.name === themeName);
+        if (theme) {
+          getEl('customThemeName').value = theme.name;
+          setColorPicker('customBgBody', theme.bgBody);
+          setColorPicker('customBgCard', theme.bgCard);
+          setColorPicker('customBgInput', theme.bgInput);
+          setColorPicker('customTextPrimary', theme.textPrimary);
+          setColorPicker('customTextSecondary', theme.textSecondary);
+          setColorPicker('customAccentBlue', theme.accentBlue);
+          setColorPicker('customAccentGreen', theme.accentGreen);
+          setColorPicker('customAccentOrange', theme.accentOrange);
+          setColorPicker('customAccentRed', theme.accentRed);
+        }
       } else {
         // Set defaults from current light theme
+        getEl('customThemeName').value = '';
         setColorPicker('customBgBody', '#FAFAFA');
         setColorPicker('customBgCard', '#FFFFFF');
         setColorPicker('customBgInput', '#F5F5F5');
@@ -3008,8 +3058,25 @@
       root.style.setProperty('--accent-red', theme.accentRed);
     }
     
+    function getCustomThemeKey(themeName) {
+      return 'custom-' + themeName;
+    }
+    
     function saveCustomTheme() {
+      let themeName = getEl('customThemeName').value.trim();
+      
+      // Generate unique name for untitled themes
+      if (!themeName) {
+        const customThemes = JSON.parse(localStorage.getItem('customThemes') || '[]');
+        let counter = 1;
+        do {
+          themeName = 'Untitled Theme ' + counter;
+          counter++;
+        } while (customThemes.some(t => t.name === themeName));
+      }
+      
       const theme = {
+        name: themeName,
         bgBody: getEl('customBgBody').value,
         bgCard: getEl('customBgCard').value,
         bgInput: getEl('customBgInput').value,
@@ -3021,9 +3088,113 @@
         accentRed: getEl('customAccentRed').value
       };
       
-      localStorage.setItem('customTheme', JSON.stringify(theme));
-      applyCustomTheme();
-      showToast('✨ Custom theme applied!');
+      // Get existing custom themes or initialize empty array
+      let customThemes = JSON.parse(localStorage.getItem('customThemes') || '[]');
+      
+      // Check if updating existing theme
+      const existingIndex = customThemes.findIndex(t => t.name === themeName);
+      if (existingIndex >= 0) {
+        customThemes[existingIndex] = theme;
+        showToast('✨ Theme "' + themeName + '" updated!');
+      } else {
+        customThemes.push(theme);
+        showToast('✨ Theme "' + themeName + '" created!');
+      }
+      
+      localStorage.setItem('customThemes', JSON.stringify(customThemes));
+      
+      // Apply the newly created/updated theme
+      applyNamedCustomTheme(themeName);
+      localStorage.setItem('theme', getCustomThemeKey(themeName));
+      
+      // Refresh the custom themes list
+      renderCustomThemesList();
+    }
+    
+    function applyNamedCustomTheme(themeName) {
+      const customThemes = JSON.parse(localStorage.getItem('customThemes') || '[]');
+      const theme = customThemes.find(t => t.name === themeName);
+      if (!theme) return;
+      
+      const root = document.documentElement;
+      
+      // Apply custom CSS variables
+      root.style.setProperty('--bg-body', theme.bgBody);
+      root.style.setProperty('--bg-card', theme.bgCard);
+      root.style.setProperty('--bg-input', theme.bgInput);
+      root.style.setProperty('--bg-hover', adjustColorBrightness(theme.bgInput, 10));
+      root.style.setProperty('--text-primary', theme.textPrimary);
+      root.style.setProperty('--text-secondary', theme.textSecondary);
+      root.style.setProperty('--text-tertiary', adjustColorBrightness(theme.textSecondary, -20));
+      root.style.setProperty('--accent-blue', theme.accentBlue);
+      root.style.setProperty('--accent-blue-soft', hexToRgba(theme.accentBlue, 0.15));
+      root.style.setProperty('--accent-green', theme.accentGreen);
+      root.style.setProperty('--accent-green-soft', hexToRgba(theme.accentGreen, 0.15));
+      root.style.setProperty('--accent-orange', theme.accentOrange);
+      root.style.setProperty('--accent-red', theme.accentRed);
+      root.style.setProperty('--border-color', adjustColorBrightness(theme.bgInput, 5));
+      root.style.setProperty('--bg-sidebar', theme.bgCard);
+      root.style.setProperty('--bg-glass', hexToRgba(theme.bgBody, 0.85));
+    }
+    
+    function renderCustomThemesList() {
+      const customThemes = JSON.parse(localStorage.getItem('customThemes') || '[]');
+      const container = getEl('customThemesList');
+      
+      if (customThemes.length === 0) {
+        container.innerHTML = '';
+        return;
+      }
+      
+      container.innerHTML = customThemes.map(theme => {
+        const gradient = `linear-gradient(135deg, ${theme.bgBody} 30%, ${theme.accentBlue} 70%)`;
+        return `
+          <div class="custom-theme-item">
+            <button class="theme-option" data-custom-theme="${theme.name}">
+              <div class="theme-color-preview" style="background: ${gradient};"></div>
+              <span>${theme.name}</span>
+            </button>
+            <button class="custom-theme-delete" data-theme-name="${theme.name}" title="Delete theme">×</button>
+          </div>
+        `;
+      }).join('');
+      
+      // Add click handlers for custom themes
+      container.querySelectorAll('.theme-option[data-custom-theme]').forEach(btn => {
+        btn.onclick = () => {
+          const themeName = btn.dataset.customTheme;
+          applyNamedCustomTheme(themeName);
+          localStorage.setItem('theme', getCustomThemeKey(themeName));
+          document.querySelector('.theme-dropdown').classList.remove('active');
+          showToast('✨ Applied "' + themeName + '"');
+        };
+      });
+      
+      // Add delete handlers
+      container.querySelectorAll('.custom-theme-delete').forEach(btn => {
+        btn.onclick = (e) => {
+          e.stopPropagation();
+          const themeName = btn.dataset.themeName;
+          if (confirm('Delete theme "' + themeName + '"?')) {
+            deleteCustomTheme(themeName);
+          }
+        };
+      });
+    }
+    
+    function deleteCustomTheme(themeName) {
+      let customThemes = JSON.parse(localStorage.getItem('customThemes') || '[]');
+      customThemes = customThemes.filter(t => t.name !== themeName);
+      localStorage.setItem('customThemes', JSON.stringify(customThemes));
+      
+      // If the deleted theme was active, switch to default
+      const currentTheme = localStorage.getItem('theme');
+      if (currentTheme === getCustomThemeKey(themeName)) {
+        applyTheme('cappuccino');
+      }
+      
+      renderCustomThemesList();
+      showToast('🗑️ Theme "' + themeName + '" deleted');
     }
 
     let timerInterval;
