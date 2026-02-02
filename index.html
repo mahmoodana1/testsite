@@ -1500,10 +1500,13 @@
                 </div>
                 <div style="display:flex; align-items:center; gap:8px;">
                   <span class="text-sm" style="color:var(--text-secondary);">Goal:</span>
-                  <div id="dailyGoalDisplay" onclick="openDailyGoalModal()" 
+                  <div id="dailyGoalDisplay" onclick="openDailyGoalModal()" role="button" tabindex="0" aria-label="Edit daily goal"
+                    onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openDailyGoalModal();}"
                     style="padding:4px 12px; border-radius:6px; background:var(--bg-input); color:var(--text-primary); font-size:0.9rem; cursor:pointer; transition:all 0.2s; border:1px solid transparent;"
                     onmouseover="this.style.borderColor='var(--accent-blue)'; this.style.background='var(--accent-blue-soft)'"
-                    onmouseout="this.style.borderColor='transparent'; this.style.background='var(--bg-input)'">
+                    onmouseout="this.style.borderColor='transparent'; this.style.background='var(--bg-input)'"
+                    onfocus="this.style.borderColor='var(--accent-blue)'; this.style.background='var(--accent-blue-soft)'"
+                    onblur="this.style.borderColor='transparent'; this.style.background='var(--bg-input)'">
                     <span id="dailyGoalValue">5</span> tasks/day
                   </div>
                 </div>
@@ -1584,7 +1587,7 @@
       <h3 class="text-h3" style="margin-bottom:24px;">Edit Daily Goal</h3>
       <div style="margin-bottom:20px;">
         <label class="text-xs" style="color:var(--text-secondary); display:block; margin-bottom:8px;">DAILY TASK GOAL</label>
-        <input type="number" id="modalDailyGoalInput" min="1" max="50" value="5"
+        <input type="number" id="modalDailyGoalInput" min="1" max="50" value="5" aria-label="Daily task goal"
           style="width:100%; padding:12px; border-radius:8px; border:1px solid var(--bg-input); background:var(--bg-body); color:var(--text-primary); font-size:1.1rem;">
         <p class="text-sm" style="color:var(--text-secondary); margin-top:8px;">Set how many tasks you want to complete each day</p>
       </div>
