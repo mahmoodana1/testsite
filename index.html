@@ -23,49 +23,50 @@
     /* VARIABLES                                                                  */
     /* -------------------------------------------------------------------------- */
     :root {
-      /* LIGHT MODE: MODERN VIBRANT AESTHETIC */
-      --bg-body: #F8F9FA;
-      /* Slightly warmer than pure white */
-      --bg-sidebar: rgba(255, 255, 255, 0.95);
-      /* More solid for better contrast */
-      --bg-card: rgba(255, 255, 255, 0.98);
-      /* Crisp white cards */
-      --bg-glass: rgba(255, 255, 255, 0.85);
+      /* LIGHT MODE: CLEAN MINIMAL AESTHETIC (IKEA/APPLE INSPIRED) */
+      --bg-body: #FAFAFA;
+      /* Clean light gray, not pure white */
+      --bg-sidebar: rgba(255, 255, 255, 0.98);
+      /* Solid white for sidebar */
+      --bg-card: #FFFFFF;
+      /* Pure white cards */
+      --bg-glass: rgba(255, 255, 255, 0.95);
 
-      /* Refined borders for modern look */
-      --bg-glass-border: 1px solid rgba(0, 0, 0, 0.08);
-      --border-color: rgba(0, 0, 0, 0.1);
+      /* Subtle borders for clean look */
+      --bg-glass-border: 1px solid rgba(0, 0, 0, 0.06);
+      --border-color: rgba(0, 0, 0, 0.08);
 
-      --bg-input: rgba(0, 0, 0, 0.04);
-      --bg-hover: rgba(0, 0, 0, 0.06);
+      --bg-input: rgba(0, 0, 0, 0.03);
+      --bg-hover: rgba(0, 0, 0, 0.05);
 
-      --text-primary: #1a1a1a;
-      --text-secondary: #6b7280;
-      --text-tertiary: #9ca3af;
+      /* Monochrome text hierarchy */
+      --text-primary: #111111;
+      --text-secondary: #666666;
+      --text-tertiary: #999999;
 
-      /* Vibrant Modern Accents */
-      /* Electric blue - more saturated */
-      --accent-blue: #2563EB;
-      --accent-blue-soft: rgba(37, 99, 235, 0.12);
+      /* Minimal Monochrome Accents - subtle and refined */
+      /* Muted blue-gray - primary accent */
+      --accent-blue: #5B7C99;
+      --accent-blue-soft: rgba(91, 124, 153, 0.08);
 
-      /* Rich purple */
-      --accent-purple: #7C3AED;
+      /* Warm gray-purple */
+      --accent-purple: #8B7E9E;
 
-      /* Bright teal/cyan green */
-      --accent-green: #10B981;
-      --accent-green-soft: rgba(16, 185, 129, 0.12);
+      /* Soft sage green */
+      --accent-green: #7A9B7E;
+      --accent-green-soft: rgba(122, 155, 126, 0.08);
 
-      /* Vibrant orange */
-      --accent-orange: #F59E0B;
+      /* Warm amber */
+      --accent-orange: #B89968;
 
-      /* Modern pink-red */
-      --accent-red: #EF4444;
+      /* Muted terracotta */
+      --accent-red: #B87E7E;
 
-      /* Enhanced Shadows for depth */
-      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
-      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
-      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
-      --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.06);
+      /* Clean Shadows - very subtle */
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+      --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.04), 0 3px 6px rgba(0, 0, 0, 0.03);
+      --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.04), 0 6px 12px rgba(0, 0, 0, 0.03);
+      --shadow-glass: 0 4px 16px rgba(0, 0, 0, 0.04);
 
       --radius-sm: 8px;
       --radius-md: 16px;
@@ -1499,11 +1500,12 @@
                 </div>
                 <div style="display:flex; align-items:center; gap:8px;">
                   <span class="text-sm" style="color:var(--text-secondary);">Goal:</span>
-                  <input type="number" id="dailyGoalInput" min="1" max="50" value="5" 
-                    aria-label="Daily goal number of tasks"
-                    style="width:60px; padding:4px 8px; border-radius:6px; border:1px solid var(--border-color); background:var(--bg-input); color:var(--text-primary); font-size:0.9rem; text-align:center;"
-                    placeholder="5">
-                  <span class="text-sm" style="color:var(--text-secondary);">tasks/day</span>
+                  <div id="dailyGoalDisplay" onclick="openDailyGoalModal()" 
+                    style="padding:4px 12px; border-radius:6px; background:var(--bg-input); color:var(--text-primary); font-size:0.9rem; cursor:pointer; transition:all 0.2s; border:1px solid transparent;"
+                    onmouseover="this.style.borderColor='var(--accent-blue)'; this.style.background='var(--accent-blue-soft)'"
+                    onmouseout="this.style.borderColor='transparent'; this.style.background='var(--bg-input)'">
+                    <span id="dailyGoalValue">5</span> tasks/day
+                  </div>
                 </div>
               </div>
             </div>
@@ -1573,6 +1575,22 @@
       <div style="display:flex; justify-content:flex-end; gap:12px;">
         <button type="button" class="btn-ghost" onclick="toggleModal('timerModal')">Cancel</button>
         <button type="button" class="btn-primary" onclick="saveTimerSettings()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="dailyGoalModal">
+    <div class="modal">
+      <h3 class="text-h3" style="margin-bottom:24px;">Edit Daily Goal</h3>
+      <div style="margin-bottom:20px;">
+        <label class="text-xs" style="color:var(--text-secondary); display:block; margin-bottom:8px;">DAILY TASK GOAL</label>
+        <input type="number" id="modalDailyGoalInput" min="1" max="50" value="5"
+          style="width:100%; padding:12px; border-radius:8px; border:1px solid var(--bg-input); background:var(--bg-body); color:var(--text-primary); font-size:1.1rem;">
+        <p class="text-sm" style="color:var(--text-secondary); margin-top:8px;">Set how many tasks you want to complete each day</p>
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:12px;">
+        <button type="button" class="btn-ghost" onclick="toggleModal('dailyGoalModal')">Cancel</button>
+        <button type="button" class="btn-primary" onclick="saveDailyGoal()">Save</button>
       </div>
     </div>
   </div>
@@ -1778,18 +1796,6 @@
 
       getEl('startTimerBtn').onclick = toggleTimer;
       getEl('resetTimerBtn').onclick = resetTimer;
-      
-      // Daily goal input handler
-      getEl('dailyGoalInput').onchange = () => {
-        const value = parseInt(getEl('dailyGoalInput').value);
-        if (value > 0 && value <= MAX_DAILY_GOAL) {
-          state.dailyGoal = value;
-          saveData();
-          showToast(`Daily goal set to ${value} tasks!`);
-        } else {
-          getEl('dailyGoalInput').value = state.dailyGoal;
-        }
-      };
 
       getEl('toastUndo').onclick = () => {
         if (state.lastUndo) {
@@ -1817,13 +1823,13 @@
             state.dailyGoal = d.dailyGoal || 5;
             state.streak = d.streak || 0;
             state.lastCompletionDate = d.lastCompletionDate || null;
-            getEl('dailyGoalInput').value = state.dailyGoal;
+            getEl('dailyGoalValue').innerText = state.dailyGoal;
             checkStreakExpiration();
             renderAll();
           } else {
             state.todos = []; state.courses = []; state.focusId = null; 
             state.dailyGoal = 5; state.streak = 0; state.lastCompletionDate = null;
-            getEl('dailyGoalInput').value = state.dailyGoal;
+            getEl('dailyGoalValue').innerText = state.dailyGoal;
             renderAll();
           }
         });
@@ -2187,7 +2193,8 @@
       const cat = c.categories.find(x => x.id === catId);
       const g = cat.goals.find(x => x.id === gid);
       const taskId = generateId();
-      state.todos.push({id: taskId, text: `[${c.name}] ${g.title}`, days: 0, color: activeColor, completed: g.completed, createdAt: new Date().toISOString(), linkedGoalId: gid, linkedCourseId: cid, linkedCategoryId: catId});
+      // Use course color instead of activeColor and include category name in task text
+      state.todos.push({id: taskId, text: `[${c.name} - ${cat.name}] ${g.title}`, days: 0, color: c.color, completed: g.completed, createdAt: new Date().toISOString(), linkedGoalId: gid, linkedCourseId: cid, linkedCategoryId: catId});
       g.linkedTaskId = taskId;
       showToast("Converted to Task"); saveData();
     }
@@ -2204,6 +2211,22 @@
       const d = parseInt(getEl('customWorkDur').value);
       if (d > 0) state.timer.duration = d;
       resetTimer(); window.toggleModal('timerModal');
+    };
+    window.openDailyGoalModal = () => {
+      getEl('modalDailyGoalInput').value = state.dailyGoal;
+      window.toggleModal('dailyGoalModal');
+    };
+    window.saveDailyGoal = () => {
+      const value = parseInt(getEl('modalDailyGoalInput').value);
+      if (value > 0 && value <= 50) {
+        state.dailyGoal = value;
+        getEl('dailyGoalValue').innerText = value;
+        saveData();
+        renderStats();
+        window.toggleModal('dailyGoalModal');
+      } else {
+        alert('Please enter a valid goal between 1 and 50');
+      }
     };
     let timerInterval;
     function toggleTimer() {
