@@ -1484,8 +1484,8 @@
         <div class="bento-card">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
             <span class="text-xs" style="color:var(--text-tertiary)">DAILY GOAL</span>
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span class="text-xs" style="color:var(--text-tertiary)">🔥</span>
+            <div style="display:flex; align-items:center; gap:8px;" role="status" aria-label="Streak indicator">
+              <span class="text-xs" style="color:var(--text-tertiary)" aria-hidden="true">🔥</span>
               <span class="text-body" id="streakCount" style="font-weight:600; color:var(--accent-orange);">0</span>
               <span class="text-xs" style="color:var(--text-tertiary)">DAY STREAK</span>
             </div>
@@ -1500,6 +1500,7 @@
                 <div style="display:flex; align-items:center; gap:8px;">
                   <span class="text-sm" style="color:var(--text-secondary);">Goal:</span>
                   <input type="number" id="dailyGoalInput" min="1" max="50" value="5" 
+                    aria-label="Daily goal number of tasks"
                     style="width:60px; padding:4px 8px; border-radius:6px; border:1px solid var(--border-color); background:var(--bg-input); color:var(--text-primary); font-size:0.9rem; text-align:center;"
                     placeholder="5">
                   <span class="text-sm" style="color:var(--text-secondary);">tasks/day</span>
@@ -1620,14 +1621,32 @@
     let activeColor = 'blue';
     let focusTarget = null;
     
-    /* STREAK MANAGEMENT */
-    function updateStreak() {
-      const today = new Date().toDateString();
-      const todayCompleted = state.todos.filter(t => {
+    const MAX_DAILY_GOAL = 50;
+    
+    /* HELPER FUNCTIONS */
+    function getTodayString() {
+      return new Date().toDateString();
+    }
+    
+    function getYesterdayString() {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      return yesterday.toDateString();
+    }
+    
+    function getTodayCompletedCount() {
+      const today = getTodayString();
+      return state.todos.filter(t => {
         if (!t.completed || !t.completedAt) return false;
         const completedDate = new Date(t.completedAt).toDateString();
         return completedDate === today;
       }).length;
+    }
+    
+    /* STREAK MANAGEMENT */
+    function updateStreak() {
+      const today = getTodayString();
+      const todayCompleted = getTodayCompletedCount();
       
       // Check if daily goal is met
       if (todayCompleted >= state.dailyGoal) {
@@ -1636,9 +1655,7 @@
         if (lastDate !== today) {
           // Check if this is a consecutive day
           if (lastDate) {
-            const yesterday = new Date();
-            yesterday.setDate(yesterday.getDate() - 1);
-            const yesterdayStr = yesterday.toDateString();
+            const yesterdayStr = getYesterdayString();
             
             if (lastDate === yesterdayStr) {
               // Consecutive day - increment streak
@@ -1664,10 +1681,8 @@
     function checkStreakExpiration() {
       if (state.lastCompletionDate) {
         const lastDate = new Date(state.lastCompletionDate).toDateString();
-        const today = new Date().toDateString();
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        const yesterdayStr = yesterday.toDateString();
+        const today = getTodayString();
+        const yesterdayStr = getYesterdayString();
         
         // If last completion was more than yesterday, reset streak
         if (lastDate !== today && lastDate !== yesterdayStr) {
@@ -1767,7 +1782,7 @@
       // Daily goal input handler
       getEl('dailyGoalInput').onchange = () => {
         const value = parseInt(getEl('dailyGoalInput').value);
-        if (value > 0 && value <= 50) {
+        if (value > 0 && value <= MAX_DAILY_GOAL) {
           state.dailyGoal = value;
           saveData();
           showToast(`Daily goal set to ${value} tasks!`);
@@ -1912,12 +1927,7 @@
 
     function renderStats() {
       // Calculate today's completed tasks
-      const today = new Date().toDateString();
-      const todayCompleted = state.todos.filter(t => {
-        if (!t.completed || !t.completedAt) return false;
-        const completedDate = new Date(t.completedAt).toDateString();
-        return completedDate === today;
-      }).length;
+      const todayCompleted = getTodayCompletedCount();
       
       state.todayCompletedCount = todayCompleted;
       const goal = state.dailyGoal || 5;
