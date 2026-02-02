@@ -3058,8 +3058,23 @@
       root.style.setProperty('--accent-red', theme.accentRed);
     }
     
+    function getCustomThemeKey(themeName) {
+      return 'custom-' + themeName;
+    }
+    
     function saveCustomTheme() {
-      const themeName = getEl('customThemeName').value.trim() || 'Untitled Theme';
+      let themeName = getEl('customThemeName').value.trim();
+      
+      // Generate unique name for untitled themes
+      if (!themeName) {
+        const customThemes = JSON.parse(localStorage.getItem('customThemes') || '[]');
+        let counter = 1;
+        do {
+          themeName = 'Untitled Theme ' + counter;
+          counter++;
+        } while (customThemes.some(t => t.name === themeName));
+      }
+      
       const theme = {
         name: themeName,
         bgBody: getEl('customBgBody').value,
@@ -3090,7 +3105,7 @@
       
       // Apply the newly created/updated theme
       applyNamedCustomTheme(themeName);
-      localStorage.setItem('theme', 'custom-' + themeName);
+      localStorage.setItem('theme', getCustomThemeKey(themeName));
       
       // Refresh the custom themes list
       renderCustomThemesList();
@@ -3149,7 +3164,7 @@
         btn.onclick = () => {
           const themeName = btn.dataset.customTheme;
           applyNamedCustomTheme(themeName);
-          localStorage.setItem('theme', 'custom-' + themeName);
+          localStorage.setItem('theme', getCustomThemeKey(themeName));
           document.querySelector('.theme-dropdown').classList.remove('active');
           showToast('✨ Applied "' + themeName + '"');
         };
@@ -3174,7 +3189,7 @@
       
       // If the deleted theme was active, switch to default
       const currentTheme = localStorage.getItem('theme');
-      if (currentTheme === 'custom-' + themeName) {
+      if (currentTheme === getCustomThemeKey(themeName)) {
         applyTheme('cappuccino');
       }
       
