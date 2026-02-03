@@ -684,7 +684,9 @@
       border-radius: var(--radius-md);
       border: 1px solid var(--border-color);
       box-shadow: var(--shadow-sm);
-      transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                  box-shadow 0.25s ease,
+                  border-color 0.2s ease;
       cursor: grab;
       position: relative;
       overflow: hidden;
@@ -692,14 +694,20 @@
     }
 
     .task-item:hover {
-      transform: translateX(4px) scale(1.005);
-      box-shadow: var(--shadow-md);
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 10px -5px rgba(0, 0, 0, 0.04);
       border-color: var(--accent-blue);
     }
 
     .task-item:active {
       cursor: grabbing;
-      transform: scale(0.98);
+      transform: translateY(0) scale(0.98);
+    }
+    
+    /* Sortable ghost class for dragging */
+    .sortable-ghost {
+      opacity: 0.4;
+      background: var(--accent-blue-soft);
     }
 
     .task-item::before {
@@ -1294,22 +1302,39 @@
       gap: 16px;
       padding: 12px 16px;
       border-radius: 12px;
-      transition: all 0.2s;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                  box-shadow 0.25s ease,
+                  background 0.2s ease,
+                  border-color 0.2s ease;
       position: relative;
       border: 1px solid transparent;
       background: var(--bg-body);
       margin-bottom: 10px;
+      cursor: grab;
     }
 
     .goal-item:hover {
       background: var(--bg-hover);
+      transform: translateY(-2px) scale(1.01);
+      box-shadow: 0 6px 20px -5px rgba(0, 0, 0, 0.08), 0 3px 8px -4px rgba(0, 0, 0, 0.03);
+    }
+    
+    .goal-item:active {
+      cursor: grabbing;
+      transform: translateY(0) scale(0.98);
     }
 
     .goal-item:focus-within {
       background: var(--bg-card);
       border-color: var(--accent-blue);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-      transform: translateX(4px);
+      box-shadow: 0 6px 20px -5px rgba(0, 0, 0, 0.08);
+      transform: translateY(-2px) scale(1.01);
+    }
+    
+    /* Sortable ghost for goals */
+    .goal-item.sortable-ghost {
+      opacity: 0.4;
+      background: var(--accent-blue-soft);
     }
 
     .goal-inputs {
@@ -2742,6 +2767,7 @@
         cat.goals.forEach(goal => {
           const gItem = document.createElement('div');
           gItem.className = 'goal-item';
+          gItem.dataset.goalId = goal.id;
           gItem.innerHTML = `
                         <div class="checkbox ${goal.completed ? 'checked' : ''}" style="margin-top:4px;">${goal.completed ? '✓' : ''}</div>
                         <div class="goal-inputs">
@@ -2776,6 +2802,16 @@
             focusTarget = null;
           }
         });
+        
+        // Initialize Sortable for goal items within each category
+        new Sortable(goalsCont, {
+          animation: 200,
+          ghostClass: 'sortable-ghost',
+          delay: 100,
+          delayOnTouchOnly: true,
+          onEnd: (evt) => reorderGoals(courseId, cat.id, evt.oldIndex, evt.newIndex)
+        });
+        
         body.appendChild(section);
       });
 
@@ -2903,6 +2939,14 @@
       const c = state.courses.find(x => x.id === cid);
       const cat = c.categories.find(x => x.id === catId);
       cat.goals = cat.goals.filter(x => x.id !== gid); saveData();
+    }
+    function reorderGoals(cid, catId, oldIdx, newIdx) {
+      if (oldIdx === newIdx) return;
+      const c = state.courses.find(x => x.id === cid);
+      const cat = c.categories.find(x => x.id === catId);
+      const item = cat.goals.splice(oldIdx, 1)[0];
+      cat.goals.splice(newIdx, 0, item);
+      saveData(false); // Don't re-render to avoid flicker during drag
     }
     function convertGoal(cid, catId, gid) {
       const c = state.courses.find(x => x.id === cid);
