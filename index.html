@@ -2419,6 +2419,8 @@
     }
     
     /* Tablet responsive - limit task list to 3 items before scrolling */
+    /* Task height calculation: min-height (64px) + margin-bottom (12px) = 76px per task
+       3 tasks = 76px * 3 = 228px */
     @media (min-width: 768px) and (max-width: 1024px) {
       #taskList {
         max-height: 228px;
@@ -2965,6 +2967,10 @@
       if (state.lastResetDate !== today) {
         state.todayCompletedCount = 0;
         state.lastResetDate = today;
+        // Persist the reset immediately to avoid losing previous day's data
+        if (state.user) {
+          saveData(false);
+        }
       }
     }
     
@@ -3593,7 +3599,8 @@
           confetti({particleCount: 50, spread: 60, origin: {y: 0.7}}); 
           if (state.focusId === id) state.focusId = null;
           
-          // Increment daily counter
+          // Increment daily counter (note: counter only increments, never decrements)
+          // This ensures daily goal tracks total tasks completed today, not current count
           checkAndResetDailyCounter();
           state.todayCompletedCount++;
           
