@@ -770,7 +770,7 @@
       white-space: normal;
       overflow: visible;
       word-break: break-word;
-      max-height: 10em;
+      max-height: 10em; /* Allow expansion for ~6-7 lines of text */
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
@@ -3739,7 +3739,7 @@
         saveData();
         renderTasks();
         renderStats();
-        showToast("Cleared " + completedTasks.length + " completed task(s)");
+        showToast(`Cleared ${completedTasks.length} completed task(s)`);
       }
     };
     window.setTimer = (min) => {state.timer.duration = min; resetTimer();}
