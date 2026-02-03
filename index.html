@@ -2417,6 +2417,13 @@
         font-size: 0.75rem;
       }
     }
+    
+    /* Tablet responsive - limit task list to 3 items before scrolling */
+    @media (min-width: 768px) and (max-width: 1024px) {
+      #taskList {
+        max-height: 228px;
+      }
+    }
   </style>
 </head>
 
@@ -2928,7 +2935,8 @@
       dailyGoal: 5,
       streak: 0,
       lastCompletionDate: null,
-      todayCompletedCount: 0
+      todayCompletedCount: 0,
+      lastResetDate: null
     };
 
     const colors = {
@@ -2952,13 +2960,17 @@
       return yesterday.toDateString();
     }
     
-    function getTodayCompletedCount() {
+    function checkAndResetDailyCounter() {
       const today = getTodayString();
-      return state.todos.filter(t => {
-        if (!t.completed || !t.completedAt) return false;
-        const completedDate = new Date(t.completedAt).toDateString();
-        return completedDate === today;
-      }).length;
+      if (state.lastResetDate !== today) {
+        state.todayCompletedCount = 0;
+        state.lastResetDate = today;
+      }
+    }
+    
+    function getTodayCompletedCount() {
+      checkAndResetDailyCounter();
+      return state.todayCompletedCount;
     }
     
     /* STREAK MANAGEMENT */
@@ -3245,12 +3257,15 @@
             state.dailyGoal = d.dailyGoal || 5;
             state.streak = d.streak || 0;
             state.lastCompletionDate = d.lastCompletionDate || null;
+            state.todayCompletedCount = d.todayCompletedCount || 0;
+            state.lastResetDate = d.lastResetDate || null;
             getEl('dailyGoalValue').innerText = state.dailyGoal;
             checkStreakExpiration();
             renderAll();
           } else {
             state.todos = []; state.courses = []; state.focusId = null; 
             state.dailyGoal = 5; state.streak = 0; state.lastCompletionDate = null;
+            state.todayCompletedCount = 0; state.lastResetDate = null;
             getEl('dailyGoalValue').innerText = state.dailyGoal;
             renderAll();
           }
@@ -3273,6 +3288,8 @@
           dailyGoal: state.dailyGoal,
           streak: state.streak,
           lastCompletionDate: state.lastCompletionDate,
+          todayCompletedCount: state.todayCompletedCount,
+          lastResetDate: state.lastResetDate,
           lastUpdated: new Date().toISOString()
         }, {merge: true}).catch(error => console.error("Cloud save failed:", error));
       }
@@ -3378,7 +3395,6 @@
       // Calculate today's completed tasks
       const todayCompleted = getTodayCompletedCount();
       
-      state.todayCompletedCount = todayCompleted;
       const goal = state.dailyGoal || 5;
       const pct = Math.min(Math.round((todayCompleted / goal) * 100), 100);
       
@@ -3576,6 +3592,10 @@
           t.completedAt = new Date().toISOString();
           confetti({particleCount: 50, spread: 60, origin: {y: 0.7}}); 
           if (state.focusId === id) state.focusId = null;
+          
+          // Increment daily counter
+          checkAndResetDailyCounter();
+          state.todayCompletedCount++;
           
           // Update streak
           updateStreak();
