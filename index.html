@@ -762,13 +762,16 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      transition: all 0.2s ease;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      max-height: 1.4em;
     }
 
     .task-item:hover .task-text {
       white-space: normal;
       overflow: visible;
       word-break: break-word;
+      max-height: 10em; /* Allow expansion for ~6-7 lines of text */
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .task-meta {
@@ -814,8 +817,35 @@
       color: var(--text-secondary);
     }
 
+    .completed-header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
     .completed-header:hover {
       color: var(--text-primary);
+    }
+
+    .btn-clear-history {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-tertiary);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-clear-history:hover {
+      background: rgba(255, 80, 80, 0.1);
+      border-color: var(--accent-red);
+      color: var(--accent-red);
     }
 
     #completedList {
@@ -1595,9 +1625,12 @@
         width: 85%;
         max-width: 320px;
         height: 100vh;
+        height: 100dvh;
         transform: translateX(-100%);
         box-shadow: none;
         z-index: 1000;
+        overflow-y: auto;
+        padding-bottom: 24px;
       }
 
       .sidebar.open {
@@ -1644,6 +1677,41 @@
 
       .course-modal {
         max-height: 85vh;
+        max-height: 85dvh;
+        margin: 10px;
+        width: calc(100% - 20px);
+      }
+      
+      .course-modal-header {
+        padding: 16px 20px;
+      }
+      
+      .course-modal-title-input {
+        font-size: 1.4rem;
+      }
+      
+      .course-modal-body {
+        padding: 16px;
+        gap: 16px;
+      }
+      
+      .course-modal-footer {
+        padding: 14px 16px;
+      }
+      
+      .category-section {
+        padding: 16px;
+      }
+      
+      .category-header {
+        margin-bottom: 14px;
+        padding-bottom: 10px;
+        padding-left: 8px;
+      }
+      
+      .goal-item {
+        padding: 10px 12px;
+        gap: 12px;
       }
 
       .text-h1 {
@@ -1660,12 +1728,18 @@
       }
 
       .task-item {
-        padding: 20px;
+        padding: 16px;
+      }
+      
+      .task-list-wrapper {
+        flex: 1;
+        overflow-y: auto;
+        min-height: 0;
       }
 
       #taskList,
       #completedList {
-        max-height: 230px;
+        max-height: none;
       }
     }
 
@@ -2413,9 +2487,18 @@
         </div>
 
         <div class="completed-section" id="completedSection">
-          <div class="completed-header" onclick="toggleCompleted()">
-            <span class="text-xs">COMPLETED HISTORY</span>
-            <span id="completedArrow">▼</span>
+          <div class="completed-header">
+            <div class="completed-header-left" onclick="toggleCompleted()">
+              <span class="text-xs">COMPLETED HISTORY</span>
+              <span id="completedArrow">▼</span>
+            </div>
+            <button type="button" class="btn-clear-history" onclick="event.stopPropagation(); clearCompletedHistory();" title="Clear all completed tasks">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+              Clear
+            </button>
           </div>
           <div id="completedList"></div>
         </div>
@@ -3644,6 +3727,20 @@
       const list = getEl('completedList'); const arrow = getEl('completedArrow');
       if (list.style.display === 'none') {list.style.display = 'block'; arrow.innerText = '▲';}
       else {list.style.display = 'none'; arrow.innerText = '▼';}
+    };
+    window.clearCompletedHistory = () => {
+      const completedTasks = state.todos.filter(t => t.completed);
+      if (completedTasks.length === 0) {
+        showToast("No completed tasks to clear");
+        return;
+      }
+      if (confirm('Are you sure you want to delete all completed tasks? This cannot be undone.')) {
+        state.todos = state.todos.filter(t => !t.completed);
+        saveData();
+        renderTasks();
+        renderStats();
+        showToast(`Cleared ${completedTasks.length} completed task(s)`);
+      }
     };
     window.setTimer = (min) => {state.timer.duration = min; resetTimer();}
     window.saveTimerSettings = () => {
