@@ -677,8 +677,7 @@
         box-shadow: none;
         z-index: 1000;
         overflow-y: auto;
-        padding: 20px;
-        padding-bottom: 24px;
+        padding: 20px 20px 24px 20px;
       }
 
       .sidebar.open {
@@ -706,8 +705,7 @@
       }
 
       .main-content {
-        padding: 16px;
-        padding-top: 20px;
+        padding: 20px 16px 16px 16px;
         overflow-y: visible;
         height: auto;
         min-height: 100vh;
