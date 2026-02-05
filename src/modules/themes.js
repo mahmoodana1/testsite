@@ -326,70 +326,11 @@ export function deleteCustomTheme(themeName) {
   showToast('🗑️ Theme "' + themeName + '" deleted');
 }
 
-// Store original theme state before opening modal
-let originalThemeState = null;
-
-/**
- * Store current theme CSS variables for restoration
- */
-function storeOriginalTheme() {
-  const root = document.documentElement;
-  const computedStyle = getComputedStyle(root);
-  originalThemeState = {
-    bgBody: computedStyle.getPropertyValue('--bg-body').trim(),
-    bgCard: computedStyle.getPropertyValue('--bg-card').trim(),
-    bgInput: computedStyle.getPropertyValue('--bg-input').trim(),
-    bgHover: computedStyle.getPropertyValue('--bg-hover').trim(),
-    textPrimary: computedStyle.getPropertyValue('--text-primary').trim(),
-    textSecondary: computedStyle.getPropertyValue('--text-secondary').trim(),
-    textTertiary: computedStyle.getPropertyValue('--text-tertiary').trim(),
-    accentBlue: computedStyle.getPropertyValue('--accent-blue').trim(),
-    accentBlueSoft: computedStyle.getPropertyValue('--accent-blue-soft').trim(),
-    accentGreen: computedStyle.getPropertyValue('--accent-green').trim(),
-    accentGreenSoft: computedStyle.getPropertyValue('--accent-green-soft').trim(),
-    accentOrange: computedStyle.getPropertyValue('--accent-orange').trim(),
-    accentRed: computedStyle.getPropertyValue('--accent-red').trim(),
-    borderColor: computedStyle.getPropertyValue('--border-color').trim(),
-    bgSidebar: computedStyle.getPropertyValue('--bg-sidebar').trim(),
-    bgGlass: computedStyle.getPropertyValue('--bg-glass').trim()
-  };
-}
-
-/**
- * Restore original theme CSS variables
- */
-function restoreOriginalTheme() {
-  if (!originalThemeState) return;
-  
-  const root = document.documentElement;
-  root.style.setProperty('--bg-body', originalThemeState.bgBody);
-  root.style.setProperty('--bg-card', originalThemeState.bgCard);
-  root.style.setProperty('--bg-input', originalThemeState.bgInput);
-  root.style.setProperty('--bg-hover', originalThemeState.bgHover);
-  root.style.setProperty('--text-primary', originalThemeState.textPrimary);
-  root.style.setProperty('--text-secondary', originalThemeState.textSecondary);
-  root.style.setProperty('--text-tertiary', originalThemeState.textTertiary);
-  root.style.setProperty('--accent-blue', originalThemeState.accentBlue);
-  root.style.setProperty('--accent-blue-soft', originalThemeState.accentBlueSoft);
-  root.style.setProperty('--accent-green', originalThemeState.accentGreen);
-  root.style.setProperty('--accent-green-soft', originalThemeState.accentGreenSoft);
-  root.style.setProperty('--accent-orange', originalThemeState.accentOrange);
-  root.style.setProperty('--accent-red', originalThemeState.accentRed);
-  root.style.setProperty('--border-color', originalThemeState.borderColor);
-  root.style.setProperty('--bg-sidebar', originalThemeState.bgSidebar);
-  root.style.setProperty('--bg-glass', originalThemeState.bgGlass);
-  
-  originalThemeState = null;
-}
-
 /**
  * Open custom theme modal
  * @param {string} themeName - Optional theme name to edit
  */
 export function openCustomThemeModal(themeName = null) {
-  // Store current theme state before any modifications
-  storeOriginalTheme();
-  
   if (themeName) {
     const customThemes = JSON.parse(localStorage.getItem('customThemes') || '[]');
     const theme = customThemes.find(t => t.name === themeName);
@@ -427,6 +368,8 @@ export function openCustomThemeModal(themeName = null) {
  */
 export function closeCustomThemeModal() {
   getEl('customThemeModal').classList.remove('active');
-  // Restore the original theme state instead of just reapplying from localStorage
-  restoreOriginalTheme();
+  const currentTheme = localStorage.getItem('theme') || 'cappuccino';
+  if (currentTheme !== 'custom') {
+    applyTheme(currentTheme);
+  }
 }
