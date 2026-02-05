@@ -320,11 +320,7 @@ export function openCourseModal(courseId) {
       goalsCont.appendChild(gItem);
 
       if (focusTarget && goal.id === focusTarget.id) {
-        // Use requestAnimationFrame for more reliable focus timing after DOM update
-        requestAnimationFrame(() => {
-          mainIn.focus();
-          mainIn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        });
+        setTimeout(() => mainIn.focus(), 50);
         setFocusTarget(null);
       }
     });
