@@ -2602,12 +2602,13 @@
         </div>
       </header>
 
-      <section class="focus-hero" id="focusHero">
-      </section>
+      <section class="focus-hero" id="focusHero"></section>
+      <div id="calBox"></div>
+      <input type="file" id="icsIn" accept=".ics" style="display:none">
 
-      <div class="bento-grid">
-        <div class="bento-card">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
+      <div class="bento-grid" style="gap:12px;margin-bottom:14px;">
+        <div class="bento-card" style="padding:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
             <span class="text-xs" style="color:var(--text-tertiary)">POMODORO TIMER</span>
             <button type="button" class="btn-icon-circle" onclick="toggleModal('timerModal')">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -2938,7 +2939,8 @@
       streak: 0,
       lastCompletionDate: null,
       todayCompletedCount: 0,
-      lastResetDate: null
+      lastResetDate: null,
+      cal: {items:[], yr:new Date().getFullYear(), mo:new Date().getMonth(), mode:'m', picked:null}
     };
 
     const colors = {
@@ -3265,13 +3267,14 @@
             state.lastCompletionDate = d.lastCompletionDate || null;
             state.todayCompletedCount = d.todayCompletedCount || 0;
             state.lastResetDate = d.lastResetDate || null;
+            state.cal.items = d.calItems || [];
             getEl('dailyGoalValue').innerText = state.dailyGoal;
             checkStreakExpiration();
             renderAll();
           } else {
             state.todos = []; state.courses = []; state.focusId = null; 
             state.dailyGoal = 5; state.streak = 0; state.lastCompletionDate = null;
-            state.todayCompletedCount = 0; state.lastResetDate = null;
+            state.todayCompletedCount = 0; state.lastResetDate = null; state.cal.items = [];
             getEl('dailyGoalValue').innerText = state.dailyGoal;
             renderAll();
           }
@@ -3296,6 +3299,7 @@
           lastCompletionDate: state.lastCompletionDate,
           todayCompletedCount: state.todayCompletedCount,
           lastResetDate: state.lastResetDate,
+          calItems: state.cal.items,
           lastUpdated: new Date().toISOString()
         }, {merge: true}).catch(error => console.error("Cloud save failed:", error));
       }
@@ -3303,7 +3307,7 @@
 
     /* RENDERING */
     function renderAll() {
-      renderTasks(); renderFocus(); renderCourses(); renderStats();
+      renderTasks(); renderFocus(); renderCourses(); renderStats(); renderCalBox();
       if (state.currentCourseId) window.openCourseModal(state.currentCourseId);
     }
 
@@ -4443,6 +4447,42 @@
     
     // Initialize PDF viewer on page load
     setTimeout(initPdfViewer, 100);
+
+    /* CAL BOX - Planner Widget */
+    const CB={M:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],D:['S','M','T','W','T','F','S'],H:{c1:'var(--accent-blue)',c2:'var(--accent-purple)',c3:'var(--accent-green)',c4:'var(--accent-orange)',c5:'var(--accent-red)'}};
+    function cbUid(){return 'i'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+    function cbDk(y,m,d){return y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');}
+    function cbFor(dk){return state.cal.items.filter(i=>i.d===dk);}
+    function cbPrev(){state.cal.mo--;if(state.cal.mo<0){state.cal.mo=11;state.cal.yr--;}renderCalBox();}
+    function cbNext(){state.cal.mo++;if(state.cal.mo>11){state.cal.mo=0;state.cal.yr++;}renderCalBox();}
+    function cbNow(){const t=new Date();state.cal.yr=t.getFullYear();state.cal.mo=t.getMonth();renderCalBox();}
+    function cbMode(m){state.cal.mode=m;renderCalBox();}
+    function cbPick(dk){state.cal.picked=dk;renderCalBox();}
+    function cbUnpick(){state.cal.picked=null;renderCalBox();}
+    function cbEdit(id,pdk){
+      const ex=id?state.cal.items.find(i=>i.id===id):null;
+      const ov=document.createElement('div');ov.id='cbOv';
+      ov.style='position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:2200;';
+      const bx=document.createElement('div');bx.style='background:var(--bg-card);border-radius:16px;padding:20px;width:90%;max-width:340px;';
+      const nv=ex?ex.n:'',dv=ex?ex.d:(pdk||cbDk(state.cal.yr,state.cal.mo,1)),sv=ex?ex.s:'09:00',ev=ex?ex.e:'10:00',hv=ex?ex.h:'c1',tr=ex?ex.tl:'',cr=ex?ex.cl:'';
+      let to='<option value="">-</option>';state.todos.filter(t=>!t.completed).forEach(t=>{to+=`<option value="${t.id}"${tr===t.id?' selected':''}>${t.text.slice(0,24)}</option>`;});
+      let co='<option value="">-</option>';state.courses.forEach(c=>{co+=`<option value="${c.id}"${cr===c.id?' selected':''}>${c.name}</option>`;});
+      bx.innerHTML=`<div style="display:flex;justify-content:space-between;margin-bottom:12px;"><b>${ex?'Edit':'Add'}</b><button id="cbX" style="border:none;background:var(--bg-input);width:24px;height:24px;border-radius:50%;cursor:pointer;">✕</button></div><div style="margin-bottom:8px;"><label style="font-size:11px;color:var(--text-secondary);">Title</label><input id="cbN" value="${nv}" style="width:100%;padding:8px;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-input);color:var(--text-primary);margin-top:2px;"></div><div style="margin-bottom:8px;"><label style="font-size:11px;color:var(--text-secondary);">Date</label><input type="date" id="cbD" value="${dv}" style="width:100%;padding:8px;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-input);color:var(--text-primary);margin-top:2px;"></div><div style="display:flex;gap:6px;margin-bottom:8px;"><div style="flex:1;"><label style="font-size:11px;color:var(--text-secondary);">Start</label><input type="time" id="cbS" value="${sv}" style="width:100%;padding:8px;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-input);color:var(--text-primary);margin-top:2px;"></div><div style="flex:1;"><label style="font-size:11px;color:var(--text-secondary);">End</label><input type="time" id="cbE" value="${ev}" style="width:100%;padding:8px;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-input);color:var(--text-primary);margin-top:2px;"></div></div><div style="margin-bottom:8px;"><label style="font-size:11px;color:var(--text-secondary);">Color</label><div id="cbH" style="display:flex;gap:4px;margin-top:2px;"></div></div><div style="margin-bottom:8px;"><label style="font-size:11px;color:var(--text-secondary);">Task</label><select id="cbT" style="width:100%;padding:8px;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-input);color:var(--text-primary);margin-top:2px;">${to}</select></div><div style="margin-bottom:12px;"><label style="font-size:11px;color:var(--text-secondary);">Course</label><select id="cbC" style="width:100%;padding:8px;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-input);color:var(--text-primary);margin-top:2px;">${co}</select></div><div style="display:flex;justify-content:space-between;">${ex?'<button id="cbDel" style="padding:6px 10px;border:1px solid var(--accent-red);background:none;border-radius:6px;color:var(--accent-red);cursor:pointer;">Del</button>':'<span></span>'}<div><button id="cbCan" class="btn-ghost">Cancel</button><button id="cbSav" class="btn-primary" style="margin-left:6px;">Save</button></div></div>`;
+      ov.appendChild(bx);document.body.appendChild(ov);
+      const hB=document.getElementById('cbH');Object.keys(CB.H).forEach(k=>{const dot=document.createElement('div');dot.dataset.h=k;dot.style=`width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid ${k===hv?'var(--text-primary)':'transparent'};background:${CB.H[k]};`;dot.onclick=()=>{hB.querySelectorAll('div').forEach(x=>x.style.borderColor='transparent');dot.style.borderColor='var(--text-primary)';};hB.appendChild(dot);});
+      document.getElementById('cbX').onclick=()=>ov.remove();
+      document.getElementById('cbCan').onclick=()=>ov.remove();
+      if(ex)document.getElementById('cbDel').onclick=()=>{state.cal.items=state.cal.items.filter(i=>i.id!==id);saveData();ov.remove();};
+      document.getElementById('cbSav').onclick=()=>{const nm=document.getElementById('cbN').value.trim();if(!nm){showToast('Enter title');return;}const sH=hB.querySelector('div[style*="var(--text-primary)"]');const obj={id:ex?id:cbUid(),n:nm,d:document.getElementById('cbD').value,s:document.getElementById('cbS').value,e:document.getElementById('cbE').value,h:sH?sH.dataset.h:'c1',tl:document.getElementById('cbT').value||null,cl:document.getElementById('cbC').value||null};if(ex){const ix=state.cal.items.findIndex(i=>i.id===id);if(ix>=0)state.cal.items[ix]=obj;}else state.cal.items.push(obj);saveData();ov.remove();};
+    }
+    function cbIcs(txt){const r=[];let c=null;txt.split(/\r?\n/).forEach(l=>{if(l.indexOf('BEGIN:VEVENT')===0)c={id:cbUid(),h:'c1'};else if(l.indexOf('END:VEVENT')===0&&c){if(c.n&&c.d)r.push(c);c=null;}else if(c){if(l.indexOf('SUMMARY:')===0)c.n=l.slice(8);else if(l.indexOf('DTSTART')>=0){const v=l.split(':').pop();if(v.length>=8){c.d=v.slice(0,4)+'-'+v.slice(4,6)+'-'+v.slice(6,8);c.s=v.length>=13?v.slice(9,11)+':'+v.slice(11,13):'09:00';}}else if(l.indexOf('DTEND')>=0){const v=l.split(':').pop();c.e=v.length>=13?v.slice(9,11)+':'+v.slice(11,13):'10:00';}}});return r;}
+    function cbImport(ev){const f=ev.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=e=>{const p=cbIcs(e.target.result);if(p.length){state.cal.items=state.cal.items.concat(p);saveData();showToast('Added '+p.length);}else showToast('None found');};rd.readAsText(f);ev.target.value='';}
+    function cbTrigger(){document.getElementById('icsIn').click();}
+    function cbGrid(){const y=state.cal.yr,m=state.cal.mo,fd=new Date(y,m,1).getDay(),dc=new Date(y,m+1,0).getDate(),pc=new Date(y,m,0).getDate(),tk=cbDk(new Date().getFullYear(),new Date().getMonth(),new Date().getDate());let g='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--border-color);border-radius:6px;overflow:hidden;">';CB.D.forEach(x=>{g+=`<div style="background:var(--bg-input);padding:6px;text-align:center;font-size:10px;font-weight:700;color:var(--text-tertiary);">${x}</div>`;});for(let i=0;i<fd;i++){g+=`<div style="background:var(--bg-input);min-height:54px;padding:2px;opacity:0.4;"><span style="font-size:11px;color:var(--text-tertiary);">${pc-fd+1+i}</span></div>`;}for(let d=1;d<=dc;d++){const dk=cbDk(y,m,d),isT=dk===tk,its=cbFor(dk);let st=`background:var(--bg-card);min-height:54px;padding:2px;cursor:pointer;display:flex;flex-direction:column;`;if(isT)st+=`outline:2px solid var(--accent-blue);outline-offset:-2px;background:var(--accent-blue-soft);`;let ch='';its.slice(0,2).forEach(it=>{ch+=`<div onclick="event.stopPropagation();cbEdit('${it.id}')" style="font-size:9px;padding:0 2px;border-radius:2px;background:${CB.H[it.h]};color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;cursor:pointer;">${it.n}</div>`;});if(its.length>2)ch+=`<div style="font-size:9px;color:var(--text-tertiary);text-align:center;">+${its.length-2}</div>`;g+=`<div onclick="cbPick('${dk}')" style="${st}"><span style="font-size:11px;font-weight:600;color:var(--text-primary);">${d}</span><div style="flex:1;overflow:hidden;">${ch}</div></div>`;}const tot=fd+dc,lft=(7-(tot%7))%7;for(let i=1;i<=lft;i++){g+=`<div style="background:var(--bg-input);min-height:54px;padding:2px;opacity:0.4;"><span style="font-size:11px;color:var(--text-tertiary);">${i}</span></div>`;}g+='</div>';return g;}
+    function cbWk(){const a=new Date(state.cal.yr,state.cal.mo,1);a.setDate(a.getDate()-a.getDay());const tk=cbDk(new Date().getFullYear(),new Date().getMonth(),new Date().getDate()),wd=[];for(let i=0;i<7;i++){const dt=new Date(a);dt.setDate(a.getDate()+i);wd.push({dt,dk:cbDk(dt.getFullYear(),dt.getMonth(),dt.getDate())});}let w='<div style="border:1px solid var(--border-color);border-radius:6px;overflow:hidden;max-height:340px;display:flex;flex-direction:column;"><div style="display:grid;grid-template-columns:38px repeat(7,1fr);background:var(--bg-input);border-bottom:1px solid var(--border-color);"><div></div>';wd.forEach(x=>{const isT=x.dk===tk,ns=isT?`background:var(--accent-blue);color:#fff;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;`:'';w+=`<div style="padding:4px;text-align:center;border-left:1px solid var(--border-color);"><div style="font-size:9px;font-weight:700;color:var(--text-tertiary);">${CB.D[x.dt.getDay()]}</div><div style="font-size:13px;font-weight:700;${ns}">${x.dt.getDate()}</div></div>`;});w+='</div><div style="flex:1;overflow-y:auto;">';for(let hr=7;hr<20;hr++){w+=`<div style="display:grid;grid-template-columns:38px repeat(7,1fr);min-height:32px;border-bottom:1px solid var(--border-color);"><div style="font-size:9px;color:var(--text-tertiary);padding:1px 3px;text-align:right;background:var(--bg-input);border-right:1px solid var(--border-color);">${hr%12||12}${hr>=12?'p':'a'}</div>`;wd.forEach(x=>{const hi=cbFor(x.dk).filter(i=>{const sh=parseInt(i.s.split(':')[0],10);return sh===hr;});let cc='';hi.forEach(i=>{const sh=parseInt(i.s.split(':')[0],10),eh=parseInt(i.e.split(':')[0],10),dur=Math.max(1,eh-sh),hp=dur*32-2;cc+=`<div onclick="event.stopPropagation();cbEdit('${i.id}')" style="position:absolute;left:1px;right:1px;top:1px;height:${hp}px;background:${CB.H[i.h]};border-radius:2px;padding:1px 2px;font-size:9px;color:#fff;overflow:hidden;cursor:pointer;z-index:5;"><b style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${i.n}</b></div>`;});w+=`<div onclick="cbEdit(null,'${x.dk}')" style="border-left:1px solid var(--border-color);position:relative;cursor:pointer;">${cc}</div>`;});w+='</div>';}w+='</div></div>';return w;}
+    function cbPanel(){if(!state.cal.picked)return '';const its=cbFor(state.cal.picked),dO=new Date(state.cal.picked+'T12:00:00'),lbl=CB.M[dO.getMonth()]+' '+dO.getDate();let ls='';if(!its.length)ls='<div style="text-align:center;padding:20px;color:var(--text-tertiary);">Empty</div>';else its.forEach(i=>{let rf='';if(i.tl){const tk=state.todos.find(t=>t.id===i.tl);if(tk)rf+=`<div style="font-size:10px;color:var(--text-tertiary);">📌 ${tk.text.slice(0,18)}</div>`;}if(i.cl){const cr=state.courses.find(c=>c.id===i.cl);if(cr)rf+=`<div style="font-size:10px;color:var(--text-tertiary);">📚 ${cr.name}</div>`;}ls+=`<div onclick="cbEdit('${i.id}')" style="padding:8px;border-radius:4px;margin-bottom:6px;cursor:pointer;border-left:3px solid ${CB.H[i.h]};background:var(--bg-hover);"><b style="color:var(--text-primary);">${i.n}</b><div style="font-size:11px;color:var(--text-secondary);">${i.s}-${i.e}</div>${rf}</div>`;});return `<div style="position:fixed;top:0;right:0;width:260px;height:100%;background:var(--bg-card);border-left:1px solid var(--border-color);box-shadow:var(--shadow-lg);z-index:1700;display:flex;flex-direction:column;"><div style="padding:12px;border-bottom:1px solid var(--border-color);display:flex;justify-content:space-between;"><b>${lbl}</b><button onclick="cbUnpick()" style="width:22px;height:22px;border-radius:50%;background:var(--bg-input);border:none;cursor:pointer;">✕</button></div><div style="flex:1;overflow-y:auto;padding:8px;">${ls}<button onclick="cbEdit(null,'${state.cal.picked}')" style="width:100%;padding:8px;border:2px dashed var(--border-color);background:none;border-radius:4px;color:var(--text-secondary);font-weight:600;cursor:pointer;margin-top:8px;">+ Add</button></div></div>`;}
+    function renderCalBox(){const el=getEl('calBox');if(!el)return;const tl=CB.M[state.cal.mo]+' '+state.cal.yr,iM=state.cal.mode==='m';const hd=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:4px;"><div style="display:flex;align-items:center;gap:4px;"><button onclick="cbPrev()" style="width:28px;height:28px;border-radius:50%;background:var(--bg-input);border:1px solid var(--border-color);color:var(--text-primary);cursor:pointer;">◀</button><span style="font-size:1rem;font-weight:700;min-width:110px;text-align:center;">${tl}</span><button onclick="cbNext()" style="width:28px;height:28px;border-radius:50%;background:var(--bg-input);border:1px solid var(--border-color);color:var(--text-primary);cursor:pointer;">▶</button></div><div style="display:flex;gap:2px;background:var(--bg-input);border-radius:4px;padding:2px;"><button onclick="cbMode('m')" style="padding:4px 8px;border:none;background:${iM?'var(--bg-card)':'transparent'};border-radius:3px;font-size:11px;font-weight:600;color:${iM?'var(--text-primary)':'var(--text-secondary)'};cursor:pointer;">Mo</button><button onclick="cbMode('w')" style="padding:4px 8px;border:none;background:${!iM?'var(--bg-card)':'transparent'};border-radius:3px;font-size:11px;font-weight:600;color:${!iM?'var(--text-primary)':'var(--text-secondary)'};cursor:pointer;">Wk</button></div><div style="display:flex;gap:4px;"><button onclick="cbTrigger()" style="padding:4px 7px;border:1px solid var(--border-color);background:var(--bg-card);border-radius:4px;font-size:10px;font-weight:600;color:var(--text-secondary);cursor:pointer;">📥</button><button onclick="cbNow()" style="padding:4px 7px;border:1px solid var(--accent-blue);background:var(--accent-blue-soft);border-radius:4px;font-size:10px;font-weight:600;color:var(--accent-blue);cursor:pointer;">Now</button></div></div>`;const vw=iM?cbGrid():cbWk();el.innerHTML=`<div style="background:var(--bg-glass);backdrop-filter:blur(40px);border:var(--bg-glass-border);border-radius:var(--radius-lg);padding:14px;margin-bottom:14px;box-shadow:var(--shadow-glass);">${hd}${vw}</div>${cbPanel()}`;document.getElementById('icsIn').onchange=cbImport;}
+    window.cbPrev=cbPrev;window.cbNext=cbNext;window.cbNow=cbNow;window.cbMode=cbMode;window.cbPick=cbPick;window.cbUnpick=cbUnpick;window.cbEdit=cbEdit;window.cbTrigger=cbTrigger;
 
     init();
   </script>
