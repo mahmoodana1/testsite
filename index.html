@@ -1013,75 +1013,321 @@
       opacity: 0.9;
     }
 
-    .focus-hero {
-      background: var(--bg-glass);
-      backdrop-filter: blur(40px);
-      border: var(--bg-glass-border);
+    /* STUDY PLANNER - Calendar Widget */
+    .focus-hero { display: none; }
+    
+    #spCalWidget {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
       border-radius: var(--radius-lg);
-      padding: 40px;
-      margin-bottom: 32px;
-      box-shadow: var(--shadow-glass);
-      position: relative;
-      overflow: hidden;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .spToolbar {
       display: flex;
-      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    
+    .spToolbarL { display: flex; align-items: center; gap: 8px; }
+    .spToolbarR { display: flex; align-items: center; gap: 6px; }
+    
+    .spMonthTxt { font-weight: 600; font-size: 1rem; color: var(--text-primary); min-width: 140px; }
+    
+    .spNavBtn {
+      background: var(--bg-hover);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      width: 28px; height: 28px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
       align-items: center;
       justify-content: center;
-      text-align: center;
-      min-height: 220px;
-      transition: transform 0.3s;
     }
-
-    .focus-hero:hover {
-      transform: translateY(-4px);
-    }
-
-    .focus-progress-bar {
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: 4px;
-      background: var(--accent-green);
-      transition: width 1s ease;
-      box-shadow: 0 2px 10px rgba(52, 199, 89, 0.4);
-    }
-
-    .focus-label {
-      font-size: 0.85rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      color: var(--accent-blue);
-      margin-bottom: 16px;
-      opacity: 0.8;
-    }
-
-    .focus-title {
-      font-size: 2.5rem;
-      font-weight: 800;
-      margin-bottom: 8px;
-      line-height: 1.2;
-    }
-
-    .focus-subtitle {
-      font-size: 1.1rem;
+    .spNavBtn:hover { background: var(--text-primary); color: var(--bg-body); }
+    
+    .spTodayBtn {
+      background: var(--bg-hover);
+      border: 1px solid var(--border-color);
       color: var(--text-secondary);
-      max-width: 600px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 500;
+      cursor: pointer;
     }
+    .spTodayBtn:hover { background: var(--accent-blue-soft); border-color: var(--accent-blue); color: var(--accent-blue); }
+    
+    .spModeBox { display: flex; background: var(--bg-input); border-radius: 5px; padding: 2px; }
+    .spModeBtn {
+      background: transparent;
+      border: none;
+      color: var(--text-tertiary);
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .spModeBtn.on { background: var(--bg-card); color: var(--text-primary); box-shadow: var(--shadow-sm); }
+    
+    .spAddBtn {
+      background: var(--accent-blue);
+      border: none;
+      color: white;
+      padding: 5px 11px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .spAddBtn:hover { opacity: 0.9; }
+    
+    .spIcsBtn {
+      background: var(--bg-hover);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+      padding: 5px 11px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      cursor: pointer;
+    }
+    .spIcsBtn:hover { background: var(--accent-blue-soft); color: var(--accent-blue); border-color: var(--accent-blue); }
+    
+    /* Month Grid */
+    .spMonthGrid { padding: 8px; }
+    .spWkRow { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; margin-bottom: 4px; }
+    .spWkCell { text-align: center; font-size: 0.62rem; font-weight: 600; color: var(--text-tertiary); padding: 5px 0; text-transform: uppercase; }
+    .spDaysGrid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+    
+    .spDayCell {
+      min-height: 58px;
+      background: var(--bg-glass);
+      border: 1px solid transparent;
+      border-radius: 5px;
+      padding: 4px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+    }
+    .spDayCell:hover { background: var(--bg-hover); border-color: var(--border-color); }
+    .spDayCell.dim { opacity: 0.35; }
+    .spDayCell.now { border-color: var(--accent-blue); background: var(--accent-blue-soft); }
+    .spDayCell.sel { border-color: var(--accent-blue); box-shadow: 0 0 0 2px var(--accent-blue-soft); }
+    
+    .spDayNum { font-size: 0.75rem; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
+    .spDayCell.now .spDayNum { color: var(--accent-blue); }
+    
+    .spDayItems { flex: 1; display: flex; flex-direction: column; gap: 1px; overflow: hidden; }
+    .spItem {
+      font-size: 0.58rem;
+      padding: 1px 3px;
+      border-radius: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .spItem.cBlue { background: var(--accent-blue-soft); color: var(--accent-blue); }
+    .spItem.cPurple { background: rgba(139,126,158,0.15); color: var(--accent-purple); }
+    .spItem.cGreen { background: var(--accent-green-soft); color: var(--accent-green); }
+    .spItem.cOrange { background: rgba(184,153,104,0.15); color: var(--accent-orange); }
+    .spItem.cRed { background: rgba(184,126,126,0.15); color: var(--accent-red); }
+    .spMore { font-size: 0.52rem; color: var(--text-tertiary); }
+    
+    /* Week Grid */
+    .spWeekGrid { max-height: 280px; overflow: hidden; display: flex; flex-direction: column; }
+    .spWeekHdr { display: grid; grid-template-columns: 42px repeat(7, 1fr); border-bottom: 1px solid var(--border-color); background: var(--bg-glass); }
+    .spWeekHdrCell { padding: 6px 4px; text-align: center; border-left: 1px solid var(--border-color); }
+    .spWeekHdrCell:first-child { border-left: none; }
+    .spWeekDayN { font-size: 0.58rem; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; }
+    .spWeekDayD { font-size: 0.88rem; font-weight: 600; color: var(--text-primary); margin-top: 1px; }
+    .spWeekHdrCell.now .spWeekDayD { color: var(--accent-blue); background: var(--accent-blue-soft); border-radius: 50%; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; }
+    
+    .spWeekBody { display: grid; grid-template-columns: 42px repeat(7, 1fr); overflow-y: auto; flex: 1; }
+    .spTimeCol { border-right: 1px solid var(--border-color); }
+    .spTimeCell { height: 32px; display: flex; align-items: flex-start; justify-content: flex-end; padding: 0 5px; font-size: 0.55rem; color: var(--text-tertiary); border-bottom: 1px solid var(--border-color); }
+    .spDayCol { position: relative; border-left: 1px solid var(--border-color); }
+    .spHrSlot { height: 32px; border-bottom: 1px solid var(--border-color); }
+    .spHrSlot:hover { background: var(--bg-hover); }
+    
+    .spBlock {
+      position: absolute;
+      left: 1px; right: 1px;
+      border-radius: 3px;
+      padding: 2px 4px;
+      font-size: 0.58rem;
+      font-weight: 500;
+      overflow: hidden;
+      cursor: pointer;
+      z-index: 1;
+    }
+    .spBlock:hover { box-shadow: var(--shadow-md); z-index: 2; }
+    .spBlock.cBlue { background: var(--accent-blue); color: white; }
+    .spBlock.cPurple { background: var(--accent-purple); color: white; }
+    .spBlock.cGreen { background: var(--accent-green); color: white; }
+    .spBlock.cOrange { background: var(--accent-orange); color: white; }
+    .spBlock.cRed { background: var(--accent-red); color: white; }
+    .spBlockT { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .spBlockH { font-size: 0.5rem; opacity: 0.8; }
+    
+    /* Timer FAB */
+    .spTimerFab {
+      position: fixed;
+      bottom: 20px; right: 20px;
+      background: var(--accent-blue);
+      color: white;
+      border: none;
+      width: 50px; height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: var(--shadow-lg);
+      z-index: 100;
+    }
+    .spTimerFab:hover { transform: scale(1.08); }
+    
+    /* Day Panel Overlay */
+    .spDayPanel {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+    }
+    .spDayPanel.on { opacity: 1; pointer-events: auto; }
+    
+    .spDayBox {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      width: 90%;
+      max-width: 520px;
+      max-height: 80vh;
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+      transform: scale(0.94);
+      transition: transform 0.25s;
+    }
+    .spDayPanel.on .spDayBox { transform: scale(1); }
+    
+    .spDayBoxHdr { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--border-color); }
+    .spDayBoxTitle { font-size: 1.1rem; font-weight: 600; color: var(--text-primary); }
+    .spDayBoxX { background: transparent; border: none; color: var(--text-tertiary); width: 28px; height: 28px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .spDayBoxX:hover { background: var(--bg-hover); color: var(--text-primary); }
+    
+    .spDayBoxBody { padding: 0; overflow-y: auto; max-height: 55vh; }
+    .spDayRow { display: grid; grid-template-columns: 50px 1fr; min-height: 42px; border-bottom: 1px solid var(--border-color); }
+    .spDayRowHr { padding: 6px 8px; font-size: 0.68rem; color: var(--text-tertiary); border-right: 1px solid var(--border-color); display: flex; align-items: flex-start; justify-content: flex-end; }
+    .spDayRowC { padding: 3px 6px; min-height: 42px; cursor: pointer; }
+    .spDayRowC:hover { background: var(--bg-hover); }
+    
+    .spDayEvt { padding: 6px 10px; border-radius: 5px; margin-bottom: 2px; cursor: pointer; }
+    .spDayEvt:hover { box-shadow: var(--shadow-md); }
+    .spDayEvtN { font-size: 0.78rem; font-weight: 500; }
+    .spDayEvtT { font-size: 0.62rem; opacity: 0.8; }
+    
+    .spDayBoxFtr { display: flex; justify-content: flex-end; gap: 8px; padding: 14px 20px; border-top: 1px solid var(--border-color); background: var(--bg-glass); }
+    
+    /* Add Event Form */
+    .spFormOverlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+    }
+    .spFormOverlay.on { opacity: 1; pointer-events: auto; }
+    
+    .spFormBox {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      width: 90%;
+      max-width: 440px;
+      max-height: 80vh;
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+      transform: scale(0.94);
+      transition: transform 0.25s;
+    }
+    .spFormOverlay.on .spFormBox { transform: scale(1); }
+    
+    .spFormHdr { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--border-color); }
+    .spFormTitle { font-size: 1.1rem; font-weight: 600; color: var(--text-primary); }
+    
+    .spFormBody { padding: 20px; overflow-y: auto; max-height: 55vh; }
+    .spFG { margin-bottom: 14px; }
+    .spFL { display: block; font-size: 0.68rem; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; margin-bottom: 5px; }
+    .spFI {
+      width: 100%;
+      padding: 10px 12px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 0.88rem;
+    }
+    .spFI:focus { outline: none; border-color: var(--accent-blue); box-shadow: 0 0 0 2px var(--accent-blue-soft); }
+    .spFRow { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    
+    .spColors { display: flex; gap: 6px; }
+    .spColorDot { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
+    .spColorDot:hover { transform: scale(1.1); }
+    .spColorDot.on { border-color: var(--text-primary); box-shadow: 0 0 0 2px var(--bg-card); }
+    
+    .spFormFtr { display: flex; justify-content: space-between; padding: 14px 20px; border-top: 1px solid var(--border-color); background: var(--bg-glass); }
+    
+    /* Timer Modal */
+    .spTimerModal {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      width: 90%;
+      max-width: 360px;
+      padding: 26px;
+      text-align: center;
+      box-shadow: var(--shadow-lg);
+      transform: scale(0.94);
+      transition: transform 0.25s;
+    }
+    .spFormOverlay.on .spTimerModal { transform: scale(1); }
+    .spTimerBig { font-size: 3.5rem; font-weight: 800; font-variant-numeric: tabular-nums; background: linear-gradient(135deg, var(--text-primary), var(--text-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 20px 0; }
+    .spTimerBtns { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+    .spTimerPresets { display: flex; justify-content: center; gap: 6px; }
+    .spPresetBtn { background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-secondary); padding: 6px 12px; border-radius: 6px; font-size: 0.72rem; font-weight: 500; cursor: pointer; }
+    .spPresetBtn:hover { background: var(--accent-blue-soft); border-color: var(--accent-blue); color: var(--accent-blue); }
 
-    /* GLASSY CARDS */
+    /* GLASSY CARDS - Compact */
     .bento-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 24px;
-      margin-bottom: 48px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-bottom: 18px;
     }
 
     .bento-card {
       background: var(--bg-card);
       backdrop-filter: blur(var(--blur-amt));
-
-      border-radius: var(--radius-lg);
-      padding: 24px;
+      border-radius: var(--radius-md);
+      padding: 14px;
       border: 1px solid var(--border-color);
       box-shadow: var(--shadow-sm);
       display: flex;
@@ -1097,29 +1343,29 @@
     }
 
     .timer-display {
-      font-size: 3.5rem;
+      font-size: 2.2rem;
       font-weight: 800;
       font-variant-numeric: tabular-nums;
       background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      margin: 16px 0;
+      margin: 8px 0;
     }
 
     .timer-controls,
     .timer-presets {
       display: flex;
-      gap: 8px;
+      gap: 6px;
       justify-content: center;
     }
 
     .timer-presets {
-      margin-top: 10px;
+      margin-top: 6px;
     }
 
     .btn-icon-circle {
-      width: 36px;
-      height: 36px;
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
       background: var(--bg-hover);
       border: none;
@@ -1140,18 +1386,18 @@
     .courses-header {
       display: flex;
       justify-content: space-between;
-      align-items: flex-end;
-      margin-bottom: 24px;
-      padding-bottom: 16px;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
       border-bottom: 1px solid var(--border-color);
     }
 
     .btn-new-course {
       background: transparent;
-      border: 2px dashed var(--border-color);
+      border: 1px dashed var(--border-color);
       color: var(--text-secondary);
-      padding: 12px 24px;
-      border-radius: var(--radius-md);
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
@@ -1165,16 +1411,15 @@
 
     .courses-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
     }
 
     .course-card-compact {
       background: var(--bg-card);
       backdrop-filter: blur(var(--blur-amt));
-
-      border-radius: var(--radius-md);
-      padding: 24px;
+      border-radius: var(--radius-sm);
+      padding: 14px;
       box-shadow: var(--shadow-sm);
       border: 1px solid var(--border-color);
       cursor: pointer;
@@ -1189,39 +1434,39 @@
       left: 0;
       top: 0;
       bottom: 0;
-      width: 6px;
+      width: 4px;
       background: var(--course-color, var(--accent-blue));
       transition: width 0.3s;
     }
 
     .course-card-compact:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-lg);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
       border-color: var(--course-color);
     }
 
     .course-card-compact:hover::before {
-      width: 12px;
+      width: 8px;
     }
 
     .course-card-title {
-      font-size: 1.25rem;
-      font-weight: 700;
-      margin-bottom: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 8px;
       color: var(--text-primary);
     }
 
     .course-card-stats {
       display: flex;
-      gap: 16px;
-      font-size: 0.8rem;
+      gap: 12px;
+      font-size: 0.72rem;
       color: var(--text-tertiary);
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
 
     .course-card-progress {
       width: 100%;
-      height: 6px;
+      height: 5px;
       background: var(--bg-input);
       border-radius: 10px;
       overflow: hidden;
