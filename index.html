@@ -4258,6 +4258,7 @@
     // Initialize PDF viewer controls
     function initPdfViewer() {
       const overlay = getEl('pdfViewerOverlay');
+      if (!overlay) return; // PDF viewer removed
       const closeBtn = getEl('pdfCloseBtn');
       const prevBtn = getEl('pdfPrevPage');
       const nextBtn = getEl('pdfNextPage');
