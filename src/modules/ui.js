@@ -162,7 +162,16 @@ export function setupEventListeners() {
     }
   });
   
-  // Theme selection is handled by themes module
+  // Theme selection
+  document.querySelectorAll('.theme-option[data-theme]').forEach(option => {
+    option.onclick = () => {
+      const themeName = option.dataset.theme;
+      import('./themes.js').then(({ applyTheme }) => {
+        applyTheme(themeName);
+        themeDropdown.classList.remove('active');
+      });
+    };
+  });
   
   // Custom theme button
   getEl('customThemeBtn').onclick = () => {
