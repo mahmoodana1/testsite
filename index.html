@@ -4606,7 +4606,7 @@
     setTimeout(initPdfViewer, 100);
 
     /* CAL BOX - Planner Widget */
-    const CB={M:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],D:['S','M','T','W','T','F','S'],H:{c1:'var(--accent-blue)',c2:'var(--accent-purple)',c3:'var(--accent-green)',c4:'var(--accent-orange)',c5:'var(--accent-red)'}};
+    const CB={M:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],D:['S','M','T','W','T','F','S'],H:{c1:'var(--accent-blue)',c2:'var(--accent-purple)',c3:'var(--accent-green)',c4:'var(--accent-orange)',c5:'var(--accent-red)'},DEF_START:'09:00',DEF_END:'10:00'};
     function cbUid(){return 'i'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
     function cbDk(y,m,d){return y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');}
     function cbFor(dk){return state.cal.items.filter(i=>i.d===dk);}
@@ -4706,7 +4706,7 @@
       if(!matchedTask){showToast('Task not found');return;}
       var now=new Date();
       var dateStr=cbDk(now.getFullYear(),now.getMonth(),now.getDate());
-      var newEntry={id:cbUid(),n:matchedTask.text,d:dateStr,s:'09:00',e:'10:00',h:'c1',tl:taskId,cl:null};
+      var newEntry={id:cbUid(),n:matchedTask.text,d:dateStr,s:CB.DEF_START,e:CB.DEF_END,h:'c1',tl:taskId,cl:null};
       state.cal.items.push(newEntry);
       saveData();
       showToast('Task added to calendar');
@@ -4721,7 +4721,7 @@
       if(!matchedGoal){showToast('Goal not found');return;}
       var now=new Date();
       var dateStr=cbDk(now.getFullYear(),now.getMonth(),now.getDate());
-      var newEntry={id:cbUid(),n:matchedGoal.title||'Untitled goal',d:dateStr,s:'09:00',e:'10:00',h:'c3',tl:null,cl:courseId};
+      var newEntry={id:cbUid(),n:matchedGoal.title||'Untitled goal',d:dateStr,s:CB.DEF_START,e:CB.DEF_END,h:'c3',tl:null,cl:courseId};
       state.cal.items.push(newEntry);
       saveData();
       showToast('Goal added to calendar');
