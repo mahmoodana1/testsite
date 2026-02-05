@@ -78,10 +78,11 @@ function init() {
     window.setTimer = setTimer;
   });
   
-  import('./modules/tasks.js').then(({ toggleCompleted, setFocus }) => {
-    window.toggleCompleted = () => {
-      import('./modules/ui.js').then(({ toggleCompleted }) => toggleCompleted());
-    };
+  import('./modules/ui.js').then(({ toggleCompleted }) => {
+    window.toggleCompleted = toggleCompleted;
+  });
+  
+  import('./modules/tasks.js').then(({ setFocus }) => {
     window.setFocus = setFocus;
   });
 }
