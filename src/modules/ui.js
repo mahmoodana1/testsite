@@ -6,9 +6,9 @@
 import { state, colors, setActiveColor } from './state.js';
 import { getEl } from './dom.js';
 import { getTodayCompletedCount } from './streak.js';
-import { renderTasks, toggleTask, setFocus, pickRandomTask } from './tasks.js';
+import { renderTasks, toggleTask, setFocus, pickRandomTask, addTask } from './tasks.js';
 import { renderCourses } from './courses.js';
-import { toggleTimer, resetTimer } from './timer.js';
+import { toggleTimer, resetTimer, setTimer } from './timer.js';
 import { saveData } from './storage.js';
 import { openCustomThemeModal } from './themes.js';
 
@@ -184,8 +184,7 @@ export function setupEventListeners() {
     const text = getEl('taskInput').value.trim();
     const days = getEl('taskDays').value;
     if (text) {
-      // Import dynamically to avoid circular dependency
-      import('./tasks.js').then(({ addTask }) => addTask(text, days));
+      addTask(text, days);
     }
   };
 
@@ -268,10 +267,7 @@ export function saveDailyGoal() {
 export function saveTimerSettings() {
   const d = parseInt(getEl('customWorkDur').value);
   if (d > 0) {
-    // Import dynamically to avoid circular dependency
-    import('./timer.js').then(({ setTimer }) => {
-      setTimer(d);
-      toggleModal('timerModal');
-    });
+    setTimer(d);
+    toggleModal('timerModal');
   }
 }
