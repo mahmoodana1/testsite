@@ -3119,6 +3119,7 @@
     /* HELPERS */
     const getEl = (id) => document.getElementById(id);
     const generateId = () => '_' + Math.random().toString(36).substr(2, 9);
+    const escHtml = (str) => { const d = document.createElement('div'); d.textContent = str; return d.innerHTML; };
     function formatTime(seconds) {
       const m = Math.floor(seconds / 60).toString().padStart(2, '0');
       const s = (seconds % 60).toString().padStart(2, '0');
@@ -3473,7 +3474,8 @@
         let taskItems = '';
         dayTasks.slice(0,4).forEach(t => {
           const hue = t.color || 'blue';
-          taskItems += `<div class="wk-task wk-${hue}" draggable="true" data-tid="${t.id}" title="${t.text.replace(/"/g,'&quot;')}">${t.text}</div>`;
+          const safeText = escHtml(t.text);
+          taskItems += `<div class="wk-task wk-${hue}" draggable="true" data-tid="${t.id}" title="${safeText}">${safeText}</div>`;
         });
         if(dayTasks.length > 4) taskItems += `<div class="wk-more">+${dayTasks.length-4}</div>`;
         
@@ -3513,7 +3515,8 @@
     }
     
     function moveTaskToDate(tid, dk) {
-      const t = state.todos.find(x => x.id === tid);
+      if(!tid || !dk) return;
+      const t = state.todos.find(x => x.id === tid && !x.completed);
       if(t) { t.scheduledDate = dk; saveData(); }
     }
     
@@ -3545,17 +3548,30 @@
       if(!file) return;
       const reader = new FileReader();
       reader.onload = (e) => {
-        const lines = e.target.result.split(/\r?\n/);
+        // Unfold ICS lines (lines starting with space/tab are continuations)
+        let content = e.target.result.replace(/\r?\n[ \t]/g, '');
+        const lines = content.split(/\r?\n/);
         let evt = null, count = 0;
+        const hueList = ['blue','purple','green','orange','red'];
         lines.forEach(ln => {
           if(ln === 'BEGIN:VEVENT') evt = {};
           else if(ln === 'END:VEVENT' && evt && evt.sum && evt.dt) {
-            state.todos.push({ id: generateId(), text: evt.sum, color: ['blue','purple','green','orange','red'][count%5], completed: false, scheduledDate: evt.dt });
+            // Sanitize the summary text
+            const safeSummary = escHtml(evt.sum);
+            state.todos.push({ id: generateId(), text: safeSummary, color: hueList[count % hueList.length], completed: false, scheduledDate: evt.dt });
             count++;
             evt = null;
           } else if(evt) {
             if(ln.startsWith('SUMMARY:')) evt.sum = ln.slice(8);
-            else if(ln.startsWith('DTSTART')) { const m = ln.match(/(\d{4})(\d{2})(\d{2})/); if(m) evt.dt = `${m[1]}-${m[2]}-${m[3]}`; }
+            else if(ln.startsWith('DTSTART')) {
+              // Handle various DTSTART formats: DTSTART:20250101, DTSTART;VALUE=DATE:20250101, DTSTART:20250101T120000Z
+              const colonIdx = ln.indexOf(':');
+              if(colonIdx > -1) {
+                const dateVal = ln.slice(colonIdx + 1);
+                const m = dateVal.match(/^(\d{4})(\d{2})(\d{2})/);
+                if(m) evt.dt = `${m[1]}-${m[2]}-${m[3]}`;
+              }
+            }
           }
         });
         if(count > 0) { saveData(); showToast(`Imported ${count} events`); }
