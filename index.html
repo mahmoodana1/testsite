@@ -15,8 +15,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
-  <!-- PDF.js for PDF viewing -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <!-- PDF.js removed -->
 
   <style>
     /* -------------------------------------------------------------------------- */
@@ -1986,6 +1985,16 @@
       #completedList {
         max-height: none;
       }
+
+      .cb-mode-tabs {
+        flex-wrap: nowrap !important;
+        overflow-x: auto;
+      }
+      .cb-day-tasks {
+        max-height: 60vh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
     }
 
     /* Theme Selector Dropdown */
@@ -2830,10 +2839,6 @@
               </button>
               <div class="theme-divider"></div>
               <div id="customThemesList"></div>
-              <button class="theme-option" id="customThemeBtn">
-                <div class="theme-color-preview" style="background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #f7b731);"></div>
-                <span>✨ Create Custom Theme</span>
-              </button>
             </div>
           </div>
           <button type="button" class="auth-btn" id="loginBtn">
@@ -3073,82 +3078,7 @@
     </div>
   </div>
 
-  <!-- PDF Viewer Modal -->
-  <div class="pdf-viewer-overlay" id="pdfViewerOverlay">
-    <div class="pdf-viewer-container">
-      <div class="pdf-viewer-header">
-        <span class="pdf-viewer-title" id="pdfViewerTitle">Document.pdf</span>
-        <div class="pdf-viewer-controls">
-          <div class="pdf-page-controls">
-            <button type="button" class="pdf-viewer-btn" id="pdfPrevPage" title="Previous">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
-            </button>
-            <input type="number" class="pdf-page-input" id="pdfPageInput" value="1" min="1">
-            <span class="pdf-page-total">/ <span id="pdfTotalPages">1</span></span>
-            <button type="button" class="pdf-viewer-btn" id="pdfNextPage" title="Next">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
-            </button>
-          </div>
-          <div class="pdf-controls-divider"></div>
-          <div class="pdf-zoom-controls">
-            <button type="button" class="pdf-viewer-btn" id="pdfZoomOut" title="Zoom Out">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            </button>
-            <span class="pdf-zoom-level" id="pdfZoomLevel">100%</span>
-            <button type="button" class="pdf-viewer-btn" id="pdfZoomIn" title="Zoom In">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            </button>
-            <button type="button" class="pdf-viewer-btn" id="pdfFitWidth" title="Fit to Width">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 3H3v18h18V3zM9 21V3M15 21V3"></path></svg>
-            </button>
-          </div>
-          <div class="pdf-controls-divider"></div>
-          <button type="button" class="pdf-viewer-btn delete-btn" id="pdfRemoveAttachment" title="Remove PDF">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-          </button>
-          <button type="button" class="pdf-viewer-btn close-btn" id="pdfCloseBtn" title="Close">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-          </button>
-        </div>
-      </div>
-      <div class="pdf-viewer-body" id="pdfViewerBody">
-        <div class="pdf-loading" id="pdfLoading">
-          <div class="spinner"></div>
-          <span>Loading PDF...</span>
-        </div>
-        <div class="pdf-canvas-wrapper" id="pdfCanvasWrapper"></div>
-        <div class="pdf-error" id="pdfError" style="display: none;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-          <span id="pdfErrorMsg">Failed to load PDF</span>
-        </div>
-        <!-- Minimal floating annotation tools button -->
-        <div class="external-tools-panel" id="externalToolsPanel">
-          <button type="button" class="external-tools-toggle" id="externalToolsToggle" aria-label="Open annotation tools">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-            Annotate
-          </button>
-          <div class="external-tools-dropdown">
-            <div class="external-tools-title">Open with</div>
-            <a href="https://www.xodo.com/app/#/" target="_blank" rel="noopener noreferrer" class="external-tool-link">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-              Xodo
-            </a>
-            <a href="https://www.adobe.com/acrobat/online/pdf-editor.html" target="_blank" rel="noopener noreferrer" class="external-tool-link">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--accent-red)" stroke="none" aria-hidden="true"><path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3Z"/></svg>
-              Adobe
-            </a>
-            <a href="https://smallpdf.com/edit-pdf" target="_blank" rel="noopener noreferrer" class="external-tool-link">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-green)" stroke-width="2" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-              Smallpdf
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Hidden file input for PDF uploads -->
-  <input type="file" id="pdfFileInput" class="hidden-file-input" accept=".pdf,application/pdf">
+  <!-- PDF viewer removed -->
 
   <script type="module">
     import {initializeApp} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
@@ -3442,11 +3372,7 @@
         };
       });
       
-      // Custom theme button
-      getEl('customThemeBtn').onclick = () => {
-        themeDropdown.classList.remove('active');
-        openCustomThemeModal();
-      };
+      // Custom theme button removed
 
       getEl('addTaskForm').onsubmit = (e) => {
         e.preventDefault();
@@ -3574,11 +3500,12 @@
                         <div class="task-text">${t.text}</div>
                         <div class="task-meta">${daysLeft}</div>
                     </div>
+                    <button type="button" class="btn-cal-add" title="Add to Calendar" style="background:none;border:none;cursor:pointer;font-size:16px;padding:2px 4px;flex-shrink:0;" onclick="event.stopPropagation();cbAddTaskToCal('${t.id}')">📅</button>
                     <button type="button" class="btn-delete-task">✕</button>
                 `;
-        el.onclick = (e) => {if (!e.target.closest('.checkbox') && !e.target.closest('button')) setFocus(t.id);};
+        el.onclick = (e) => {if (!e.target.closest('.checkbox') && !e.target.closest('button') && !e.target.closest('.btn-cal-add')) setFocus(t.id);};
         el.querySelector('.checkbox').onclick = (e) => {e.stopPropagation(); toggleTask(t.id);};
-        el.querySelector('button').onclick = (e) => {e.stopPropagation(); deleteTask(t.id);};
+        el.querySelector('.btn-delete-task').onclick = (e) => {e.stopPropagation(); deleteTask(t.id);};
         list.appendChild(el);
       });
 
@@ -3742,27 +3669,16 @@
           gItem.className = 'goal-item';
           gItem.dataset.goalId = goal.id;
           
-          // Check if goal has PDF attachment
-          const hasPdf = goal.pdfAttachment && goal.pdfAttachment.data;
-          const pdfIndicator = hasPdf ? 
-            `<span class="pdf-indicator" onclick="event.stopPropagation(); openGoalPdf('${courseId}', '${cat.id}', '${goal.id}')">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-              PDF
-            </span>` : '';
-          
           gItem.innerHTML = `
                         <div class="checkbox ${goal.completed ? 'checked' : ''}" style="margin-top:4px;">${goal.completed ? '✓' : ''}</div>
                         <div class="goal-inputs">
                             <div style="display:flex; align-items:center;">
                               <input class="goal-main-input" value="${goal.title}" placeholder="New Goal..." style="flex:1;">
-                              ${pdfIndicator}
                             </div>
                             <input class="goal-sub-input" value="${goal.subtitle || ''}" placeholder="Add details...">
                         </div>
                         <div class="goal-actions">
-                            <button type="button" class="btn-attach-pdf ${hasPdf ? 'has-pdf' : ''}" title="${hasPdf ? 'View PDF' : 'Attach PDF'}" data-action="pdf">
-                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                            </button>
+                            <button type="button" class="btn-goal-cal-add" title="Add to Calendar" data-action="schedule" style="background:none;border:none;cursor:pointer;font-size:16px;padding:2px 4px;">📅</button>
                             <button type="button" class="btn-delete-task" title="Convert">➔</button>
                             <button type="button" class="btn-delete-task" style="color:var(--accent-red);" title="Delete">✕</button>
                         </div>
@@ -3774,20 +3690,15 @@
           mainIn.onkeydown = (e) => {
             if (e.key === 'Enter') {
               e.preventDefault(); e.target.blur();
-              addGoal(courseId, cat.id); // Triggers re-render and focus on new input
+              addGoal(courseId, cat.id);
             }
           };
 
           const subIn = gItem.querySelector('.goal-sub-input');
           subIn.onblur = () => updateGoal(courseId, cat.id, goal.id, {subtitle: subIn.value}, false);
 
-          // PDF button handler
-          gItem.querySelector('[data-action="pdf"]').onclick = () => {
-            if (hasPdf) {
-              window.openGoalPdf(courseId, cat.id, goal.id);
-            } else {
-              window.triggerPdfUpload(courseId, cat.id, goal.id);
-            }
+          gItem.querySelector('[data-action="schedule"]').onclick = () => {
+            cbAddGoalToCal(courseId, cat.id, goal.id);
           };
 
           gItem.querySelector('[title="Convert"]').onclick = () => convertGoal(courseId, cat.id, goal.id);
@@ -4724,10 +4635,104 @@
     function cbImport(ev){const f=ev.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=e=>{const p=cbIcs(e.target.result);if(p.length){state.cal.items=state.cal.items.concat(p);saveData();showToast('Added '+p.length);}else showToast('None found');};rd.readAsText(f);ev.target.value='';}
     function cbTrigger(){document.getElementById('icsIn').click();}
     function cbGrid(){const y=state.cal.yr,m=state.cal.mo,fd=new Date(y,m,1).getDay(),dc=new Date(y,m+1,0).getDate(),pc=new Date(y,m,0).getDate(),tk=cbDk(new Date().getFullYear(),new Date().getMonth(),new Date().getDate());let g='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--border-color);border-radius:6px;overflow:hidden;">';CB.D.forEach(x=>{g+=`<div style="background:var(--bg-input);padding:6px;text-align:center;font-size:10px;font-weight:700;color:var(--text-tertiary);">${x}</div>`;});for(let i=0;i<fd;i++){g+=`<div style="background:var(--bg-input);min-height:54px;padding:2px;opacity:0.4;"><span style="font-size:11px;color:var(--text-tertiary);">${pc-fd+1+i}</span></div>`;}for(let d=1;d<=dc;d++){const dk=cbDk(y,m,d),isT=dk===tk,its=cbFor(dk);let st=`background:var(--bg-card);min-height:54px;padding:2px;cursor:pointer;display:flex;flex-direction:column;`;if(isT)st+=`outline:2px solid var(--accent-blue);outline-offset:-2px;background:var(--accent-blue-soft);`;let ch='';its.slice(0,2).forEach(it=>{ch+=`<div onclick="event.stopPropagation();cbEdit('${it.id}')" style="font-size:9px;padding:0 2px;border-radius:2px;background:${CB.H[it.h]};color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;cursor:pointer;">${it.n}</div>`;});if(its.length>2)ch+=`<div style="font-size:9px;color:var(--text-tertiary);text-align:center;">+${its.length-2}</div>`;g+=`<div onclick="cbPick('${dk}')" style="${st}"><span style="font-size:11px;font-weight:600;color:var(--text-primary);">${d}</span><div style="flex:1;overflow:hidden;">${ch}</div></div>`;}const tot=fd+dc,lft=(7-(tot%7))%7;for(let i=1;i<=lft;i++){g+=`<div style="background:var(--bg-input);min-height:54px;padding:2px;opacity:0.4;"><span style="font-size:11px;color:var(--text-tertiary);">${i}</span></div>`;}g+='</div>';return g;}
-    function cbWk(){const a=new Date(state.cal.yr,state.cal.mo,1);a.setDate(a.getDate()-a.getDay());const tk=cbDk(new Date().getFullYear(),new Date().getMonth(),new Date().getDate()),wd=[];for(let i=0;i<7;i++){const dt=new Date(a);dt.setDate(a.getDate()+i);wd.push({dt,dk:cbDk(dt.getFullYear(),dt.getMonth(),dt.getDate())});}let w='<div style="border:1px solid var(--border-color);border-radius:6px;overflow:hidden;max-height:340px;display:flex;flex-direction:column;"><div style="display:grid;grid-template-columns:38px repeat(7,1fr);background:var(--bg-input);border-bottom:1px solid var(--border-color);"><div></div>';wd.forEach(x=>{const isT=x.dk===tk,ns=isT?`background:var(--accent-blue);color:#fff;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;`:'';w+=`<div style="padding:4px;text-align:center;border-left:1px solid var(--border-color);"><div style="font-size:9px;font-weight:700;color:var(--text-tertiary);">${CB.D[x.dt.getDay()]}</div><div style="font-size:13px;font-weight:700;${ns}">${x.dt.getDate()}</div></div>`;});w+='</div><div style="flex:1;overflow-y:auto;">';for(let hr=7;hr<20;hr++){w+=`<div style="display:grid;grid-template-columns:38px repeat(7,1fr);min-height:32px;border-bottom:1px solid var(--border-color);"><div style="font-size:9px;color:var(--text-tertiary);padding:1px 3px;text-align:right;background:var(--bg-input);border-right:1px solid var(--border-color);">${hr%12||12}${hr>=12?'p':'a'}</div>`;wd.forEach(x=>{const hi=cbFor(x.dk).filter(i=>{const sh=parseInt(i.s.split(':')[0],10);return sh===hr;});let cc='';hi.forEach(i=>{const sh=parseInt(i.s.split(':')[0],10),eh=parseInt(i.e.split(':')[0],10),dur=Math.max(1,eh-sh),hp=dur*32-2;cc+=`<div onclick="event.stopPropagation();cbEdit('${i.id}')" style="position:absolute;left:1px;right:1px;top:1px;height:${hp}px;background:${CB.H[i.h]};border-radius:2px;padding:1px 2px;font-size:9px;color:#fff;overflow:hidden;cursor:pointer;z-index:5;"><b style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${i.n}</b></div>`;});w+=`<div onclick="cbEdit(null,'${x.dk}')" style="border-left:1px solid var(--border-color);position:relative;cursor:pointer;">${cc}</div>`;});w+='</div>';}w+='</div></div>';return w;}
+    function cbWk(){const a=new Date(state.cal.yr,state.cal.mo,1);a.setDate(a.getDate()-a.getDay());const tk=cbDk(new Date().getFullYear(),new Date().getMonth(),new Date().getDate()),wd=[];for(let i=0;i<7;i++){const dt=new Date(a);dt.setDate(a.getDate()+i);wd.push({dt,dk:cbDk(dt.getFullYear(),dt.getMonth(),dt.getDate())});}let w='<div style="border:1px solid var(--border-color);border-radius:6px;overflow:hidden;max-height:500px;display:flex;flex-direction:column;"><div style="display:grid;grid-template-columns:38px repeat(7,1fr);background:var(--bg-input);border-bottom:1px solid var(--border-color);"><div></div>';wd.forEach(x=>{const isT=x.dk===tk,ns=isT?`background:var(--accent-blue);color:#fff;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;`:'';w+=`<div style="padding:4px;text-align:center;border-left:1px solid var(--border-color);"><div style="font-size:9px;font-weight:700;color:var(--text-tertiary);">${CB.D[x.dt.getDay()]}</div><div style="font-size:13px;font-weight:700;${ns}">${x.dt.getDate()}</div></div>`;});w+='</div><div style="flex:1;overflow-y:auto;">';for(let hr=0;hr<24;hr++){w+=`<div style="display:grid;grid-template-columns:38px repeat(7,1fr);min-height:32px;border-bottom:1px solid var(--border-color);"><div style="font-size:9px;color:var(--text-tertiary);padding:1px 3px;text-align:right;background:var(--bg-input);border-right:1px solid var(--border-color);">${hr%12||12}${hr>=12?'p':'a'}</div>`;wd.forEach(x=>{const hi=cbFor(x.dk).filter(i=>{const sh=parseInt(i.s.split(':')[0],10);return sh===hr;});let cc='';hi.forEach(i=>{const sh=parseInt(i.s.split(':')[0],10),eh=parseInt(i.e.split(':')[0],10),dur=Math.max(1,eh-sh),hp=dur*32-2;cc+=`<div onclick="event.stopPropagation();cbEdit('${i.id}')" style="position:absolute;left:1px;right:1px;top:1px;height:${hp}px;background:${CB.H[i.h]};border-radius:2px;padding:1px 2px;font-size:9px;color:#fff;overflow:hidden;cursor:pointer;z-index:5;"><b style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${i.n}</b></div>`;});w+=`<div onclick="cbEdit(null,'${x.dk}')" style="border-left:1px solid var(--border-color);position:relative;cursor:pointer;">${cc}</div>`;});w+='</div>';}w+='</div></div>';return w;}
+    function cbDay(){
+      var now=new Date();
+      var todayKey=cbDk(now.getFullYear(),now.getMonth(),now.getDate());
+      var todayLabel=CB.D[now.getDay()]+', '+CB.M[now.getMonth()]+' '+now.getDate()+', '+now.getFullYear();
+      var eventsForToday=cbFor(todayKey);
+      var markup='<div style="margin-bottom:14px;"><div style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:8px;">🗓 Today\'s Schedule — '+todayLabel+'</div>';
+      if(eventsForToday.length===0){
+        markup+='<div style="padding:12px;color:var(--text-tertiary);font-size:12px;text-align:center;">No events scheduled for today</div>';
+      } else {
+        eventsForToday.sort(function(a,b){return a.s.localeCompare(b.s);});
+        for(var ei=0;ei<eventsForToday.length;ei++){
+          var ev=eventsForToday[ei];
+          markup+='<div onclick="cbEdit(\''+ev.id+'\')" style="padding:8px 10px;margin-bottom:4px;border-left:3px solid '+CB.H[ev.h]+';background:var(--bg-hover);border-radius:4px;cursor:pointer;">';
+          markup+='<b style="color:var(--text-primary);font-size:12px;">'+ev.n+'</b>';
+          markup+='<div style="font-size:11px;color:var(--text-secondary);">'+ev.s+' – '+ev.e+'</div></div>';
+        }
+      }
+      markup+='</div>';
+      var pendingTodos=state.todos.filter(function(item){return !item.completed;});
+      markup+='<div style="margin-bottom:14px;"><div style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:8px;">✅ Tasks</div>';
+      markup+='<div class="cb-day-tasks">';
+      if(pendingTodos.length===0){
+        markup+='<div style="padding:12px;color:var(--text-tertiary);font-size:12px;text-align:center;">All tasks completed!</div>';
+      } else {
+        for(var ti=0;ti<pendingTodos.length;ti++){
+          var todo=pendingTodos[ti];
+          markup+='<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:4px;background:var(--bg-card);margin-bottom:3px;">';
+          markup+='<input type="checkbox" onchange="cbToggleDayTask(\''+todo.id+'\')" style="cursor:pointer;width:16px;height:16px;accent-color:var(--accent-blue);">';
+          markup+='<span style="flex:1;font-size:12px;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+todo.text+'</span>';
+          markup+='<button onclick="cbAddTaskToCal(\''+todo.id+'\')" style="background:none;border:none;cursor:pointer;font-size:14px;padding:1px 3px;flex-shrink:0;" title="Schedule on calendar">📅</button>';
+          markup+='</div>';
+        }
+      }
+      markup+='</div></div>';
+      var incompleteGoals=[];
+      for(var ci=0;ci<state.courses.length;ci++){
+        var crs=state.courses[ci];
+        for(var ki=0;ki<crs.categories.length;ki++){
+          var ctg=crs.categories[ki];
+          for(var gi=0;gi<ctg.goals.length;gi++){
+            var gl=ctg.goals[gi];
+            if(!gl.completed){
+              incompleteGoals.push({courseId:crs.id,catId:ctg.id,goalId:gl.id,title:gl.title,courseName:crs.name});
+            }
+          }
+        }
+      }
+      markup+='<div><div style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:8px;">🎯 Course Goals</div>';
+      markup+='<div class="cb-day-tasks">';
+      if(incompleteGoals.length===0){
+        markup+='<div style="padding:12px;color:var(--text-tertiary);font-size:12px;text-align:center;">No pending goals</div>';
+      } else {
+        for(var ig=0;ig<incompleteGoals.length;ig++){
+          var gObj=incompleteGoals[ig];
+          markup+='<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:4px;background:var(--bg-card);margin-bottom:3px;">';
+          markup+='<span style="flex:1;font-size:12px;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="'+gObj.courseName+'">';
+          markup+=(gObj.title||'Untitled goal')+'</span>';
+          markup+='<button onclick="cbAddGoalToCal(\''+gObj.courseId+'\',\''+gObj.catId+'\',\''+gObj.goalId+'\')" style="background:none;border:none;cursor:pointer;font-size:14px;padding:1px 3px;flex-shrink:0;" title="Schedule on calendar">📅</button>';
+          markup+='</div>';
+        }
+      }
+      markup+='</div></div>';
+      return markup;
+    }
+    function cbAddTaskToCal(taskId){
+      var matchedTask=state.todos.find(function(x){return x.id===taskId;});
+      if(!matchedTask){showToast('Task not found');return;}
+      var now=new Date();
+      var dateStr=cbDk(now.getFullYear(),now.getMonth(),now.getDate());
+      var newEntry={id:cbUid(),n:matchedTask.text,d:dateStr,s:'09:00',e:'10:00',h:'c1',tl:taskId,cl:null};
+      state.cal.items.push(newEntry);
+      saveData();
+      showToast('Task added to calendar');
+      renderCalBox();
+    }
+    function cbAddGoalToCal(courseId,catId,goalId){
+      var matchedCourse=state.courses.find(function(x){return x.id===courseId;});
+      if(!matchedCourse){showToast('Course not found');return;}
+      var matchedCat=matchedCourse.categories.find(function(x){return x.id===catId;});
+      if(!matchedCat){showToast('Category not found');return;}
+      var matchedGoal=matchedCat.goals.find(function(x){return x.id===goalId;});
+      if(!matchedGoal){showToast('Goal not found');return;}
+      var now=new Date();
+      var dateStr=cbDk(now.getFullYear(),now.getMonth(),now.getDate());
+      var newEntry={id:cbUid(),n:matchedGoal.title||'Untitled goal',d:dateStr,s:'09:00',e:'10:00',h:'c3',tl:null,cl:courseId};
+      state.cal.items.push(newEntry);
+      saveData();
+      showToast('Goal added to calendar');
+      renderCalBox();
+    }
+    function cbToggleDayTask(taskId){
+      toggleTask(taskId);
+      renderCalBox();
+    }
     function cbPanel(){if(!state.cal.picked)return '';const its=cbFor(state.cal.picked),dO=new Date(state.cal.picked+'T12:00:00'),lbl=CB.M[dO.getMonth()]+' '+dO.getDate();let ls='';if(!its.length)ls='<div style="text-align:center;padding:20px;color:var(--text-tertiary);">Empty</div>';else its.forEach(i=>{let rf='';if(i.tl){const tk=state.todos.find(t=>t.id===i.tl);if(tk)rf+=`<div style="font-size:10px;color:var(--text-tertiary);">📌 ${tk.text.slice(0,18)}</div>`;}if(i.cl){const cr=state.courses.find(c=>c.id===i.cl);if(cr)rf+=`<div style="font-size:10px;color:var(--text-tertiary);">📚 ${cr.name}</div>`;}ls+=`<div onclick="cbEdit('${i.id}')" style="padding:8px;border-radius:4px;margin-bottom:6px;cursor:pointer;border-left:3px solid ${CB.H[i.h]};background:var(--bg-hover);"><b style="color:var(--text-primary);">${i.n}</b><div style="font-size:11px;color:var(--text-secondary);">${i.s}-${i.e}</div>${rf}</div>`;});return `<div style="position:fixed;top:0;right:0;width:260px;height:100%;background:var(--bg-card);border-left:1px solid var(--border-color);box-shadow:var(--shadow-lg);z-index:1700;display:flex;flex-direction:column;"><div style="padding:12px;border-bottom:1px solid var(--border-color);display:flex;justify-content:space-between;"><b>${lbl}</b><button onclick="cbUnpick()" style="width:22px;height:22px;border-radius:50%;background:var(--bg-input);border:none;cursor:pointer;">✕</button></div><div style="flex:1;overflow-y:auto;padding:8px;">${ls}<button onclick="cbEdit(null,'${state.cal.picked}')" style="width:100%;padding:8px;border:2px dashed var(--border-color);background:none;border-radius:4px;color:var(--text-secondary);font-weight:600;cursor:pointer;margin-top:8px;">+ Add</button></div></div>`;}
-    function renderCalBox(){const el=getEl('calBox');if(!el)return;const tl=CB.M[state.cal.mo]+' '+state.cal.yr,iM=state.cal.mode==='m';const hd=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:4px;"><div style="display:flex;align-items:center;gap:4px;"><button onclick="cbPrev()" style="width:28px;height:28px;border-radius:50%;background:var(--bg-input);border:1px solid var(--border-color);color:var(--text-primary);cursor:pointer;">◀</button><span style="font-size:1rem;font-weight:700;min-width:110px;text-align:center;">${tl}</span><button onclick="cbNext()" style="width:28px;height:28px;border-radius:50%;background:var(--bg-input);border:1px solid var(--border-color);color:var(--text-primary);cursor:pointer;">▶</button></div><div style="display:flex;gap:2px;background:var(--bg-input);border-radius:4px;padding:2px;"><button onclick="cbMode('m')" style="padding:4px 8px;border:none;background:${iM?'var(--bg-card)':'transparent'};border-radius:3px;font-size:11px;font-weight:600;color:${iM?'var(--text-primary)':'var(--text-secondary)'};cursor:pointer;">Mo</button><button onclick="cbMode('w')" style="padding:4px 8px;border:none;background:${!iM?'var(--bg-card)':'transparent'};border-radius:3px;font-size:11px;font-weight:600;color:${!iM?'var(--text-primary)':'var(--text-secondary)'};cursor:pointer;">Wk</button></div><div style="display:flex;gap:4px;"><button onclick="cbTrigger()" style="padding:4px 7px;border:1px solid var(--border-color);background:var(--bg-card);border-radius:4px;font-size:10px;font-weight:600;color:var(--text-secondary);cursor:pointer;">📥</button><button onclick="cbNow()" style="padding:4px 7px;border:1px solid var(--accent-blue);background:var(--accent-blue-soft);border-radius:4px;font-size:10px;font-weight:600;color:var(--accent-blue);cursor:pointer;">Now</button></div></div>`;const vw=iM?cbGrid():cbWk();el.innerHTML=`<div style="background:var(--bg-glass);backdrop-filter:blur(40px);border:var(--bg-glass-border);border-radius:var(--radius-lg);padding:14px;margin-bottom:14px;box-shadow:var(--shadow-glass);">${hd}${vw}</div>${cbPanel()}`;document.getElementById('icsIn').onchange=cbImport;}
-    window.cbPrev=cbPrev;window.cbNext=cbNext;window.cbNow=cbNow;window.cbMode=cbMode;window.cbPick=cbPick;window.cbUnpick=cbUnpick;window.cbEdit=cbEdit;window.cbTrigger=cbTrigger;
+    function renderCalBox(){const el=getEl('calBox');if(!el)return;const tl=CB.M[state.cal.mo]+' '+state.cal.yr;const curMode=state.cal.mode||'m';function mBtn(label,val){var isAct=curMode===val;return '<button onclick="cbMode(\''+val+'\')" style="padding:4px 8px;border:none;background:'+(isAct?'var(--bg-card)':'transparent')+';border-radius:3px;font-size:11px;font-weight:600;color:'+(isAct?'var(--text-primary)':'var(--text-secondary)')+';cursor:pointer;">'+label+'</button>';}const hd='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:4px;"><div style="display:flex;align-items:center;gap:4px;"><button onclick="cbPrev()" style="width:28px;height:28px;border-radius:50%;background:var(--bg-input);border:1px solid var(--border-color);color:var(--text-primary);cursor:pointer;">◀</button><span style="font-size:1rem;font-weight:700;min-width:110px;text-align:center;">'+tl+'</span><button onclick="cbNext()" style="width:28px;height:28px;border-radius:50%;background:var(--bg-input);border:1px solid var(--border-color);color:var(--text-primary);cursor:pointer;">▶</button></div><div class="cb-mode-tabs" style="display:flex;gap:2px;background:var(--bg-input);border-radius:4px;padding:2px;">'+mBtn('Mo','m')+mBtn('Wk','w')+mBtn('Day','d')+'</div><div style="display:flex;gap:4px;"><button onclick="cbTrigger()" style="padding:4px 7px;border:1px solid var(--border-color);background:var(--bg-card);border-radius:4px;font-size:10px;font-weight:600;color:var(--text-secondary);cursor:pointer;">📥</button><button onclick="cbNow()" style="padding:4px 7px;border:1px solid var(--accent-blue);background:var(--accent-blue-soft);border-radius:4px;font-size:10px;font-weight:600;color:var(--accent-blue);cursor:pointer;">Now</button></div></div>';var vw;if(curMode==='d'){vw=cbDay();}else if(curMode==='w'){vw=cbWk();}else{vw=cbGrid();}el.innerHTML='<div style="background:var(--bg-glass);backdrop-filter:blur(40px);border:var(--bg-glass-border);border-radius:var(--radius-lg);padding:14px;margin-bottom:14px;box-shadow:var(--shadow-glass);">'+hd+vw+'</div>'+cbPanel();document.getElementById('icsIn').onchange=cbImport;}
+    window.cbPrev=cbPrev;window.cbNext=cbNext;window.cbNow=cbNow;window.cbMode=cbMode;window.cbPick=cbPick;window.cbUnpick=cbUnpick;window.cbEdit=cbEdit;window.cbTrigger=cbTrigger;window.cbDay=cbDay;window.cbAddTaskToCal=cbAddTaskToCal;window.cbAddGoalToCal=cbAddGoalToCal;window.cbToggleDayTask=cbToggleDayTask;
 
     init();
   </script>
