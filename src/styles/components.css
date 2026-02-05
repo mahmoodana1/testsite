@@ -654,13 +654,15 @@
 
       body,
       html {
-        overflow: auto;
+        overflow-x: hidden;
+        overflow-y: auto;
       }
 
       .app-layout {
         grid-template-columns: 1fr;
         height: auto;
         min-height: 100vh;
+        min-height: 100dvh;
       }
 
       .sidebar {
@@ -675,7 +677,7 @@
         box-shadow: none;
         z-index: 1000;
         overflow-y: auto;
-        padding-bottom: 24px;
+        padding: 20px 20px 24px 20px;
       }
 
       .sidebar.open {
@@ -703,28 +705,106 @@
       }
 
       .main-content {
-        padding: 24px;
+        padding: 20px 16px 16px 16px;
         overflow-y: visible;
         height: auto;
+        min-height: 100vh;
+        min-height: 100dvh;
       }
 
+      /* Fixed sidebar toggle button on mobile */
       .toggle-sidebar-btn {
         display: flex !important;
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        z-index: 100;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        box-shadow: var(--shadow-lg);
+        background: var(--text-primary);
+        color: var(--bg-body);
+        border: none;
+      }
+
+      .toggle-sidebar-btn:hover {
+        transform: scale(1.1);
+      }
+
+      /* Mobile top bar adjustments */
+      .top-bar {
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 24px;
+        padding-left: 0;
+      }
+
+      .top-bar > div:first-child {
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      /* Hide toggle button from inline position on mobile - use fixed one */
+      .top-bar .toggle-sidebar-btn {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
       }
 
       .app-layout.collapsed .sidebar {
         transform: translateX(-100%);
       }
 
+      /* Focus hero adjustments for mobile */
+      .focus-hero {
+        padding: 24px;
+        min-height: 180px;
+        margin-bottom: 20px;
+      }
+
+      /* Bento grid mobile layout */
+      .bento-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+
+      .bento-card {
+        padding: 20px;
+      }
+
+      .timer-display {
+        font-size: 2.5rem;
+      }
+
+      .timer-presets {
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .timer-presets button {
+        font-size: 0.75rem !important;
+        padding: 4px 8px !important;
+      }
+
+      .courses-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
       .courses-grid {
         grid-template-columns: 1fr;
+        gap: 12px;
       }
 
       .course-modal {
-        max-height: 85vh;
-        max-height: 85dvh;
-        margin: 10px;
-        width: calc(100% - 20px);
+        max-height: 90vh;
+        max-height: 90dvh;
+        margin: 8px;
+        width: calc(100% - 16px);
+        border-radius: var(--radius-md);
       }
       
       .course-modal-header {
@@ -742,6 +822,8 @@
       
       .course-modal-footer {
         padding: 14px 16px;
+        flex-wrap: wrap;
+        gap: 12px;
       }
       
       .category-section {
@@ -752,6 +834,8 @@
         margin-bottom: 14px;
         padding-bottom: 10px;
         padding-left: 8px;
+        flex-wrap: wrap;
+        gap: 8px;
       }
       
       .goal-item {
@@ -759,12 +843,25 @@
         gap: 12px;
       }
 
+      /* Always show goal actions on mobile for better touch UX */
+      .goal-actions {
+        opacity: 1;
+      }
+
       .text-h1 {
-        font-size: 2rem;
+        font-size: 1.8rem;
+      }
+
+      .text-h2 {
+        font-size: 1.3rem;
       }
 
       .focus-title {
-        font-size: 1.8rem;
+        font-size: 1.5rem;
+      }
+
+      .focus-subtitle {
+        font-size: 0.95rem;
       }
 
       .checkbox {
@@ -773,7 +870,7 @@
       }
 
       .task-item {
-        padding: 16px;
+        padding: 14px;
       }
       
       .task-list-wrapper {
@@ -785,6 +882,49 @@
       #taskList,
       #completedList {
         max-height: none;
+      }
+
+      /* Auth button mobile adjustments */
+      .auth-btn {
+        padding: 8px 16px;
+        font-size: 0.85rem;
+      }
+
+      /* Theme selector mobile adjustments */
+      .theme-dropdown {
+        right: auto;
+        left: 50%;
+        transform: translateX(-50%) translateY(-10px);
+        max-width: calc(100vw - 32px);
+      }
+
+      .theme-dropdown.active {
+        transform: translateX(-50%) translateY(0);
+      }
+
+      /* Custom theme modal mobile */
+      .custom-theme-modal {
+        max-width: calc(100vw - 16px);
+        max-height: 90vh;
+        max-height: 90dvh;
+        margin: 8px;
+      }
+
+      .custom-theme-body {
+        padding: 16px;
+      }
+
+      .custom-theme-header,
+      .custom-theme-footer {
+        padding: 16px;
+      }
+
+      .color-picker-row {
+        flex-wrap: wrap;
+      }
+
+      .color-picker-hex {
+        min-width: 100px;
       }
     }
 
