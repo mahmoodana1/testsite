@@ -1013,75 +1013,321 @@
       opacity: 0.9;
     }
 
-    .focus-hero {
-      background: var(--bg-glass);
-      backdrop-filter: blur(40px);
-      border: var(--bg-glass-border);
+    /* STUDY PLANNER - Calendar Widget */
+    .focus-hero { display: none; }
+    
+    #spCalWidget {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
       border-radius: var(--radius-lg);
-      padding: 40px;
-      margin-bottom: 32px;
-      box-shadow: var(--shadow-glass);
-      position: relative;
-      overflow: hidden;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .spToolbar {
       display: flex;
-      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    
+    .spToolbarL { display: flex; align-items: center; gap: 8px; }
+    .spToolbarR { display: flex; align-items: center; gap: 6px; }
+    
+    .spMonthTxt { font-weight: 600; font-size: 1rem; color: var(--text-primary); min-width: 140px; }
+    
+    .spNavBtn {
+      background: var(--bg-hover);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      width: 28px; height: 28px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
       align-items: center;
       justify-content: center;
-      text-align: center;
-      min-height: 220px;
-      transition: transform 0.3s;
     }
-
-    .focus-hero:hover {
-      transform: translateY(-4px);
-    }
-
-    .focus-progress-bar {
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: 4px;
-      background: var(--accent-green);
-      transition: width 1s ease;
-      box-shadow: 0 2px 10px rgba(52, 199, 89, 0.4);
-    }
-
-    .focus-label {
-      font-size: 0.85rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      color: var(--accent-blue);
-      margin-bottom: 16px;
-      opacity: 0.8;
-    }
-
-    .focus-title {
-      font-size: 2.5rem;
-      font-weight: 800;
-      margin-bottom: 8px;
-      line-height: 1.2;
-    }
-
-    .focus-subtitle {
-      font-size: 1.1rem;
+    .spNavBtn:hover { background: var(--text-primary); color: var(--bg-body); }
+    
+    .spTodayBtn {
+      background: var(--bg-hover);
+      border: 1px solid var(--border-color);
       color: var(--text-secondary);
-      max-width: 600px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 500;
+      cursor: pointer;
     }
+    .spTodayBtn:hover { background: var(--accent-blue-soft); border-color: var(--accent-blue); color: var(--accent-blue); }
+    
+    .spModeBox { display: flex; background: var(--bg-input); border-radius: 5px; padding: 2px; }
+    .spModeBtn {
+      background: transparent;
+      border: none;
+      color: var(--text-tertiary);
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .spModeBtn.on { background: var(--bg-card); color: var(--text-primary); box-shadow: var(--shadow-sm); }
+    
+    .spAddBtn {
+      background: var(--accent-blue);
+      border: none;
+      color: white;
+      padding: 5px 11px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .spAddBtn:hover { opacity: 0.9; }
+    
+    .spIcsBtn {
+      background: var(--bg-hover);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+      padding: 5px 11px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      cursor: pointer;
+    }
+    .spIcsBtn:hover { background: var(--accent-blue-soft); color: var(--accent-blue); border-color: var(--accent-blue); }
+    
+    /* Month Grid */
+    .spMonthGrid { padding: 8px; }
+    .spWkRow { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; margin-bottom: 4px; }
+    .spWkCell { text-align: center; font-size: 0.62rem; font-weight: 600; color: var(--text-tertiary); padding: 5px 0; text-transform: uppercase; }
+    .spDaysGrid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+    
+    .spDayCell {
+      min-height: 58px;
+      background: var(--bg-glass);
+      border: 1px solid transparent;
+      border-radius: 5px;
+      padding: 4px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+    }
+    .spDayCell:hover { background: var(--bg-hover); border-color: var(--border-color); }
+    .spDayCell.dim { opacity: 0.35; }
+    .spDayCell.now { border-color: var(--accent-blue); background: var(--accent-blue-soft); }
+    .spDayCell.sel { border-color: var(--accent-blue); box-shadow: 0 0 0 2px var(--accent-blue-soft); }
+    
+    .spDayNum { font-size: 0.75rem; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
+    .spDayCell.now .spDayNum { color: var(--accent-blue); }
+    
+    .spDayItems { flex: 1; display: flex; flex-direction: column; gap: 1px; overflow: hidden; }
+    .spItem {
+      font-size: 0.58rem;
+      padding: 1px 3px;
+      border-radius: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .spItem.cBlue { background: var(--accent-blue-soft); color: var(--accent-blue); }
+    .spItem.cPurple { background: rgba(139,126,158,0.15); color: var(--accent-purple); }
+    .spItem.cGreen { background: var(--accent-green-soft); color: var(--accent-green); }
+    .spItem.cOrange { background: rgba(184,153,104,0.15); color: var(--accent-orange); }
+    .spItem.cRed { background: rgba(184,126,126,0.15); color: var(--accent-red); }
+    .spMore { font-size: 0.52rem; color: var(--text-tertiary); }
+    
+    /* Week Grid */
+    .spWeekGrid { max-height: 280px; overflow: hidden; display: flex; flex-direction: column; }
+    .spWeekHdr { display: grid; grid-template-columns: 42px repeat(7, 1fr); border-bottom: 1px solid var(--border-color); background: var(--bg-glass); }
+    .spWeekHdrCell { padding: 6px 4px; text-align: center; border-left: 1px solid var(--border-color); }
+    .spWeekHdrCell:first-child { border-left: none; }
+    .spWeekDayN { font-size: 0.58rem; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; }
+    .spWeekDayD { font-size: 0.88rem; font-weight: 600; color: var(--text-primary); margin-top: 1px; }
+    .spWeekHdrCell.now .spWeekDayD { color: var(--accent-blue); background: var(--accent-blue-soft); border-radius: 50%; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; }
+    
+    .spWeekBody { display: grid; grid-template-columns: 42px repeat(7, 1fr); overflow-y: auto; flex: 1; }
+    .spTimeCol { border-right: 1px solid var(--border-color); }
+    .spTimeCell { height: 32px; display: flex; align-items: flex-start; justify-content: flex-end; padding: 0 5px; font-size: 0.55rem; color: var(--text-tertiary); border-bottom: 1px solid var(--border-color); }
+    .spDayCol { position: relative; border-left: 1px solid var(--border-color); }
+    .spHrSlot { height: 32px; border-bottom: 1px solid var(--border-color); }
+    .spHrSlot:hover { background: var(--bg-hover); }
+    
+    .spBlock {
+      position: absolute;
+      left: 1px; right: 1px;
+      border-radius: 3px;
+      padding: 2px 4px;
+      font-size: 0.58rem;
+      font-weight: 500;
+      overflow: hidden;
+      cursor: pointer;
+      z-index: 1;
+    }
+    .spBlock:hover { box-shadow: var(--shadow-md); z-index: 2; }
+    .spBlock.cBlue { background: var(--accent-blue); color: white; }
+    .spBlock.cPurple { background: var(--accent-purple); color: white; }
+    .spBlock.cGreen { background: var(--accent-green); color: white; }
+    .spBlock.cOrange { background: var(--accent-orange); color: white; }
+    .spBlock.cRed { background: var(--accent-red); color: white; }
+    .spBlockT { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .spBlockH { font-size: 0.5rem; opacity: 0.8; }
+    
+    /* Timer FAB */
+    .spTimerFab {
+      position: fixed;
+      bottom: 20px; right: 20px;
+      background: var(--accent-blue);
+      color: white;
+      border: none;
+      width: 50px; height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: var(--shadow-lg);
+      z-index: 100;
+    }
+    .spTimerFab:hover { transform: scale(1.08); }
+    
+    /* Day Panel Overlay */
+    .spDayPanel {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+    }
+    .spDayPanel.on { opacity: 1; pointer-events: auto; }
+    
+    .spDayBox {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      width: 90%;
+      max-width: 520px;
+      max-height: 80vh;
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+      transform: scale(0.94);
+      transition: transform 0.25s;
+    }
+    .spDayPanel.on .spDayBox { transform: scale(1); }
+    
+    .spDayBoxHdr { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--border-color); }
+    .spDayBoxTitle { font-size: 1.1rem; font-weight: 600; color: var(--text-primary); }
+    .spDayBoxX { background: transparent; border: none; color: var(--text-tertiary); width: 28px; height: 28px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .spDayBoxX:hover { background: var(--bg-hover); color: var(--text-primary); }
+    
+    .spDayBoxBody { padding: 0; overflow-y: auto; max-height: 55vh; }
+    .spDayRow { display: grid; grid-template-columns: 50px 1fr; min-height: 42px; border-bottom: 1px solid var(--border-color); }
+    .spDayRowHr { padding: 6px 8px; font-size: 0.68rem; color: var(--text-tertiary); border-right: 1px solid var(--border-color); display: flex; align-items: flex-start; justify-content: flex-end; }
+    .spDayRowC { padding: 3px 6px; min-height: 42px; cursor: pointer; }
+    .spDayRowC:hover { background: var(--bg-hover); }
+    
+    .spDayEvt { padding: 6px 10px; border-radius: 5px; margin-bottom: 2px; cursor: pointer; }
+    .spDayEvt:hover { box-shadow: var(--shadow-md); }
+    .spDayEvtN { font-size: 0.78rem; font-weight: 500; }
+    .spDayEvtT { font-size: 0.62rem; opacity: 0.8; }
+    
+    .spDayBoxFtr { display: flex; justify-content: flex-end; gap: 8px; padding: 14px 20px; border-top: 1px solid var(--border-color); background: var(--bg-glass); }
+    
+    /* Add Event Form */
+    .spFormOverlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+    }
+    .spFormOverlay.on { opacity: 1; pointer-events: auto; }
+    
+    .spFormBox {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      width: 90%;
+      max-width: 440px;
+      max-height: 80vh;
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+      transform: scale(0.94);
+      transition: transform 0.25s;
+    }
+    .spFormOverlay.on .spFormBox { transform: scale(1); }
+    
+    .spFormHdr { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--border-color); }
+    .spFormTitle { font-size: 1.1rem; font-weight: 600; color: var(--text-primary); }
+    
+    .spFormBody { padding: 20px; overflow-y: auto; max-height: 55vh; }
+    .spFG { margin-bottom: 14px; }
+    .spFL { display: block; font-size: 0.68rem; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; margin-bottom: 5px; }
+    .spFI {
+      width: 100%;
+      padding: 10px 12px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 0.88rem;
+    }
+    .spFI:focus { outline: none; border-color: var(--accent-blue); box-shadow: 0 0 0 2px var(--accent-blue-soft); }
+    .spFRow { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    
+    .spColors { display: flex; gap: 6px; }
+    .spColorDot { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
+    .spColorDot:hover { transform: scale(1.1); }
+    .spColorDot.on { border-color: var(--text-primary); box-shadow: 0 0 0 2px var(--bg-card); }
+    
+    .spFormFtr { display: flex; justify-content: space-between; padding: 14px 20px; border-top: 1px solid var(--border-color); background: var(--bg-glass); }
+    
+    /* Timer Modal */
+    .spTimerModal {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      width: 90%;
+      max-width: 360px;
+      padding: 26px;
+      text-align: center;
+      box-shadow: var(--shadow-lg);
+      transform: scale(0.94);
+      transition: transform 0.25s;
+    }
+    .spFormOverlay.on .spTimerModal { transform: scale(1); }
+    .spTimerBig { font-size: 3.5rem; font-weight: 800; font-variant-numeric: tabular-nums; background: linear-gradient(135deg, var(--text-primary), var(--text-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 20px 0; }
+    .spTimerBtns { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+    .spTimerPresets { display: flex; justify-content: center; gap: 6px; }
+    .spPresetBtn { background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-secondary); padding: 6px 12px; border-radius: 6px; font-size: 0.72rem; font-weight: 500; cursor: pointer; }
+    .spPresetBtn:hover { background: var(--accent-blue-soft); border-color: var(--accent-blue); color: var(--accent-blue); }
 
-    /* GLASSY CARDS */
+    /* GLASSY CARDS - Compact */
     .bento-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 24px;
-      margin-bottom: 48px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-bottom: 18px;
     }
 
     .bento-card {
       background: var(--bg-card);
       backdrop-filter: blur(var(--blur-amt));
-
-      border-radius: var(--radius-lg);
-      padding: 24px;
+      border-radius: var(--radius-md);
+      padding: 14px;
       border: 1px solid var(--border-color);
       box-shadow: var(--shadow-sm);
       display: flex;
@@ -1097,29 +1343,29 @@
     }
 
     .timer-display {
-      font-size: 3.5rem;
+      font-size: 2.2rem;
       font-weight: 800;
       font-variant-numeric: tabular-nums;
       background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      margin: 16px 0;
+      margin: 8px 0;
     }
 
     .timer-controls,
     .timer-presets {
       display: flex;
-      gap: 8px;
+      gap: 6px;
       justify-content: center;
     }
 
     .timer-presets {
-      margin-top: 10px;
+      margin-top: 6px;
     }
 
     .btn-icon-circle {
-      width: 36px;
-      height: 36px;
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
       background: var(--bg-hover);
       border: none;
@@ -1140,18 +1386,18 @@
     .courses-header {
       display: flex;
       justify-content: space-between;
-      align-items: flex-end;
-      margin-bottom: 24px;
-      padding-bottom: 16px;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
       border-bottom: 1px solid var(--border-color);
     }
 
     .btn-new-course {
       background: transparent;
-      border: 2px dashed var(--border-color);
+      border: 1px dashed var(--border-color);
       color: var(--text-secondary);
-      padding: 12px 24px;
-      border-radius: var(--radius-md);
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
@@ -1165,16 +1411,15 @@
 
     .courses-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
     }
 
     .course-card-compact {
       background: var(--bg-card);
       backdrop-filter: blur(var(--blur-amt));
-
-      border-radius: var(--radius-md);
-      padding: 24px;
+      border-radius: var(--radius-sm);
+      padding: 14px;
       box-shadow: var(--shadow-sm);
       border: 1px solid var(--border-color);
       cursor: pointer;
@@ -1189,39 +1434,39 @@
       left: 0;
       top: 0;
       bottom: 0;
-      width: 6px;
+      width: 4px;
       background: var(--course-color, var(--accent-blue));
       transition: width 0.3s;
     }
 
     .course-card-compact:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-lg);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
       border-color: var(--course-color);
     }
 
     .course-card-compact:hover::before {
-      width: 12px;
+      width: 8px;
     }
 
     .course-card-title {
-      font-size: 1.25rem;
-      font-weight: 700;
-      margin-bottom: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 8px;
       color: var(--text-primary);
     }
 
     .course-card-stats {
       display: flex;
-      gap: 16px;
-      font-size: 0.8rem;
+      gap: 12px;
+      font-size: 0.72rem;
       color: var(--text-tertiary);
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
 
     .course-card-progress {
       width: 100%;
-      height: 6px;
+      height: 5px;
       background: var(--bg-input);
       border-radius: 10px;
       overflow: hidden;
@@ -2602,12 +2847,13 @@
         </div>
       </header>
 
-      <section class="focus-hero" id="focusHero">
-      </section>
+      <section class="focus-hero" id="focusHero"></section>
+      <div id="calBox"></div>
+      <input type="file" id="icsIn" accept=".ics" style="display:none">
 
-      <div class="bento-grid">
-        <div class="bento-card">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
+      <div class="bento-grid" style="gap:12px;margin-bottom:14px;">
+        <div class="bento-card" style="padding:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
             <span class="text-xs" style="color:var(--text-tertiary)">POMODORO TIMER</span>
             <button type="button" class="btn-icon-circle" onclick="toggleModal('timerModal')">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -2938,7 +3184,8 @@
       streak: 0,
       lastCompletionDate: null,
       todayCompletedCount: 0,
-      lastResetDate: null
+      lastResetDate: null,
+      cal: {items:[], yr:new Date().getFullYear(), mo:new Date().getMonth(), mode:'m', picked:null}
     };
 
     const colors = {
@@ -3265,13 +3512,14 @@
             state.lastCompletionDate = d.lastCompletionDate || null;
             state.todayCompletedCount = d.todayCompletedCount || 0;
             state.lastResetDate = d.lastResetDate || null;
+            state.cal.items = d.calItems || [];
             getEl('dailyGoalValue').innerText = state.dailyGoal;
             checkStreakExpiration();
             renderAll();
           } else {
             state.todos = []; state.courses = []; state.focusId = null; 
             state.dailyGoal = 5; state.streak = 0; state.lastCompletionDate = null;
-            state.todayCompletedCount = 0; state.lastResetDate = null;
+            state.todayCompletedCount = 0; state.lastResetDate = null; state.cal.items = [];
             getEl('dailyGoalValue').innerText = state.dailyGoal;
             renderAll();
           }
@@ -3296,6 +3544,7 @@
           lastCompletionDate: state.lastCompletionDate,
           todayCompletedCount: state.todayCompletedCount,
           lastResetDate: state.lastResetDate,
+          calItems: state.cal.items,
           lastUpdated: new Date().toISOString()
         }, {merge: true}).catch(error => console.error("Cloud save failed:", error));
       }
@@ -3303,7 +3552,7 @@
 
     /* RENDERING */
     function renderAll() {
-      renderTasks(); renderFocus(); renderCourses(); renderStats();
+      renderTasks(); renderFocus(); renderCourses(); renderStats(); renderCalBox();
       if (state.currentCourseId) window.openCourseModal(state.currentCourseId);
     }
 
@@ -4443,6 +4692,42 @@
     
     // Initialize PDF viewer on page load
     setTimeout(initPdfViewer, 100);
+
+    /* CAL BOX - Planner Widget */
+    const CB={M:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],D:['S','M','T','W','T','F','S'],H:{c1:'var(--accent-blue)',c2:'var(--accent-purple)',c3:'var(--accent-green)',c4:'var(--accent-orange)',c5:'var(--accent-red)'}};
+    function cbUid(){return 'i'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+    function cbDk(y,m,d){return y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');}
+    function cbFor(dk){return state.cal.items.filter(i=>i.d===dk);}
+    function cbPrev(){state.cal.mo--;if(state.cal.mo<0){state.cal.mo=11;state.cal.yr--;}renderCalBox();}
+    function cbNext(){state.cal.mo++;if(state.cal.mo>11){state.cal.mo=0;state.cal.yr++;}renderCalBox();}
+    function cbNow(){const t=new Date();state.cal.yr=t.getFullYear();state.cal.mo=t.getMonth();renderCalBox();}
+    function cbMode(m){state.cal.mode=m;renderCalBox();}
+    function cbPick(dk){state.cal.picked=dk;renderCalBox();}
+    function cbUnpick(){state.cal.picked=null;renderCalBox();}
+    function cbEdit(id,pdk){
+      const ex=id?state.cal.items.find(i=>i.id===id):null;
+      const ov=document.createElement('div');ov.id='cbOv';
+      ov.style='position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:2200;';
+      const bx=document.createElement('div');bx.style='background:var(--bg-card);border-radius:16px;padding:20px;width:90%;max-width:340px;';
+      const nv=ex?ex.n:'',dv=ex?ex.d:(pdk||cbDk(state.cal.yr,state.cal.mo,1)),sv=ex?ex.s:'09:00',ev=ex?ex.e:'10:00',hv=ex?ex.h:'c1',tr=ex?ex.tl:'',cr=ex?ex.cl:'';
+      let to='<option value="">-</option>';state.todos.filter(t=>!t.completed).forEach(t=>{to+=`<option value="${t.id}"${tr===t.id?' selected':''}>${t.text.slice(0,24)}</option>`;});
+      let co='<option value="">-</option>';state.courses.forEach(c=>{co+=`<option value="${c.id}"${cr===c.id?' selected':''}>${c.name}</option>`;});
+      bx.innerHTML=`<div style="display:flex;justify-content:space-between;margin-bottom:12px;"><b>${ex?'Edit':'Add'}</b><button id="cbX" style="border:none;background:var(--bg-input);width:24px;height:24px;border-radius:50%;cursor:pointer;">✕</button></div><div style="margin-bottom:8px;"><label style="font-size:11px;color:var(--text-secondary);">Title</label><input id="cbN" value="${nv}" style="width:100%;padding:8px;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-input);color:var(--text-primary);margin-top:2px;"></div><div style="margin-bottom:8px;"><label style="font-size:11px;color:var(--text-secondary);">Date</label><input type="date" id="cbD" value="${dv}" style="width:100%;padding:8px;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-input);color:var(--text-primary);margin-top:2px;"></div><div style="display:flex;gap:6px;margin-bottom:8px;"><div style="flex:1;"><label style="font-size:11px;color:var(--text-secondary);">Start</label><input type="time" id="cbS" value="${sv}" style="width:100%;padding:8px;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-input);color:var(--text-primary);margin-top:2px;"></div><div style="flex:1;"><label style="font-size:11px;color:var(--text-secondary);">End</label><input type="time" id="cbE" value="${ev}" style="width:100%;padding:8px;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-input);color:var(--text-primary);margin-top:2px;"></div></div><div style="margin-bottom:8px;"><label style="font-size:11px;color:var(--text-secondary);">Color</label><div id="cbH" style="display:flex;gap:4px;margin-top:2px;"></div></div><div style="margin-bottom:8px;"><label style="font-size:11px;color:var(--text-secondary);">Task</label><select id="cbT" style="width:100%;padding:8px;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-input);color:var(--text-primary);margin-top:2px;">${to}</select></div><div style="margin-bottom:12px;"><label style="font-size:11px;color:var(--text-secondary);">Course</label><select id="cbC" style="width:100%;padding:8px;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-input);color:var(--text-primary);margin-top:2px;">${co}</select></div><div style="display:flex;justify-content:space-between;">${ex?'<button id="cbDel" style="padding:6px 10px;border:1px solid var(--accent-red);background:none;border-radius:6px;color:var(--accent-red);cursor:pointer;">Del</button>':'<span></span>'}<div><button id="cbCan" class="btn-ghost">Cancel</button><button id="cbSav" class="btn-primary" style="margin-left:6px;">Save</button></div></div>`;
+      ov.appendChild(bx);document.body.appendChild(ov);
+      const hB=document.getElementById('cbH');Object.keys(CB.H).forEach(k=>{const dot=document.createElement('div');dot.dataset.h=k;dot.style=`width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid ${k===hv?'var(--text-primary)':'transparent'};background:${CB.H[k]};`;dot.onclick=()=>{hB.querySelectorAll('div').forEach(x=>x.style.borderColor='transparent');dot.style.borderColor='var(--text-primary)';};hB.appendChild(dot);});
+      document.getElementById('cbX').onclick=()=>ov.remove();
+      document.getElementById('cbCan').onclick=()=>ov.remove();
+      if(ex)document.getElementById('cbDel').onclick=()=>{state.cal.items=state.cal.items.filter(i=>i.id!==id);saveData();ov.remove();};
+      document.getElementById('cbSav').onclick=()=>{const nm=document.getElementById('cbN').value.trim();if(!nm){showToast('Enter title');return;}const sH=hB.querySelector('div[style*="var(--text-primary)"]');const obj={id:ex?id:cbUid(),n:nm,d:document.getElementById('cbD').value,s:document.getElementById('cbS').value,e:document.getElementById('cbE').value,h:sH?sH.dataset.h:'c1',tl:document.getElementById('cbT').value||null,cl:document.getElementById('cbC').value||null};if(ex){const ix=state.cal.items.findIndex(i=>i.id===id);if(ix>=0)state.cal.items[ix]=obj;}else state.cal.items.push(obj);saveData();ov.remove();};
+    }
+    function cbIcs(txt){const r=[];let c=null;txt.split(/\r?\n/).forEach(l=>{if(l.indexOf('BEGIN:VEVENT')===0)c={id:cbUid(),h:'c1'};else if(l.indexOf('END:VEVENT')===0&&c){if(c.n&&c.d)r.push(c);c=null;}else if(c){if(l.indexOf('SUMMARY:')===0)c.n=l.slice(8);else if(l.indexOf('DTSTART')>=0){const v=l.split(':').pop();if(v.length>=8){c.d=v.slice(0,4)+'-'+v.slice(4,6)+'-'+v.slice(6,8);c.s=v.length>=13?v.slice(9,11)+':'+v.slice(11,13):'09:00';}}else if(l.indexOf('DTEND')>=0){const v=l.split(':').pop();c.e=v.length>=13?v.slice(9,11)+':'+v.slice(11,13):'10:00';}}});return r;}
+    function cbImport(ev){const f=ev.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=e=>{const p=cbIcs(e.target.result);if(p.length){state.cal.items=state.cal.items.concat(p);saveData();showToast('Added '+p.length);}else showToast('None found');};rd.readAsText(f);ev.target.value='';}
+    function cbTrigger(){document.getElementById('icsIn').click();}
+    function cbGrid(){const y=state.cal.yr,m=state.cal.mo,fd=new Date(y,m,1).getDay(),dc=new Date(y,m+1,0).getDate(),pc=new Date(y,m,0).getDate(),tk=cbDk(new Date().getFullYear(),new Date().getMonth(),new Date().getDate());let g='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--border-color);border-radius:6px;overflow:hidden;">';CB.D.forEach(x=>{g+=`<div style="background:var(--bg-input);padding:6px;text-align:center;font-size:10px;font-weight:700;color:var(--text-tertiary);">${x}</div>`;});for(let i=0;i<fd;i++){g+=`<div style="background:var(--bg-input);min-height:54px;padding:2px;opacity:0.4;"><span style="font-size:11px;color:var(--text-tertiary);">${pc-fd+1+i}</span></div>`;}for(let d=1;d<=dc;d++){const dk=cbDk(y,m,d),isT=dk===tk,its=cbFor(dk);let st=`background:var(--bg-card);min-height:54px;padding:2px;cursor:pointer;display:flex;flex-direction:column;`;if(isT)st+=`outline:2px solid var(--accent-blue);outline-offset:-2px;background:var(--accent-blue-soft);`;let ch='';its.slice(0,2).forEach(it=>{ch+=`<div onclick="event.stopPropagation();cbEdit('${it.id}')" style="font-size:9px;padding:0 2px;border-radius:2px;background:${CB.H[it.h]};color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;cursor:pointer;">${it.n}</div>`;});if(its.length>2)ch+=`<div style="font-size:9px;color:var(--text-tertiary);text-align:center;">+${its.length-2}</div>`;g+=`<div onclick="cbPick('${dk}')" style="${st}"><span style="font-size:11px;font-weight:600;color:var(--text-primary);">${d}</span><div style="flex:1;overflow:hidden;">${ch}</div></div>`;}const tot=fd+dc,lft=(7-(tot%7))%7;for(let i=1;i<=lft;i++){g+=`<div style="background:var(--bg-input);min-height:54px;padding:2px;opacity:0.4;"><span style="font-size:11px;color:var(--text-tertiary);">${i}</span></div>`;}g+='</div>';return g;}
+    function cbWk(){const a=new Date(state.cal.yr,state.cal.mo,1);a.setDate(a.getDate()-a.getDay());const tk=cbDk(new Date().getFullYear(),new Date().getMonth(),new Date().getDate()),wd=[];for(let i=0;i<7;i++){const dt=new Date(a);dt.setDate(a.getDate()+i);wd.push({dt,dk:cbDk(dt.getFullYear(),dt.getMonth(),dt.getDate())});}let w='<div style="border:1px solid var(--border-color);border-radius:6px;overflow:hidden;max-height:340px;display:flex;flex-direction:column;"><div style="display:grid;grid-template-columns:38px repeat(7,1fr);background:var(--bg-input);border-bottom:1px solid var(--border-color);"><div></div>';wd.forEach(x=>{const isT=x.dk===tk,ns=isT?`background:var(--accent-blue);color:#fff;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;`:'';w+=`<div style="padding:4px;text-align:center;border-left:1px solid var(--border-color);"><div style="font-size:9px;font-weight:700;color:var(--text-tertiary);">${CB.D[x.dt.getDay()]}</div><div style="font-size:13px;font-weight:700;${ns}">${x.dt.getDate()}</div></div>`;});w+='</div><div style="flex:1;overflow-y:auto;">';for(let hr=7;hr<20;hr++){w+=`<div style="display:grid;grid-template-columns:38px repeat(7,1fr);min-height:32px;border-bottom:1px solid var(--border-color);"><div style="font-size:9px;color:var(--text-tertiary);padding:1px 3px;text-align:right;background:var(--bg-input);border-right:1px solid var(--border-color);">${hr%12||12}${hr>=12?'p':'a'}</div>`;wd.forEach(x=>{const hi=cbFor(x.dk).filter(i=>{const sh=parseInt(i.s.split(':')[0],10);return sh===hr;});let cc='';hi.forEach(i=>{const sh=parseInt(i.s.split(':')[0],10),eh=parseInt(i.e.split(':')[0],10),dur=Math.max(1,eh-sh),hp=dur*32-2;cc+=`<div onclick="event.stopPropagation();cbEdit('${i.id}')" style="position:absolute;left:1px;right:1px;top:1px;height:${hp}px;background:${CB.H[i.h]};border-radius:2px;padding:1px 2px;font-size:9px;color:#fff;overflow:hidden;cursor:pointer;z-index:5;"><b style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${i.n}</b></div>`;});w+=`<div onclick="cbEdit(null,'${x.dk}')" style="border-left:1px solid var(--border-color);position:relative;cursor:pointer;">${cc}</div>`;});w+='</div>';}w+='</div></div>';return w;}
+    function cbPanel(){if(!state.cal.picked)return '';const its=cbFor(state.cal.picked),dO=new Date(state.cal.picked+'T12:00:00'),lbl=CB.M[dO.getMonth()]+' '+dO.getDate();let ls='';if(!its.length)ls='<div style="text-align:center;padding:20px;color:var(--text-tertiary);">Empty</div>';else its.forEach(i=>{let rf='';if(i.tl){const tk=state.todos.find(t=>t.id===i.tl);if(tk)rf+=`<div style="font-size:10px;color:var(--text-tertiary);">📌 ${tk.text.slice(0,18)}</div>`;}if(i.cl){const cr=state.courses.find(c=>c.id===i.cl);if(cr)rf+=`<div style="font-size:10px;color:var(--text-tertiary);">📚 ${cr.name}</div>`;}ls+=`<div onclick="cbEdit('${i.id}')" style="padding:8px;border-radius:4px;margin-bottom:6px;cursor:pointer;border-left:3px solid ${CB.H[i.h]};background:var(--bg-hover);"><b style="color:var(--text-primary);">${i.n}</b><div style="font-size:11px;color:var(--text-secondary);">${i.s}-${i.e}</div>${rf}</div>`;});return `<div style="position:fixed;top:0;right:0;width:260px;height:100%;background:var(--bg-card);border-left:1px solid var(--border-color);box-shadow:var(--shadow-lg);z-index:1700;display:flex;flex-direction:column;"><div style="padding:12px;border-bottom:1px solid var(--border-color);display:flex;justify-content:space-between;"><b>${lbl}</b><button onclick="cbUnpick()" style="width:22px;height:22px;border-radius:50%;background:var(--bg-input);border:none;cursor:pointer;">✕</button></div><div style="flex:1;overflow-y:auto;padding:8px;">${ls}<button onclick="cbEdit(null,'${state.cal.picked}')" style="width:100%;padding:8px;border:2px dashed var(--border-color);background:none;border-radius:4px;color:var(--text-secondary);font-weight:600;cursor:pointer;margin-top:8px;">+ Add</button></div></div>`;}
+    function renderCalBox(){const el=getEl('calBox');if(!el)return;const tl=CB.M[state.cal.mo]+' '+state.cal.yr,iM=state.cal.mode==='m';const hd=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:4px;"><div style="display:flex;align-items:center;gap:4px;"><button onclick="cbPrev()" style="width:28px;height:28px;border-radius:50%;background:var(--bg-input);border:1px solid var(--border-color);color:var(--text-primary);cursor:pointer;">◀</button><span style="font-size:1rem;font-weight:700;min-width:110px;text-align:center;">${tl}</span><button onclick="cbNext()" style="width:28px;height:28px;border-radius:50%;background:var(--bg-input);border:1px solid var(--border-color);color:var(--text-primary);cursor:pointer;">▶</button></div><div style="display:flex;gap:2px;background:var(--bg-input);border-radius:4px;padding:2px;"><button onclick="cbMode('m')" style="padding:4px 8px;border:none;background:${iM?'var(--bg-card)':'transparent'};border-radius:3px;font-size:11px;font-weight:600;color:${iM?'var(--text-primary)':'var(--text-secondary)'};cursor:pointer;">Mo</button><button onclick="cbMode('w')" style="padding:4px 8px;border:none;background:${!iM?'var(--bg-card)':'transparent'};border-radius:3px;font-size:11px;font-weight:600;color:${!iM?'var(--text-primary)':'var(--text-secondary)'};cursor:pointer;">Wk</button></div><div style="display:flex;gap:4px;"><button onclick="cbTrigger()" style="padding:4px 7px;border:1px solid var(--border-color);background:var(--bg-card);border-radius:4px;font-size:10px;font-weight:600;color:var(--text-secondary);cursor:pointer;">📥</button><button onclick="cbNow()" style="padding:4px 7px;border:1px solid var(--accent-blue);background:var(--accent-blue-soft);border-radius:4px;font-size:10px;font-weight:600;color:var(--accent-blue);cursor:pointer;">Now</button></div></div>`;const vw=iM?cbGrid():cbWk();el.innerHTML=`<div style="background:var(--bg-glass);backdrop-filter:blur(40px);border:var(--bg-glass-border);border-radius:var(--radius-lg);padding:14px;margin-bottom:14px;box-shadow:var(--shadow-glass);">${hd}${vw}</div>${cbPanel()}`;document.getElementById('icsIn').onchange=cbImport;}
+    window.cbPrev=cbPrev;window.cbNext=cbNext;window.cbNow=cbNow;window.cbMode=cbMode;window.cbPick=cbPick;window.cbUnpick=cbUnpick;window.cbEdit=cbEdit;window.cbTrigger=cbTrigger;
 
     init();
   </script>
