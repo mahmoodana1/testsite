@@ -2216,31 +2216,10 @@
       flex-shrink: 0;
     }
 
-    .contribution-tooltip-date {
-      font-weight: 600;
-      margin-bottom: 4px;
-      font-size: 0.75rem;
-      color: var(--text-secondary);
-    }
-
-    .contribution-tooltip-items {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-
-    .contribution-tooltip-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.75rem;
-    }
-
-    .contribution-tooltip-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 2px;
-      flex-shrink: 0;
+    .contribution-modal-empty {
+      color: var(--text-tertiary);
+      text-align: center;
+      padding: 20px;
     }
 
     .contribution-nav-btn {
@@ -3825,8 +3804,7 @@
     };
 
     const MS_PER_DAY = 1000 * 60 * 60 * 24; // Milliseconds in a day
-    const MODAL_TRANSITION_DURATION = 300; // Match CSS transition duration
-    const MODAL_DISPLAY_DELAY = 10; // Small delay to trigger CSS transition after display change
+    const MODAL_TRANSITION_DURATION = 300; // Match CSS transition duration (not currently used but kept for future reference)
 
     let contributionMonthOffset = 0; // Track the current month offset for navigation
 
@@ -3899,7 +3877,7 @@
       endDate.setDate(endDate.getDate() + sundayOffset);
 
       // Calculate number of weeks to display
-      const totalDays = Math.ceil((endDate - startDate) / MS_PER_DAY) + 1;
+      const totalDays = Math.ceil((endDate - startDate) / MS_PER_DAY);
       const totalWeeks = Math.ceil(totalDays / 7);
 
       // Update navigation button states
@@ -4018,7 +3996,7 @@
 
       let html = '';
       if (count === 0) {
-        html = '<div style="color:var(--text-tertiary); text-align: center; padding: 20px;">No contributions on this day</div>';
+        html = '<div class="contribution-modal-empty">No contributions on this day</div>';
       } else {
         html = `<div class="contribution-modal-count">${count} contribution${count > 1 ? 's' : ''}</div>`;
         html += '<div class="contribution-modal-items">';
@@ -4039,8 +4017,8 @@
       }
 
       body.innerHTML = html;
-      // Small delay to trigger CSS transition after display change
-      setTimeout(() => modal.classList.add('active'), MODAL_DISPLAY_DELAY);
+      // Use requestAnimationFrame to ensure styles are applied before triggering transition
+      requestAnimationFrame(() => modal.classList.add('active'));
     }
 
     function closeContributionModal() {
