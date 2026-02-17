@@ -1668,6 +1668,10 @@
         transform: translateX(-100%);
       }
 
+      .bento-grid {
+        grid-template-columns: 1fr;
+      }
+
       .courses-grid {
         grid-template-columns: 1fr;
       }
@@ -2105,51 +2109,117 @@
       font-weight: 600;
     }
 
-    .contribution-tooltip {
+    /* Contribution Modal Styles */
+    .contribution-modal-overlay {
       position: fixed;
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 0.8rem;
-      color: var(--text-primary);
-      box-shadow: var(--shadow-md);
-      pointer-events: none;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      z-index: 300;
+      display: none;
+      align-items: center;
+      justify-content: center;
       opacity: 0;
-      transition: opacity 0.15s ease;
-      z-index: 1200;
-      max-width: 220px;
+      pointer-events: none;
+      transition: opacity 0.3s;
+      padding: 20px;
     }
 
-    .contribution-tooltip.visible {
-      opacity: 1;
-    }
-
-    .contribution-tooltip-date {
-      font-weight: 600;
-      margin-bottom: 4px;
-      font-size: 0.75rem;
-      color: var(--text-secondary);
-    }
-
-    .contribution-tooltip-items {
+    .contribution-modal-overlay.active {
       display: flex;
-      flex-direction: column;
-      gap: 3px;
+      opacity: 1;
+      pointer-events: auto;
     }
 
-    .contribution-tooltip-item {
+    .contribution-modal-content {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      transform: scale(0.95);
+      transition: transform 0.3s var(--ease-spring);
+      border: 1px solid var(--border-color);
+      max-width: 400px;
+      width: 100%;
+    }
+
+    .contribution-modal-overlay.active .contribution-modal-content {
+      transform: scale(1);
+    }
+
+    .contribution-modal-overlay .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .contribution-modal-overlay .modal-title {
+      margin: 0;
+    }
+
+    .contribution-modal-overlay .modal-body {
+      padding: 20px 24px;
+    }
+
+    .contribution-modal-overlay .modal-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
       display: flex;
       align-items: center;
-      gap: 6px;
-      font-size: 0.75rem;
+      justify-content: center;
+      border-radius: 6px;
+      color: var(--text-secondary);
+      transition: all 0.2s;
     }
 
-    .contribution-tooltip-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 2px;
+    .contribution-modal-overlay .modal-close:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+
+    .contribution-modal-date {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+
+    .contribution-modal-count {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+    }
+
+    .contribution-modal-items {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .contribution-modal-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+      background: var(--bg-input);
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+
+    .contribution-modal-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
       flex-shrink: 0;
+    }
+
+    .contribution-modal-empty {
+      color: var(--text-tertiary);
+      text-align: center;
+      padding: 20px;
     }
 
     .contribution-nav-btn {
@@ -2452,7 +2522,23 @@
             </div>
           </div>
           <div class="contribution-summary" id="contributionSummary"></div>
-          <div class="contribution-tooltip" id="contributionTooltip"></div>
+        </div>
+      </div>
+
+      <!-- Contribution Details Modal -->
+      <div id="contributionModal" class="contribution-modal-overlay">
+        <div class="contribution-modal-content">
+          <div class="modal-header">
+            <h3 id="contributionModalTitle" class="modal-title"></h3>
+            <button class="modal-close" id="contributionModalClose">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+          <div class="modal-body" id="contributionModalBody">
+          </div>
         </div>
       </div>
 
@@ -2737,6 +2823,7 @@
       checkStreakExpiration();
       
       setupEventListeners();
+      initContributionModalListeners();
       new Sortable(getEl('taskList'), {
         animation: 150, ghostClass: 'sortable-ghost', delay: 100,
         onEnd: (evt) => reorderTasks(evt.oldIndex, evt.newIndex)
@@ -3716,6 +3803,9 @@
       gray: '#8E8E93'
     };
 
+    const MS_PER_DAY = 1000 * 60 * 60 * 24; // Milliseconds in a day
+    const MODAL_TRANSITION_DURATION = 300; // Match CSS transition duration (not currently used but kept for future reference)
+
     let contributionMonthOffset = 0; // Track the current month offset for navigation
 
     function navigateContributionMonth(direction) {
@@ -3754,7 +3844,6 @@
       const monthsEl = getEl('contributionMonths');
       const legendEl = getEl('contributionLegend');
       const summaryEl = getEl('contributionSummary');
-      const tooltip = getEl('contributionTooltip');
 
       if (!grid) return;
 
@@ -3763,21 +3852,33 @@
 
       const contributions = getContributionData();
 
-      // Generate last 20 weeks of dates (140 days)
+      // Calculate the target month based on offset
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      const totalWeeks = 20;
-      const totalDays = totalWeeks * 7;
+      const targetDate = new Date(today);
+      targetDate.setMonth(targetDate.getMonth() + contributionMonthOffset);
 
-      // Find the start date (beginning of the week, totalWeeks ago)
-      // Adjust by month offset
-      const startDate = new Date(today);
-      startDate.setMonth(startDate.getMonth() + contributionMonthOffset);
-      startDate.setDate(startDate.getDate() - totalDays + 1);
-      // Align to Monday
+      // Get first and last day of the target month
+      const year = targetDate.getFullYear();
+      const month = targetDate.getMonth();
+      const firstDayOfMonth = new Date(year, month, 1);
+      const lastDayOfMonth = new Date(year, month + 1, 0);
+
+      // Find the Monday before or on the first day of the month
+      const startDate = new Date(firstDayOfMonth);
       const dayOfWeek = startDate.getDay();
       const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
       startDate.setDate(startDate.getDate() + mondayOffset);
+
+      // Find the Sunday after or on the last day of the month
+      const endDate = new Date(lastDayOfMonth);
+      const endDayOfWeek = endDate.getDay();
+      const sundayOffset = endDayOfWeek === 0 ? 0 : 7 - endDayOfWeek;
+      endDate.setDate(endDate.getDate() + sundayOffset);
+
+      // Calculate number of weeks to display
+      const totalDays = Math.ceil((endDate - startDate) / MS_PER_DAY);
+      const totalWeeks = Math.ceil(totalDays / 7);
 
       // Update navigation button states
       const prevBtn = getEl('prevMonthBtn');
@@ -3790,27 +3891,13 @@
       let totalContributions = 0;
       let activeDays = 0;
 
-      // Generate month labels
-      const months = [];
-      let lastMonth = -1;
-      const tempDate = new Date(startDate);
-      for (let w = 0; w < totalWeeks; w++) {
-        const weekDate = new Date(tempDate);
-        weekDate.setDate(weekDate.getDate() + w * 7);
-        const month = weekDate.getMonth();
-        if (month !== lastMonth) {
-          months.push({ name: weekDate.toLocaleDateString('en-US', { month: 'short' }), week: w });
-          lastMonth = month;
-        }
-      }
-
-      // Create month labels with positioning
-      months.forEach((m, i) => {
-        const span = document.createElement('span');
-        span.textContent = m.name;
-        span.style.gridColumnStart = m.week + 1;
-        monthsEl.appendChild(span);
-      });
+      // Create month label
+      const monthName = targetDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+      const span = document.createElement('span');
+      span.textContent = monthName;
+      span.style.gridColumnStart = '1';
+      span.style.gridColumnEnd = '-1';
+      monthsEl.appendChild(span);
 
       // Create grid cells
       const realToday = new Date();
@@ -3858,63 +3945,23 @@
             }
           }
 
-          // Tooltip
+          // Click to show modal with contribution details
           const formattedDate = currentDate.toLocaleDateString('en-US', {
             weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'
           });
           const cellDate = new Date(currentDate); // Capture for closure
+          const cellCount = count;
+          const cellContributions = [...dayContributions]; // Copy for closure
 
-          cell.onmouseenter = (e) => {
+          cell.onclick = () => {
             if (cellDate.getTime() > realToday.getTime()) return;
-            let html = `<div class="contribution-tooltip-date">${formattedDate}</div>`;
-            if (count === 0) {
-              html += '<div style="color:var(--text-tertiary)">No contributions</div>';
-            } else {
-              html += `<div style="margin-bottom:3px"><strong>${count}</strong> contribution${count > 1 ? 's' : ''}</div>`;
-              html += '<div class="contribution-tooltip-items">';
-              const grouped = {};
-              dayContributions.forEach(c => {
-                grouped[c.name] = grouped[c.name] || { count: 0, color: c.color };
-                grouped[c.name].count++;
-              });
-              Object.keys(grouped).forEach(name => {
-                const g = grouped[name];
-                const dotColor = CONTRIBUTION_COLORS[g.color] || CONTRIBUTION_COLORS.blue;
-                html += `<div class="contribution-tooltip-item">
-                  <span class="contribution-tooltip-dot" style="background:${dotColor}"></span>
-                  ${name}: ${g.count}
-                </div>`;
-              });
-              html += '</div>';
-            }
-            tooltip.innerHTML = html;
-            tooltip.classList.add('visible');
-
-            const rect = cell.getBoundingClientRect();
-            const tooltipWidth = 220;
-            const spaceRight = window.innerWidth - rect.right;
-            const spaceLeft = rect.left;
-            
-            // Position to the right if there's space, otherwise to the left
-            if (spaceRight > tooltipWidth + 10) {
-              tooltip.style.left = (rect.right + 8) + 'px';
-              tooltip.style.top = (rect.top + (rect.height / 2)) + 'px';
-              tooltip.style.transform = 'translateY(-50%)';
-            } else if (spaceLeft > tooltipWidth + 10) {
-              tooltip.style.left = (rect.left - tooltipWidth - 8) + 'px';
-              tooltip.style.top = (rect.top + (rect.height / 2)) + 'px';
-              tooltip.style.transform = 'translateY(-50%)';
-            } else {
-              // Fallback to top if not enough space on sides
-              tooltip.style.left = Math.min(rect.left, window.innerWidth - 230) + 'px';
-              tooltip.style.top = (rect.top - tooltip.offsetHeight - 8) + 'px';
-              tooltip.style.transform = 'none';
-            }
+            openContributionModal(formattedDate, cellCount, cellContributions);
           };
 
-          cell.onmouseleave = () => {
-            tooltip.classList.remove('visible');
-          };
+          // Add cursor pointer for clickable cells
+          if (cellDate.getTime() <= realToday.getTime()) {
+            cell.style.cursor = 'pointer';
+          }
 
           grid.appendChild(cell);
           currentDate.setDate(currentDate.getDate() + 1);
@@ -3933,11 +3980,70 @@
         });
       }
 
-      // Render summary
+      // Render summary - update to show month summary
       summaryEl.innerHTML = `
-        <span><strong>${totalContributions}</strong> contributions in the last ${totalWeeks} weeks</span>
+        <span><strong>${totalContributions}</strong> contributions in ${monthName}</span>
         <span><strong>${activeDays}</strong> active days</span>
       `;
+    }
+
+    function openContributionModal(dateStr, count, contributions) {
+      const modal = getEl('contributionModal');
+      const title = getEl('contributionModalTitle');
+      const body = getEl('contributionModalBody');
+
+      title.textContent = dateStr;
+
+      let html = '';
+      if (count === 0) {
+        html = '<div class="contribution-modal-empty">No contributions on this day</div>';
+      } else {
+        html = `<div class="contribution-modal-count">${count} contribution${count > 1 ? 's' : ''}</div>`;
+        html += '<div class="contribution-modal-items">';
+        const grouped = {};
+        contributions.forEach(c => {
+          grouped[c.name] = grouped[c.name] || { count: 0, color: c.color };
+          grouped[c.name].count++;
+        });
+        Object.keys(grouped).forEach(name => {
+          const g = grouped[name];
+          const dotColor = CONTRIBUTION_COLORS[g.color] || CONTRIBUTION_COLORS.blue;
+          html += `<div class="contribution-modal-item">
+            <span class="contribution-modal-dot" style="background:${dotColor}"></span>
+            <strong>${name}:</strong> ${g.count} contribution${g.count > 1 ? 's' : ''}
+          </div>`;
+        });
+        html += '</div>';
+      }
+
+      body.innerHTML = html;
+      // Use requestAnimationFrame to ensure styles are applied before triggering transition
+      requestAnimationFrame(() => modal.classList.add('active'));
+    }
+
+    function closeContributionModal() {
+      const modal = getEl('contributionModal');
+      modal.classList.remove('active');
+    }
+
+    // Initialize modal event listeners
+    function initContributionModalListeners() {
+      const modal = getEl('contributionModal');
+      const closeBtn = getEl('contributionModalClose');
+      
+      // Close modal when clicking outside
+      if (modal) {
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) {
+            closeContributionModal();
+          }
+        });
+      }
+      
+      // Close modal with close button
+      if (closeBtn) {
+        closeBtn.addEventListener('click', closeContributionModal);
+      }
     }
 
     init();
