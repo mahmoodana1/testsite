@@ -2680,7 +2680,7 @@
       todayCompletedCount: 0,
       lastResetDate: null,
       contributionViewMode: 'weekly', // 'weekly' or 'monthly'
-      contributionMonthOffset: 0 // 0 = current month, -1 = previous month, etc.
+      contributionMonthOffset: 0 // 0 = current period, -1 = previous period, etc.
     };
 
     const colors = {
@@ -3320,17 +3320,17 @@
           if (state.focusId === id) state.focusId = null;
           
           // Record contribution permanently
+          const linkedCourse = t.linkedCourseId 
+            ? state.courses.find(c => c.id === t.linkedCourseId)
+            : null;
+          
           const contributionRecord = {
             id: generateId(),
             taskName: t.text,
             taskId: t.id,
             date: t.completedAt,
-            courseName: t.linkedCourseId 
-              ? (state.courses.find(c => c.id === t.linkedCourseId) || {}).name || 'Tasks'
-              : 'Tasks',
-            courseColor: t.linkedCourseId
-              ? (state.courses.find(c => c.id === t.linkedCourseId) || {}).color || 'blue'
-              : t.color || 'blue',
+            courseName: linkedCourse ? (linkedCourse.name || 'Tasks') : 'Tasks',
+            courseColor: linkedCourse ? (linkedCourse.color || 'blue') : (t.color || 'blue'),
             courseId: t.linkedCourseId || null
           };
           state.contributions.push(contributionRecord);
@@ -3880,9 +3880,6 @@
         
         if (offset === 0) {
           periodText = `Last ${totalWeeks} weeks`;
-        } else if (offset > 0) {
-          // Viewing future periods (should not normally happen due to next button being disabled)
-          periodText = `${startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
         } else {
           periodText = `${startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
         }
