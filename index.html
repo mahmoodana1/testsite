@@ -3343,9 +3343,11 @@
           // Update streak
           updateStreak();
         } else {
+          // Store the completion date before clearing it
+          const completionDate = t.completedAt;
           t.completedAt = null;
-          // Remove the contribution record if uncompleting
-          state.contributions = state.contributions.filter(c => c.taskId !== id || c.date !== t.completedAt);
+          // Remove the contribution record using the stored date
+          state.contributions = state.contributions.filter(c => !(c.taskId === id && c.date === completionDate));
         }
         
         // If this task is linked to a course goal, toggle that too
@@ -3878,6 +3880,9 @@
         
         if (offset === 0) {
           periodText = `Last ${totalWeeks} weeks`;
+        } else if (offset > 0) {
+          // Viewing future periods (should not normally happen due to next button being disabled)
+          periodText = `${startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
         } else {
           periodText = `${startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
         }
@@ -4018,7 +4023,6 @@
       }
 
       // Render summary
-      const periodDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
       summaryEl.innerHTML = `
         <span><strong>${totalContributions}</strong> contributions</span>
         <span><strong>${activeDays}</strong> active days</span>
