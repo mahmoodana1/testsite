@@ -3685,30 +3685,20 @@
       // Gather from completed tasks
       state.todos.forEach(task => {
         if (task.completed && task.completedAt) {
-          const dateKey = new Date(task.completedAt).toISOString().split('T')[0];
-          if (!contributions[dateKey]) contributions[dateKey] = [];
-          const courseName = task.linkedCourseId
-            ? (state.courses.find(c => c.id === task.linkedCourseId) || {}).name || 'Tasks'
-            : 'Tasks';
-          const courseColor = task.linkedCourseId
-            ? (state.courses.find(c => c.id === task.linkedCourseId) || {}).color || 'blue'
-            : task.color || 'blue';
-          contributions[dateKey].push({ name: courseName, color: courseColor });
+          try {
+            const d = new Date(task.completedAt);
+            if (isNaN(d.getTime())) return;
+            const dateKey = d.toISOString().split('T')[0];
+            if (!contributions[dateKey]) contributions[dateKey] = [];
+            const courseName = task.linkedCourseId
+              ? (state.courses.find(c => c.id === task.linkedCourseId) || {}).name || 'Tasks'
+              : 'Tasks';
+            const courseColor = task.linkedCourseId
+              ? (state.courses.find(c => c.id === task.linkedCourseId) || {}).color || 'blue'
+              : task.color || 'blue';
+            contributions[dateKey].push({ name: courseName, color: courseColor });
+          } catch (e) { /* skip invalid date */ }
         }
-      });
-
-      // Gather from completed goals (that aren't linked to tasks)
-      state.courses.forEach(course => {
-        course.categories.forEach(cat => {
-          cat.goals.forEach(goal => {
-            if (goal.completed && !goal.linkedTaskId) {
-              // Use today as fallback since goals don't have completedAt
-              const dateKey = new Date().toISOString().split('T')[0];
-              if (!contributions[dateKey]) contributions[dateKey] = [];
-              contributions[dateKey].push({ name: course.name, color: course.color || 'blue' });
-            }
-          });
-        });
       });
 
       return contributions;
@@ -3779,7 +3769,7 @@
           const dayContributions = contributions[dateKey] || [];
           const count = dayContributions.length;
 
-          if (currentDate > today) {
+          if (currentDate.getTime() > today.getTime()) {
             cell.style.opacity = '0.3';
             cell.style.cursor = 'default';
           } else if (count > 0) {
@@ -3818,7 +3808,7 @@
           });
 
           cell.onmouseenter = (e) => {
-            if (currentDate > today) return;
+            if (currentDate.getTime() > today.getTime()) return;
             let html = `<div class="contribution-tooltip-date">${formattedDate}</div>`;
             if (count === 0) {
               html += '<div style="color:var(--text-tertiary)">No contributions</div>';
