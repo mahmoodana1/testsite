@@ -15,8 +15,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
-  <!-- PDF.js for PDF viewing -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
   <style>
     /* -------------------------------------------------------------------------- */
@@ -1992,432 +1990,188 @@
     }
 
     /* ========================================================================== */
-    /* PDF VIEWER STYLES                                                          */
+    /* CONTRIBUTION TRACKER STYLES                                                */
     /* ========================================================================== */
-    
-    .pdf-viewer-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.85);
-      z-index: 1100;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s ease;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-    }
-    
-    .pdf-viewer-overlay.active {
-      opacity: 1;
-      visibility: visible;
-    }
-    
-    .pdf-viewer-container {
-      width: 95%;
-      max-width: 1200px;
-      height: 90vh;
-      background: var(--bg-card);
-      border-radius: var(--radius-lg);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      box-shadow: var(--shadow-lg);
-      transform: scale(0.9) translateY(20px);
-      transition: transform 0.3s var(--ease-spring);
-    }
-    
-    .pdf-viewer-overlay.active .pdf-viewer-container {
-      transform: scale(1) translateY(0);
-    }
-    
-    .pdf-viewer-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 16px;
-      background: var(--bg-card);
-      border-bottom: 1px solid var(--border-color);
-      gap: 12px;
-    }
-    
-    .pdf-viewer-title {
-      font-weight: 500;
-      font-size: 0.95rem;
-      color: var(--text-primary);
-      flex: 1;
-      min-width: 100px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    
-    .pdf-viewer-controls {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    
-    .pdf-viewer-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-secondary);
-      padding: 8px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.15s ease;
-    }
-    
-    .pdf-viewer-btn:hover {
-      background: var(--bg-hover);
-      color: var(--text-primary);
-    }
-    
-    .pdf-viewer-btn:active {
-      transform: scale(0.95);
-    }
-    
-    .pdf-viewer-btn.close-btn {
-      color: var(--text-primary);
-    }
-    
-    .pdf-viewer-btn.delete-btn:hover {
-      background: rgba(255, 80, 80, 0.1);
-      color: var(--accent-red);
-    }
-    
-    .pdf-page-controls {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      background: var(--bg-input);
-      padding: 4px 8px;
-      border-radius: 8px;
-      margin-right: 4px;
-    }
-    
-    .pdf-page-input {
-      width: 40px;
-      text-align: center;
-      padding: 2px 4px;
-      border: none;
-      border-radius: 4px;
-      background: transparent;
-      color: var(--text-primary);
-      font-size: 0.85rem;
-    }
-    
-    .pdf-page-input:focus {
-      background: var(--bg-card);
-      outline: 1px solid var(--border-color);
-    }
-    
-    .pdf-page-total {
-      color: var(--text-secondary);
-      font-size: 0.85rem;
-    }
-    
-    .pdf-zoom-controls {
-      display: flex;
-      align-items: center;
-      gap: 2px;
-    }
-    
-    .pdf-zoom-level {
-      min-width: 44px;
-      text-align: center;
-      color: var(--text-secondary);
-      font-size: 0.8rem;
+
+    .contribution-tracker {
+      position: relative;
+      overflow-x: auto;
+      padding-bottom: 4px;
     }
 
-    .pdf-controls-divider {
-      width: 1px;
-      height: 20px;
-      background: var(--border-color);
-      margin: 0 4px;
-    }
-    
-    .pdf-viewer-body {
-      flex: 1;
-      overflow: auto;
-      position: relative;
-      background: linear-gradient(145deg, #3a3d41 0%, #525659 100%);
+    .contribution-months {
       display: flex;
-      justify-content: center;
-      padding: 24px;
-      touch-action: pan-x pan-y pinch-zoom;
-    }
-    
-    .pdf-canvas-wrapper {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-    }
-    
-    .pdf-page-canvas {
-      background: white;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
-      border-radius: 2px;
-    }
-    
-    .pdf-loading {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      color: var(--text-secondary);
-      gap: 16px;
-    }
-    
-    .pdf-loading .spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid var(--bg-input);
-      border-top-color: var(--accent-blue);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-    
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    
-    .pdf-error {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      color: var(--accent-red);
-      gap: 12px;
-      text-align: center;
-      padding: 20px;
-    }
-    
-    .pdf-error svg {
-      width: 48px;
-      height: 48px;
-    }
-    
-    /* PDF Attachment Button in Goal Item */
-    .btn-attach-pdf {
-      background: transparent;
-      border: none;
+      font-size: 0.7rem;
       color: var(--text-tertiary);
-      padding: 4px;
-      cursor: pointer;
-      border-radius: 4px;
-      transition: all 0.2s ease;
+      margin-bottom: 4px;
+      padding-left: 32px;
+      gap: 0;
+      user-select: none;
+    }
+
+    .contribution-months span {
+      flex: 1;
+      min-width: 0;
+      text-align: left;
+    }
+
+    .contribution-grid-wrapper {
       display: flex;
-      align-items: center;
-      justify-content: center;
+      gap: 4px;
     }
-    
-    .btn-attach-pdf:hover {
-      color: var(--accent-blue);
-      background: var(--accent-blue-soft);
+
+    .contribution-days-labels {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      font-size: 0.65rem;
+      color: var(--text-tertiary);
+      padding: 2px 4px 2px 0;
+      width: 28px;
+      flex-shrink: 0;
+      user-select: none;
     }
-    
-    .btn-attach-pdf.has-pdf {
-      color: var(--accent-green);
+
+    .contribution-grid {
+      display: grid;
+      grid-template-rows: repeat(7, 1fr);
+      grid-auto-flow: column;
+      grid-auto-columns: 1fr;
+      gap: 3px;
+      flex: 1;
+      min-height: 90px;
     }
-    
-    .btn-attach-pdf.has-pdf:hover {
-      color: var(--accent-green);
-      background: var(--accent-green-soft);
+
+    .contribution-cell {
+      aspect-ratio: 1;
+      min-width: 10px;
+      max-width: 16px;
+      border-radius: 3px;
+      background: var(--bg-input);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      position: relative;
+      border: 1px solid transparent;
     }
-    
-    /* PDF Indicator Badge */
-    .pdf-indicator {
-      display: inline-flex;
+
+    .contribution-cell:hover {
+      border-color: var(--text-tertiary);
+      transform: scale(1.4);
+      z-index: 2;
+    }
+
+    .contribution-cell.level-1 { opacity: 0.45; }
+    .contribution-cell.level-2 { opacity: 0.65; }
+    .contribution-cell.level-3 { opacity: 0.85; }
+    .contribution-cell.level-4 { opacity: 1; }
+
+    .contribution-legend {
+      display: flex;
       align-items: center;
       gap: 4px;
+      font-size: 0.7rem;
+      color: var(--text-tertiary);
+      flex-wrap: wrap;
+    }
+
+    .contribution-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      padding: 2px 6px;
+      border-radius: 8px;
+      background: var(--bg-input);
+      font-size: 0.7rem;
+      white-space: nowrap;
+    }
+
+    .contribution-legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .contribution-summary {
+      display: flex;
+      gap: 16px;
+      margin-top: 8px;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      flex-wrap: wrap;
+    }
+
+    .contribution-summary strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .contribution-tooltip {
+      position: fixed;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      color: var(--text-primary);
+      box-shadow: var(--shadow-md);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+      z-index: 1200;
+      max-width: 220px;
+    }
+
+    .contribution-tooltip.visible {
+      opacity: 1;
+    }
+
+    .contribution-tooltip-date {
+      font-weight: 600;
+      margin-bottom: 4px;
       font-size: 0.75rem;
-      color: var(--accent-blue);
-      background: var(--accent-blue-soft);
-      padding: 2px 8px;
-      border-radius: 12px;
-      margin-left: 8px;
-      cursor: pointer;
-      transition: all 0.2s ease;
+      color: var(--text-secondary);
     }
-    
-    .pdf-indicator:hover {
-      filter: brightness(1.1);
+
+    .contribution-tooltip-items {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
     }
-    
-    .pdf-indicator svg {
-      width: 12px;
-      height: 12px;
-    }
-    
-    /* External Tools Panel - Minimal Collapsible */
-    .external-tools-panel {
-      position: absolute;
-      bottom: 12px;
-      right: 12px;
-      z-index: 10;
-    }
-    
-    .external-tools-toggle {
+
+    .contribution-tooltip-item {
       display: flex;
       align-items: center;
       gap: 6px;
-      padding: 8px 14px;
-      background: var(--bg-glass);
-      backdrop-filter: blur(10px);
-      border: 1px solid var(--border-color);
-      border-radius: 20px;
-      cursor: pointer;
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-      transition: all 0.2s ease;
-    }
-    
-    .external-tools-toggle:hover {
-      background: var(--bg-hover);
-      color: var(--text-primary);
-    }
-    
-    .external-tools-dropdown {
-      position: absolute;
-      bottom: 100%;
-      right: 0;
-      margin-bottom: 8px;
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-sm);
-      padding: 8px;
-      box-shadow: var(--shadow-md);
-      display: none;
-      min-width: 160px;
-    }
-    
-    .external-tools-panel.open .external-tools-dropdown {
-      display: block;
-      animation: fadeInUp 0.2s ease;
-    }
-    
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(8px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    .external-tools-title {
       font-size: 0.75rem;
-      color: var(--text-tertiary);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      padding: 4px 8px;
-      margin-bottom: 4px;
     }
-    
-    .external-tool-link {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      background: transparent;
-      border-radius: 6px;
-      color: var(--text-primary);
-      text-decoration: none;
-      font-size: 0.85rem;
-      transition: all 0.15s ease;
-    }
-    
-    .external-tool-link:hover {
-      background: var(--bg-hover);
-    }
-    
-    .external-tool-link svg {
-      width: 16px;
-      height: 16px;
+
+    .contribution-tooltip-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 2px;
       flex-shrink: 0;
     }
-    
-    /* Hidden file input */
-    .hidden-file-input {
-      display: none !important;
-    }
-    
-    /* Mobile responsive for PDF viewer */
+
     @media (max-width: 768px) {
-      .pdf-viewer-container {
-        width: 100%;
-        height: 100%;
-        border-radius: 0;
-        max-height: 100vh;
-      }
-      
-      .pdf-viewer-header {
-        padding: 10px 12px;
-        flex-wrap: wrap;
-        gap: 8px;
-      }
-      
-      .pdf-viewer-title {
-        font-size: 0.85rem;
-        min-width: auto;
-        flex: none;
-        max-width: 150px;
-      }
-      
-      .pdf-viewer-controls {
-        flex: 1;
-        justify-content: flex-end;
+      .contribution-grid {
         gap: 2px;
+        min-height: 70px;
       }
-      
-      .pdf-page-controls {
-        padding: 2px 6px;
+      .contribution-cell {
+        min-width: 7px;
+        max-width: 12px;
       }
-      
-      .pdf-controls-divider {
-        display: none;
+      .contribution-days-labels {
+        font-size: 0.6rem;
+        width: 22px;
       }
-      
-      .pdf-zoom-level {
-        display: none;
-      }
-      
-      .pdf-zoom-controls {
-        display: none;
-      }
-      
-      .pdf-viewer-btn {
-        padding: 6px;
-      }
-      
-      .pdf-viewer-body {
-        padding: 12px;
-      }
-      
-      .external-tools-panel {
-        bottom: 8px;
-        right: 8px;
-      }
-      
-      .external-tools-toggle {
-        padding: 6px 10px;
-        font-size: 0.75rem;
+      .contribution-months {
+        padding-left: 26px;
+        font-size: 0.6rem;
       }
     }
-    
+
     /* Tablet responsive - limit task list to 3 items before scrolling */
     /* Task height calculation: min-height (64px) + margin-bottom (12px) = 76px per task
        3 tasks = 76px * 3 = 228px */
@@ -2606,35 +2360,22 @@
       </section>
 
       <div class="bento-grid">
-        <div class="bento-card">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span class="text-xs" style="color:var(--text-tertiary)">POMODORO TIMER</span>
-            <button type="button" class="btn-icon-circle" onclick="toggleModal('timerModal')">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="3"></circle>
-                <path
-                  d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
-                </path>
-              </svg>
-            </button>
+        <div class="bento-card" style="grid-column: 1 / -1;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <span class="text-xs" style="color:var(--text-tertiary)">CONTRIBUTION TRACKER</span>
+            <div id="contributionLegend" class="contribution-legend"></div>
           </div>
-
-          <div class="timer-presets" style="margin-top: 10px; display:flex; gap:8px; justify-content:center;">
-            <button type="button" class="btn-ghost" onclick="setTimer(25)"
-              style="font-size:0.8rem; padding:4px 10px; border:1px solid var(--border-color);">Focus 25</button>
-            <button type="button" class="btn-ghost" onclick="setTimer(5)"
-              style="font-size:0.8rem; padding:4px 10px; border:1px solid var(--border-color);">Short 5</button>
-            <button type="button" class="btn-ghost" onclick="setTimer(15)"
-              style="font-size:0.8rem; padding:4px 10px; border:1px solid var(--border-color);">Long 15</button>
-          </div>
-
-          <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-            <div class="timer-display" id="timerDisplay">25:00</div>
-            <div class="timer-controls">
-              <button type="button" id="startTimerBtn" class="btn-primary">Start Focus</button>
-              <button type="button" id="resetTimerBtn" class="btn-ghost">Reset</button>
+          <div class="contribution-tracker" id="contributionTracker">
+            <div class="contribution-months" id="contributionMonths"></div>
+            <div class="contribution-grid-wrapper">
+              <div class="contribution-days-labels">
+                <span>Mon</span><span>Wed</span><span>Fri</span>
+              </div>
+              <div class="contribution-grid" id="contributionGrid"></div>
             </div>
           </div>
+          <div class="contribution-summary" id="contributionSummary"></div>
+          <div class="contribution-tooltip" id="contributionTooltip"></div>
         </div>
 
         <div class="bento-card">
@@ -2717,22 +2458,6 @@
             <line x1="14" y1="11" x2="14" y2="17"></line>
           </svg>
         </button>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal-overlay" id="timerModal">
-    <div class="modal">
-      <h3 class="text-h3" style="margin-bottom:24px;">Timer Settings</h3>
-      <div style="margin-bottom:20px;">
-        <label class="text-xs" style="color:var(--text-secondary); display:block; margin-bottom:8px;">FOCUS DURATION
-          (MIN)</label>
-        <input type="number" id="customWorkDur" value="25"
-          style="width:100%; padding:12px; border-radius:8px; border:1px solid var(--bg-input); background:var(--bg-body); color:var(--text-primary); font-size:1.1rem;">
-      </div>
-      <div style="display:flex; justify-content:flex-end; gap:12px;">
-        <button type="button" class="btn-ghost" onclick="toggleModal('timerModal')">Cancel</button>
-        <button type="button" class="btn-primary" onclick="saveTimerSettings()">Save</button>
       </div>
     </div>
   </div>
@@ -2826,83 +2551,6 @@
       </div>
     </div>
   </div>
-
-  <!-- PDF Viewer Modal -->
-  <div class="pdf-viewer-overlay" id="pdfViewerOverlay">
-    <div class="pdf-viewer-container">
-      <div class="pdf-viewer-header">
-        <span class="pdf-viewer-title" id="pdfViewerTitle">Document.pdf</span>
-        <div class="pdf-viewer-controls">
-          <div class="pdf-page-controls">
-            <button type="button" class="pdf-viewer-btn" id="pdfPrevPage" title="Previous">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
-            </button>
-            <input type="number" class="pdf-page-input" id="pdfPageInput" value="1" min="1">
-            <span class="pdf-page-total">/ <span id="pdfTotalPages">1</span></span>
-            <button type="button" class="pdf-viewer-btn" id="pdfNextPage" title="Next">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
-            </button>
-          </div>
-          <div class="pdf-controls-divider"></div>
-          <div class="pdf-zoom-controls">
-            <button type="button" class="pdf-viewer-btn" id="pdfZoomOut" title="Zoom Out">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            </button>
-            <span class="pdf-zoom-level" id="pdfZoomLevel">100%</span>
-            <button type="button" class="pdf-viewer-btn" id="pdfZoomIn" title="Zoom In">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            </button>
-            <button type="button" class="pdf-viewer-btn" id="pdfFitWidth" title="Fit to Width">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 3H3v18h18V3zM9 21V3M15 21V3"></path></svg>
-            </button>
-          </div>
-          <div class="pdf-controls-divider"></div>
-          <button type="button" class="pdf-viewer-btn delete-btn" id="pdfRemoveAttachment" title="Remove PDF">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-          </button>
-          <button type="button" class="pdf-viewer-btn close-btn" id="pdfCloseBtn" title="Close">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-          </button>
-        </div>
-      </div>
-      <div class="pdf-viewer-body" id="pdfViewerBody">
-        <div class="pdf-loading" id="pdfLoading">
-          <div class="spinner"></div>
-          <span>Loading PDF...</span>
-        </div>
-        <div class="pdf-canvas-wrapper" id="pdfCanvasWrapper"></div>
-        <div class="pdf-error" id="pdfError" style="display: none;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-          <span id="pdfErrorMsg">Failed to load PDF</span>
-        </div>
-        <!-- Minimal floating annotation tools button -->
-        <div class="external-tools-panel" id="externalToolsPanel">
-          <button type="button" class="external-tools-toggle" id="externalToolsToggle" aria-label="Open annotation tools">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-            Annotate
-          </button>
-          <div class="external-tools-dropdown">
-            <div class="external-tools-title">Open with</div>
-            <a href="https://www.xodo.com/app/#/" target="_blank" rel="noopener noreferrer" class="external-tool-link">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-              Xodo
-            </a>
-            <a href="https://www.adobe.com/acrobat/online/pdf-editor.html" target="_blank" rel="noopener noreferrer" class="external-tool-link">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--accent-red)" stroke="none" aria-hidden="true"><path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3Z"/></svg>
-              Adobe
-            </a>
-            <a href="https://smallpdf.com/edit-pdf" target="_blank" rel="noopener noreferrer" class="external-tool-link">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-green)" stroke-width="2" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-              Smallpdf
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Hidden file input for PDF uploads -->
-  <input type="file" id="pdfFileInput" class="hidden-file-input" accept=".pdf,application/pdf">
 
   <script type="module">
     import {initializeApp} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
@@ -3234,9 +2882,6 @@
         };
       });
 
-      getEl('startTimerBtn').onclick = toggleTimer;
-      getEl('resetTimerBtn').onclick = resetTimer;
-
       getEl('toastUndo').onclick = () => {
         if (state.lastUndo) {
           if (state.lastUndo.type === 'task') state.todos.push(state.lastUndo.data);
@@ -3303,7 +2948,7 @@
 
     /* RENDERING */
     function renderAll() {
-      renderTasks(); renderFocus(); renderCourses(); renderStats();
+      renderTasks(); renderFocus(); renderCourses(); renderStats(); renderContributionTracker();
       if (state.currentCourseId) window.openCourseModal(state.currentCourseId);
     }
 
@@ -3493,27 +3138,15 @@
           gItem.className = 'goal-item';
           gItem.dataset.goalId = goal.id;
           
-          // Check if goal has PDF attachment
-          const hasPdf = goal.pdfAttachment && goal.pdfAttachment.data;
-          const pdfIndicator = hasPdf ? 
-            `<span class="pdf-indicator" onclick="event.stopPropagation(); openGoalPdf('${courseId}', '${cat.id}', '${goal.id}')">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-              PDF
-            </span>` : '';
-          
           gItem.innerHTML = `
                         <div class="checkbox ${goal.completed ? 'checked' : ''}" style="margin-top:4px;">${goal.completed ? '✓' : ''}</div>
                         <div class="goal-inputs">
                             <div style="display:flex; align-items:center;">
                               <input class="goal-main-input" value="${goal.title}" placeholder="New Goal..." style="flex:1;">
-                              ${pdfIndicator}
                             </div>
                             <input class="goal-sub-input" value="${goal.subtitle || ''}" placeholder="Add details...">
                         </div>
                         <div class="goal-actions">
-                            <button type="button" class="btn-attach-pdf ${hasPdf ? 'has-pdf' : ''}" title="${hasPdf ? 'View PDF' : 'Attach PDF'}" data-action="pdf">
-                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                            </button>
                             <button type="button" class="btn-delete-task" title="Convert">➔</button>
                             <button type="button" class="btn-delete-task" style="color:var(--accent-red);" title="Delete">✕</button>
                         </div>
@@ -3531,15 +3164,6 @@
 
           const subIn = gItem.querySelector('.goal-sub-input');
           subIn.onblur = () => updateGoal(courseId, cat.id, goal.id, {subtitle: subIn.value}, false);
-
-          // PDF button handler
-          gItem.querySelector('[data-action="pdf"]').onclick = () => {
-            if (hasPdf) {
-              window.openGoalPdf(courseId, cat.id, goal.id);
-            } else {
-              window.triggerPdfUpload(courseId, cat.id, goal.id);
-            }
-          };
 
           gItem.querySelector('[title="Convert"]').onclick = () => convertGoal(courseId, cat.id, goal.id);
           gItem.querySelector('[title="Delete"]').onclick = () => deleteGoal(courseId, cat.id, goal.id);
@@ -3768,12 +3392,6 @@
         renderStats();
         showToast(`Cleared ${completedTasks.length} completed task(s)`);
       }
-    };
-    window.setTimer = (min) => {state.timer.duration = min; resetTimer();}
-    window.saveTimerSettings = () => {
-      const d = parseInt(getEl('customWorkDur').value);
-      if (d > 0) state.timer.duration = d;
-      resetTimer(); window.toggleModal('timerModal');
     };
     window.openDailyGoalModal = () => {
       getEl('modalDailyGoalInput').value = state.dailyGoal;
@@ -4044,405 +3662,219 @@
       showToast('🗑️ Theme "' + themeName + '" deleted');
     }
 
-    let timerInterval;
-    function toggleTimer() {
-      const btn = getEl('startTimerBtn');
-      if (state.timer.isRunning) {
-        clearInterval(timerInterval); state.timer.isRunning = false; btn.innerText = "Resume"; btn.style.background = "var(--accent-green)";
-      } else {
-        if (state.timer.timeLeft === undefined) state.timer.timeLeft = state.timer.duration * 60;
-        state.timer.isRunning = true; btn.innerText = "Pause"; btn.style.background = "var(--accent-orange)";
-        timerInterval = setInterval(() => {
-          if (state.timer.timeLeft > 0) {
-            state.timer.timeLeft--; getEl('timerDisplay').innerText = formatTime(state.timer.timeLeft);
-          } else {
-            clearInterval(timerInterval); state.timer.isRunning = false;
-            new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg').play();
-            alert("Focus Session Complete!"); resetTimer();
-          }
-        }, 1000);
-      }
-    }
-    function resetTimer() {
-      clearInterval(timerInterval); state.timer.isRunning = false; state.timer.timeLeft = state.timer.duration * 60;
-      getEl('timerDisplay').innerText = formatTime(state.timer.timeLeft);
-      const btn = getEl('startTimerBtn'); btn.innerText = "Start Focus"; btn.style.background = "var(--text-primary)";
-    }
     function showToast(msg) {getEl('toastMsg').innerText = msg; getEl('toast').classList.add('active'); setTimeout(hideToast, 4000);}
     function hideToast() {getEl('toast').classList.remove('active'); setTimeout(() => {state.lastUndo = null;}, 600);}
 
     /* ========================================================================== */
-    /* PDF VIEWER MODULE                                                          */
+    /* CONTRIBUTION TRACKER MODULE                                                */
     /* ========================================================================== */
-    
-    // Initialize PDF.js worker
-    if (typeof pdfjsLib !== 'undefined') {
-      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-    }
-    
-    // PDF Viewer State
-    const PDF_MIN_ZOOM = 0.25;
-    const PDF_MAX_ZOOM = 3.0;
-    const PDF_MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
-    
-    let pdfState = {
-      doc: null,
-      currentPage: 1,
-      totalPages: 0,
-      scale: 1.0,
-      currentGoalRef: null, // {courseId, categoryId, goalId}
-      pdfData: null,
-      fileName: ''
+
+    const CONTRIBUTION_COLORS = {
+      blue: '#4A90D9',
+      purple: '#9B59B6',
+      green: '#06D6A0',
+      orange: '#F7B731',
+      red: '#EF476F',
+      gray: '#8E8E93'
     };
-    
-    // Initialize PDF viewer controls
-    function initPdfViewer() {
-      const overlay = getEl('pdfViewerOverlay');
-      const closeBtn = getEl('pdfCloseBtn');
-      const prevBtn = getEl('pdfPrevPage');
-      const nextBtn = getEl('pdfNextPage');
-      const zoomInBtn = getEl('pdfZoomIn');
-      const zoomOutBtn = getEl('pdfZoomOut');
-      const fitWidthBtn = getEl('pdfFitWidth');
-      const pageInput = getEl('pdfPageInput');
-      const removeBtn = getEl('pdfRemoveAttachment');
-      const fileInput = getEl('pdfFileInput');
-      
-      // Close button
-      closeBtn.onclick = closePdfViewer;
-      
-      // Click outside to close (but not on the container or its children)
-      overlay.onclick = (e) => {
-        // Only close if clicking directly on the overlay, not the container
-        if (e.target === overlay) {
-          closePdfViewer();
-        }
-      };
-      
-      // Stop propagation from the container to prevent accidental closes
-      const container = document.querySelector('.pdf-viewer-container');
-      if (container) {
-        container.onclick = (e) => {
-          e.stopPropagation();
-        };
-      }
-      
-      // Escape key to close
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && overlay.classList.contains('active')) {
-          closePdfViewer();
+
+    function getContributionData() {
+      // Build contribution data from completed tasks and goals
+      const contributions = {};
+
+      // Gather from completed tasks
+      state.todos.forEach(task => {
+        if (task.completed && task.completedAt) {
+          const dateKey = new Date(task.completedAt).toISOString().split('T')[0];
+          if (!contributions[dateKey]) contributions[dateKey] = [];
+          const courseName = task.linkedCourseId
+            ? (state.courses.find(c => c.id === task.linkedCourseId) || {}).name || 'Tasks'
+            : 'Tasks';
+          const courseColor = task.linkedCourseId
+            ? (state.courses.find(c => c.id === task.linkedCourseId) || {}).color || 'blue'
+            : task.color || 'blue';
+          contributions[dateKey].push({ name: courseName, color: courseColor });
         }
       });
-      
-      // Navigation
-      prevBtn.onclick = () => goToPage(pdfState.currentPage - 1);
-      nextBtn.onclick = () => goToPage(pdfState.currentPage + 1);
-      
-      pageInput.onchange = () => {
-        const page = parseInt(pageInput.value);
-        if (page >= 1 && page <= pdfState.totalPages) {
-          goToPage(page);
-        } else {
-          pageInput.value = pdfState.currentPage;
+
+      // Gather from completed goals (that aren't linked to tasks)
+      state.courses.forEach(course => {
+        course.categories.forEach(cat => {
+          cat.goals.forEach(goal => {
+            if (goal.completed && !goal.linkedTaskId) {
+              // Use today as fallback since goals don't have completedAt
+              const dateKey = new Date().toISOString().split('T')[0];
+              if (!contributions[dateKey]) contributions[dateKey] = [];
+              contributions[dateKey].push({ name: course.name, color: course.color || 'blue' });
+            }
+          });
+        });
+      });
+
+      return contributions;
+    }
+
+    function renderContributionTracker() {
+      const grid = getEl('contributionGrid');
+      const monthsEl = getEl('contributionMonths');
+      const legendEl = getEl('contributionLegend');
+      const summaryEl = getEl('contributionSummary');
+      const tooltip = getEl('contributionTooltip');
+
+      if (!grid) return;
+
+      grid.innerHTML = '';
+      monthsEl.innerHTML = '';
+
+      const contributions = getContributionData();
+
+      // Generate last 20 weeks of dates (140 days)
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const totalWeeks = 20;
+      const totalDays = totalWeeks * 7;
+
+      // Find the start date (beginning of the week, totalWeeks ago)
+      const startDate = new Date(today);
+      startDate.setDate(startDate.getDate() - totalDays + 1);
+      // Align to Monday
+      const dayOfWeek = startDate.getDay();
+      const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+      startDate.setDate(startDate.getDate() + mondayOffset);
+
+      // Track unique projects for legend
+      const projectsSet = new Map();
+      let totalContributions = 0;
+      let activeDays = 0;
+
+      // Generate month labels
+      const months = [];
+      let lastMonth = -1;
+      const tempDate = new Date(startDate);
+      for (let w = 0; w < totalWeeks; w++) {
+        const weekDate = new Date(tempDate);
+        weekDate.setDate(weekDate.getDate() + w * 7);
+        const month = weekDate.getMonth();
+        if (month !== lastMonth) {
+          months.push({ name: weekDate.toLocaleDateString('en-US', { month: 'short' }), week: w });
+          lastMonth = month;
         }
-      };
-      
-      // Zoom controls
-      zoomInBtn.onclick = () => setZoom(pdfState.scale + 0.25);
-      zoomOutBtn.onclick = () => setZoom(pdfState.scale - 0.25);
-      fitWidthBtn.onclick = fitToWidth;
-      
-      // Remove PDF
-      removeBtn.onclick = removePdfFromGoal;
-      
-      // File input change handler
-      fileInput.onchange = handlePdfFileSelect;
-      
-      // External tools toggle
-      const externalToolsToggle = getEl('externalToolsToggle');
-      if (externalToolsToggle) {
-        externalToolsToggle.onclick = () => {
-          const panel = getEl('externalToolsPanel');
-          panel.classList.toggle('open');
-        };
       }
-      
-      // Touch zoom support
-      setupTouchZoom();
-    }
-    
-    // Setup touch zoom (pinch to zoom)
-    function setupTouchZoom() {
-      const body = getEl('pdfViewerBody');
-      let initialDistance = 0;
-      let initialScale = 1;
-      
-      body.addEventListener('touchstart', (e) => {
-        if (e.touches.length === 2) {
-          initialDistance = getDistance(e.touches[0], e.touches[1]);
-          initialScale = pdfState.scale;
-        }
-      }, { passive: true });
-      
-      body.addEventListener('touchmove', (e) => {
-        if (e.touches.length === 2) {
-          const currentDistance = getDistance(e.touches[0], e.touches[1]);
-          const scaleFactor = currentDistance / initialDistance;
-          const newScale = Math.min(Math.max(initialScale * scaleFactor, PDF_MIN_ZOOM), PDF_MAX_ZOOM);
-          setZoom(newScale, false);
-        }
-      }, { passive: true });
-      
-      body.addEventListener('touchend', () => {
-        initialDistance = 0;
-      }, { passive: true });
-    }
-    
-    function getDistance(touch1, touch2) {
-      const dx = touch1.clientX - touch2.clientX;
-      const dy = touch1.clientY - touch2.clientY;
-      return Math.sqrt(dx * dx + dy * dy);
-    }
-    
-    // Open PDF viewer with a file
-    function openPdfViewer(pdfData, fileName, goalRef) {
-      pdfState.currentGoalRef = goalRef;
-      pdfState.pdfData = pdfData;
-      pdfState.fileName = fileName;
-      
-      getEl('pdfViewerTitle').textContent = fileName;
-      getEl('pdfViewerOverlay').classList.add('active');
-      getEl('pdfLoading').style.display = 'flex';
-      getEl('pdfError').style.display = 'none';
-      getEl('pdfCanvasWrapper').innerHTML = '';
-      
-      loadPdf(pdfData);
-    }
-    
-    // Close PDF viewer
-    function closePdfViewer() {
-      getEl('pdfViewerOverlay').classList.remove('active');
-      // Close the external tools dropdown when closing viewer
-      const toolsPanel = getEl('externalToolsPanel');
-      if (toolsPanel) toolsPanel.classList.remove('open');
-      // Keep pdfData and fileName in state for potential reopen
-      // Only clear the rendered doc reference
-      pdfState.doc = null;
-      pdfState.currentGoalRef = null;
-      // Clear the canvas wrapper after animation completes
-      setTimeout(() => {
-        getEl('pdfCanvasWrapper').innerHTML = '';
-      }, 300);
-    }
-    
-    // Load PDF from base64 or URL
-    async function loadPdf(pdfData) {
-      try {
-        if (typeof pdfjsLib === 'undefined') {
-          throw new Error('PDF.js library not loaded');
-        }
-        
-        // Parse base64 data - handle both data URL format and raw base64
-        let base64Content;
-        if (pdfData.startsWith('data:')) {
-          // Data URL format: data:application/pdf;base64,<base64data>
-          const parts = pdfData.split(',');
-          if (parts.length < 2) {
-            throw new Error('Invalid PDF data format');
+
+      // Create month labels with positioning
+      months.forEach((m, i) => {
+        const span = document.createElement('span');
+        span.textContent = m.name;
+        span.style.gridColumnStart = m.week + 1;
+        monthsEl.appendChild(span);
+      });
+
+      // Create grid cells
+      const currentDate = new Date(startDate);
+      for (let w = 0; w < totalWeeks; w++) {
+        for (let d = 0; d < 7; d++) {
+          const cell = document.createElement('div');
+          cell.className = 'contribution-cell';
+          const dateKey = currentDate.toISOString().split('T')[0];
+          const dayContributions = contributions[dateKey] || [];
+          const count = dayContributions.length;
+
+          if (currentDate > today) {
+            cell.style.opacity = '0.3';
+            cell.style.cursor = 'default';
+          } else if (count > 0) {
+            totalContributions += count;
+            activeDays++;
+
+            // Determine the dominant project color
+            const colorCounts = {};
+            dayContributions.forEach(c => {
+              const colorKey = c.color || 'blue';
+              colorCounts[colorKey] = (colorCounts[colorKey] || 0) + 1;
+              projectsSet.set(c.name, colorKey);
+            });
+
+            // Use dominant project color
+            const dominantColor = Object.keys(colorCounts).reduce((a, b) =>
+              colorCounts[a] > colorCounts[b] ? a : b
+            );
+            const cssColor = CONTRIBUTION_COLORS[dominantColor] || CONTRIBUTION_COLORS.blue;
+            cell.style.background = cssColor;
+
+            // Set intensity level
+            const level = count >= 6 ? 4 : count >= 4 ? 3 : count >= 2 ? 2 : 1;
+            cell.classList.add(`level-${level}`);
+
+            // Multi-color gradient for mixed projects
+            if (Object.keys(colorCounts).length > 1) {
+              const gradColors = Object.keys(colorCounts).map(c => CONTRIBUTION_COLORS[c] || CONTRIBUTION_COLORS.blue);
+              cell.style.background = `linear-gradient(135deg, ${gradColors.join(', ')})`;
+            }
           }
-          base64Content = parts[1];
-        } else {
-          // Assume it's raw base64
-          base64Content = pdfData;
+
+          // Tooltip
+          const formattedDate = currentDate.toLocaleDateString('en-US', {
+            weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'
+          });
+
+          cell.onmouseenter = (e) => {
+            if (currentDate > today) return;
+            let html = `<div class="contribution-tooltip-date">${formattedDate}</div>`;
+            if (count === 0) {
+              html += '<div style="color:var(--text-tertiary)">No contributions</div>';
+            } else {
+              html += `<div style="margin-bottom:3px"><strong>${count}</strong> contribution${count > 1 ? 's' : ''}</div>`;
+              html += '<div class="contribution-tooltip-items">';
+              const grouped = {};
+              dayContributions.forEach(c => {
+                grouped[c.name] = grouped[c.name] || { count: 0, color: c.color };
+                grouped[c.name].count++;
+              });
+              Object.keys(grouped).forEach(name => {
+                const g = grouped[name];
+                const dotColor = CONTRIBUTION_COLORS[g.color] || CONTRIBUTION_COLORS.blue;
+                html += `<div class="contribution-tooltip-item">
+                  <span class="contribution-tooltip-dot" style="background:${dotColor}"></span>
+                  ${name}: ${g.count}
+                </div>`;
+              });
+              html += '</div>';
+            }
+            tooltip.innerHTML = html;
+            tooltip.classList.add('visible');
+
+            const rect = cell.getBoundingClientRect();
+            tooltip.style.left = Math.min(rect.left, window.innerWidth - 230) + 'px';
+            tooltip.style.top = (rect.top - tooltip.offsetHeight - 8) + 'px';
+          };
+
+          cell.onmouseleave = () => {
+            tooltip.classList.remove('visible');
+          };
+
+          grid.appendChild(cell);
+          currentDate.setDate(currentDate.getDate() + 1);
         }
-        
-        const loadingTask = pdfjsLib.getDocument({ data: atob(base64Content) });
-        pdfState.doc = await loadingTask.promise;
-        pdfState.totalPages = pdfState.doc.numPages;
-        pdfState.currentPage = 1;
-        
-        getEl('pdfTotalPages').textContent = pdfState.totalPages;
-        getEl('pdfPageInput').max = pdfState.totalPages;
-        getEl('pdfLoading').style.display = 'none';
-        
-        // Auto fit to width on first load
-        await fitToWidth();
-        
-      } catch (error) {
-        console.error('Error loading PDF:', error);
-        getEl('pdfLoading').style.display = 'none';
-        getEl('pdfError').style.display = 'flex';
-        getEl('pdfErrorMsg').textContent = 'Failed to load PDF: ' + error.message;
       }
-    }
-    
-    // Render all pages
-    async function renderAllPages() {
-      if (!pdfState.doc) return;
-      
-      const wrapper = getEl('pdfCanvasWrapper');
-      wrapper.innerHTML = '';
-      
-      for (let i = 1; i <= pdfState.totalPages; i++) {
-        const page = await pdfState.doc.getPage(i);
-        const viewport = page.getViewport({ scale: pdfState.scale });
-        
-        const canvas = document.createElement('canvas');
-        canvas.className = 'pdf-page-canvas';
-        canvas.id = `pdf-page-${i}`;
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
-        
-        const context = canvas.getContext('2d');
-        await page.render({ canvasContext: context, viewport: viewport }).promise;
-        
-        wrapper.appendChild(canvas);
+
+      // Render legend
+      legendEl.innerHTML = '';
+      if (projectsSet.size > 0) {
+        projectsSet.forEach((color, name) => {
+          const item = document.createElement('span');
+          item.className = 'contribution-legend-item';
+          const dotColor = CONTRIBUTION_COLORS[color] || CONTRIBUTION_COLORS.blue;
+          item.innerHTML = `<span class="contribution-legend-dot" style="background:${dotColor}"></span>${name}`;
+          legendEl.appendChild(item);
+        });
       }
+
+      // Render summary
+      summaryEl.innerHTML = `
+        <span><strong>${totalContributions}</strong> contributions in the last ${totalWeeks} weeks</span>
+        <span><strong>${activeDays}</strong> active days</span>
+      `;
     }
-    
-    // Go to specific page
-    function goToPage(pageNum) {
-      if (pageNum < 1 || pageNum > pdfState.totalPages) return;
-      
-      pdfState.currentPage = pageNum;
-      getEl('pdfPageInput').value = pageNum;
-      
-      // Scroll to page
-      const pageCanvas = document.getElementById(`pdf-page-${pageNum}`);
-      if (pageCanvas) {
-        pageCanvas.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }
-    
-    // Set zoom level
-    async function setZoom(scale, rerender = true) {
-      pdfState.scale = Math.min(Math.max(scale, PDF_MIN_ZOOM), PDF_MAX_ZOOM);
-      getEl('pdfZoomLevel').textContent = Math.round(pdfState.scale * 100) + '%';
-      
-      if (rerender) {
-        await renderAllPages();
-      }
-    }
-    
-    // Fit PDF to viewer width
-    async function fitToWidth() {
-      if (!pdfState.doc) return;
-      
-      const page = await pdfState.doc.getPage(1);
-      const viewport = page.getViewport({ scale: 1 });
-      const containerWidth = getEl('pdfViewerBody').clientWidth - 40;
-      const newScale = containerWidth / viewport.width;
-      
-      await setZoom(newScale);
-    }
-    
-    // Handle PDF file selection
-    function handlePdfFileSelect(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      
-      if (file.type !== 'application/pdf') {
-        showToast('Please select a PDF file');
-        return;
-      }
-      
-      if (file.size > PDF_MAX_FILE_SIZE) {
-        showToast('PDF file is too large (max 10MB)');
-        return;
-      }
-      
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const base64Data = e.target.result;
-        const goalRef = pdfState.currentGoalRef;
-        
-        if (goalRef) {
-          // Attaching to existing goal - update it
-          attachPdfToGoal(goalRef.courseId, goalRef.categoryId, goalRef.goalId, base64Data, file.name);
-          showToast('📎 PDF attached to goal');
-          // Open the viewer with the newly attached PDF
-          openPdfViewer(base64Data, file.name, goalRef);
-        }
-      };
-      reader.readAsDataURL(file);
-      
-      // Clear input for future selections
-      event.target.value = '';
-    }
-    
-    // Attach PDF to a goal
-    function attachPdfToGoal(courseId, categoryId, goalId, pdfData, fileName) {
-      const course = state.courses.find(c => c.id === courseId);
-      if (!course) return;
-      
-      const category = course.categories.find(cat => cat.id === categoryId);
-      if (!category) return;
-      
-      const goal = category.goals.find(g => g.id === goalId);
-      if (!goal) return;
-      
-      goal.pdfAttachment = {
-        data: pdfData,
-        fileName: fileName,
-        attachedAt: new Date().toISOString()
-      };
-      
-      saveData();
-    }
-    
-    // Remove PDF from goal
-    function removePdfFromGoal() {
-      const goalRef = pdfState.currentGoalRef;
-      if (!goalRef) return;
-      
-      if (!confirm('Remove PDF attachment from this goal?')) return;
-      
-      const course = state.courses.find(c => c.id === goalRef.courseId);
-      if (!course) return;
-      
-      const category = course.categories.find(cat => cat.id === goalRef.categoryId);
-      if (!category) return;
-      
-      const goal = category.goals.find(g => g.id === goalRef.goalId);
-      if (!goal) return;
-      
-      delete goal.pdfAttachment;
-      saveData();
-      closePdfViewer();
-      showToast('📎 PDF removed from goal');
-      
-      // Re-render course modal to update UI
-      if (state.currentCourseId) {
-        window.openCourseModal(state.currentCourseId);
-      }
-    }
-    
-    // Trigger PDF file picker for a goal
-    window.triggerPdfUpload = (courseId, categoryId, goalId) => {
-      pdfState.currentGoalRef = { courseId, categoryId, goalId };
-      getEl('pdfFileInput').click();
-    };
-    
-    // Open PDF that's attached to a goal
-    window.openGoalPdf = (courseId, categoryId, goalId) => {
-      const course = state.courses.find(c => c.id === courseId);
-      if (!course) return;
-      
-      const category = course.categories.find(cat => cat.id === categoryId);
-      if (!category) return;
-      
-      const goal = category.goals.find(g => g.id === goalId);
-      if (!goal || !goal.pdfAttachment) return;
-      
-      openPdfViewer(
-        goal.pdfAttachment.data,
-        goal.pdfAttachment.fileName,
-        { courseId, categoryId, goalId }
-      );
-    };
-    
-    // Initialize PDF viewer on page load
-    setTimeout(initPdfViewer, 100);
 
     init();
   </script>
