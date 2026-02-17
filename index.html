@@ -2110,13 +2110,13 @@
     }
 
     /* Contribution Modal Styles */
-    #contributionModal {
+    .contribution-modal-overlay {
       position: fixed;
       inset: 0;
       background: rgba(0, 0, 0, 0.6);
       backdrop-filter: blur(8px);
       z-index: 300;
-      display: flex;
+      display: none;
       align-items: center;
       justify-content: center;
       opacity: 0;
@@ -2125,12 +2125,13 @@
       padding: 20px;
     }
 
-    #contributionModal.active {
+    .contribution-modal-overlay.active {
+      display: flex;
       opacity: 1;
       pointer-events: auto;
     }
 
-    #contributionModal .modal-content {
+    .contribution-modal-content {
       background: var(--bg-card);
       border-radius: var(--radius-lg);
       box-shadow: var(--shadow-lg);
@@ -2141,11 +2142,11 @@
       width: 100%;
     }
 
-    #contributionModal.active .modal-content {
+    .contribution-modal-overlay.active .contribution-modal-content {
       transform: scale(1);
     }
 
-    #contributionModal .modal-header {
+    .contribution-modal-overlay .modal-header {
       padding: 20px 24px;
       border-bottom: 1px solid var(--border-color);
       display: flex;
@@ -2153,11 +2154,15 @@
       align-items: center;
     }
 
-    #contributionModal .modal-body {
+    .contribution-modal-overlay .modal-title {
+      margin: 0;
+    }
+
+    .contribution-modal-overlay .modal-body {
       padding: 20px 24px;
     }
 
-    #contributionModal .modal-close {
+    .contribution-modal-overlay .modal-close {
       background: none;
       border: none;
       cursor: pointer;
@@ -2170,7 +2175,7 @@
       transition: all 0.2s;
     }
 
-    #contributionModal .modal-close:hover {
+    .contribution-modal-overlay .modal-close:hover {
       background: var(--bg-hover);
       color: var(--text-primary);
     }
@@ -2542,11 +2547,11 @@
       </div>
 
       <!-- Contribution Details Modal -->
-      <div id="contributionModal" class="modal" style="display:none;" onclick="if(event.target === this) closeContributionModal()">
-        <div class="modal-content" style="max-width: 400px;">
+      <div id="contributionModal" class="contribution-modal-overlay">
+        <div class="contribution-modal-content">
           <div class="modal-header">
-            <h3 id="contributionModalTitle" style="margin: 0;"></h3>
-            <button class="modal-close" onclick="closeContributionModal()">
+            <h3 id="contributionModalTitle" class="modal-title"></h3>
+            <button class="modal-close" id="contributionModalClose">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -2839,6 +2844,7 @@
       checkStreakExpiration();
       
       setupEventListeners();
+      initContributionModalListeners();
       new Sortable(getEl('taskList'), {
         animation: 150, ghostClass: 'sortable-ghost', delay: 100,
         onEnd: (evt) => reorderTasks(evt.oldIndex, evt.newIndex)
@@ -3818,6 +3824,10 @@
       gray: '#8E8E93'
     };
 
+    const MS_PER_DAY = 1000 * 60 * 60 * 24; // Milliseconds in a day
+    const MODAL_TRANSITION_DURATION = 300; // Match CSS transition duration
+    const MODAL_DISPLAY_DELAY = 10; // Small delay to trigger CSS transition after display change
+
     let contributionMonthOffset = 0; // Track the current month offset for navigation
 
     function navigateContributionMonth(direction) {
@@ -3889,7 +3899,7 @@
       endDate.setDate(endDate.getDate() + sundayOffset);
 
       // Calculate number of weeks to display
-      const totalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+      const totalDays = Math.ceil((endDate - startDate) / MS_PER_DAY) + 1;
       const totalWeeks = Math.ceil(totalDays / 7);
 
       // Update navigation button states
@@ -4029,14 +4039,33 @@
       }
 
       body.innerHTML = html;
-      modal.style.display = 'flex';
-      setTimeout(() => modal.classList.add('active'), 10);
+      // Small delay to trigger CSS transition after display change
+      setTimeout(() => modal.classList.add('active'), MODAL_DISPLAY_DELAY);
     }
 
     function closeContributionModal() {
       const modal = getEl('contributionModal');
       modal.classList.remove('active');
-      setTimeout(() => modal.style.display = 'none', 300);
+    }
+
+    // Initialize modal event listeners
+    function initContributionModalListeners() {
+      const modal = getEl('contributionModal');
+      const closeBtn = getEl('contributionModalClose');
+      
+      // Close modal when clicking outside
+      if (modal) {
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) {
+            closeContributionModal();
+          }
+        });
+      }
+      
+      // Close modal with close button
+      if (closeBtn) {
+        closeBtn.addEventListener('click', closeContributionModal);
+      }
     }
 
     init();
