@@ -3813,6 +3813,9 @@
       });
 
       // Create grid cells
+      const realToday = new Date();
+      realToday.setHours(0, 0, 0, 0);
+      
       const currentDate = new Date(startDate);
       for (let w = 0; w < totalWeeks; w++) {
         for (let d = 0; d < 7; d++) {
@@ -3821,9 +3824,6 @@
           const dateKey = currentDate.toISOString().split('T')[0];
           const dayContributions = contributions[dateKey] || [];
           const count = dayContributions.length;
-
-          const realToday = new Date();
-          realToday.setHours(0, 0, 0, 0);
           
           if (currentDate.getTime() > realToday.getTime()) {
             cell.style.opacity = '0.3';
@@ -3862,11 +3862,10 @@
           const formattedDate = currentDate.toLocaleDateString('en-US', {
             weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'
           });
+          const cellDate = new Date(currentDate); // Capture for closure
 
           cell.onmouseenter = (e) => {
-            const realToday = new Date();
-            realToday.setHours(0, 0, 0, 0);
-            if (currentDate.getTime() > realToday.getTime()) return;
+            if (cellDate.getTime() > realToday.getTime()) return;
             let html = `<div class="contribution-tooltip-date">${formattedDate}</div>`;
             if (count === 0) {
               html += '<div style="color:var(--text-tertiary)">No contributions</div>';
