@@ -3770,17 +3770,14 @@
       const totalDays = totalWeeks * 7;
 
       // Find the start date (beginning of the week, totalWeeks ago)
-      // Adjust by month offset (approximately 4 weeks per month)
+      // Adjust by month offset
       const startDate = new Date(today);
-      startDate.setDate(startDate.getDate() - totalDays + 1 - (contributionMonthOffset * 28));
+      startDate.setMonth(startDate.getMonth() + contributionMonthOffset);
+      startDate.setDate(startDate.getDate() - totalDays + 1);
       // Align to Monday
       const dayOfWeek = startDate.getDay();
       const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
       startDate.setDate(startDate.getDate() + mondayOffset);
-
-      // Calculate the actual "today" for this view
-      const viewToday = new Date(today);
-      viewToday.setDate(viewToday.getDate() - (contributionMonthOffset * 28));
 
       // Update navigation button states
       const prevBtn = getEl('prevMonthBtn');
