@@ -1012,13 +1012,12 @@
     }
 
     .focus-hero {
-      background: var(--bg-glass);
+      background: var(--bg-card);
       backdrop-filter: blur(40px);
-      border: var(--bg-glass-border);
+      border: 1px solid var(--border-color);
       border-radius: var(--radius-lg);
-      padding: 40px;
-      margin-bottom: 32px;
-      box-shadow: var(--shadow-glass);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
       position: relative;
       overflow: hidden;
       display: flex;
@@ -1026,7 +1025,6 @@
       align-items: center;
       justify-content: center;
       text-align: center;
-      min-height: 220px;
       transition: transform 0.3s;
     }
 
@@ -1069,8 +1067,9 @@
     /* GLASSY CARDS */
     .bento-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 24px;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: auto auto;
+      gap: 16px;
       margin-bottom: 48px;
     }
 
@@ -1996,14 +1995,14 @@
     .contribution-tracker {
       position: relative;
       overflow-x: auto;
-      padding-bottom: 4px;
+      padding-bottom: 2px;
     }
 
     .contribution-months {
       display: flex;
       font-size: 0.7rem;
       color: var(--text-tertiary);
-      margin-bottom: 4px;
+      margin-bottom: 2px;
       padding-left: 32px;
       gap: 0;
       user-select: none;
@@ -2017,7 +2016,7 @@
 
     .contribution-grid-wrapper {
       display: flex;
-      gap: 4px;
+      gap: 2px;
     }
 
     .contribution-days-labels {
@@ -2026,7 +2025,7 @@
       justify-content: space-between;
       font-size: 0.65rem;
       color: var(--text-tertiary);
-      padding: 2px 4px 2px 0;
+      padding: 2px 2px 2px 0;
       width: 28px;
       flex-shrink: 0;
       user-select: none;
@@ -2037,7 +2036,7 @@
       grid-template-rows: repeat(7, 1fr);
       grid-auto-flow: column;
       grid-auto-columns: 1fr;
-      gap: 3px;
+      gap: 2px;
       flex: 1;
       min-height: 90px;
     }
@@ -2045,8 +2044,8 @@
     .contribution-cell {
       aspect-ratio: 1;
       min-width: 10px;
-      max-width: 16px;
-      border-radius: 3px;
+      max-width: 14px;
+      border-radius: 2px;
       background: var(--bg-input);
       cursor: pointer;
       transition: all 0.15s ease;
@@ -2068,8 +2067,8 @@
     .contribution-legend {
       display: flex;
       align-items: center;
-      gap: 4px;
-      font-size: 0.7rem;
+      gap: 3px;
+      font-size: 0.65rem;
       color: var(--text-tertiary);
       flex-wrap: wrap;
     }
@@ -2077,11 +2076,11 @@
     .contribution-legend-item {
       display: flex;
       align-items: center;
-      gap: 3px;
+      gap: 2px;
       padding: 2px 6px;
-      border-radius: 8px;
+      border-radius: 6px;
       background: var(--bg-input);
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       white-space: nowrap;
     }
 
@@ -2094,9 +2093,9 @@
 
     .contribution-summary {
       display: flex;
-      gap: 16px;
-      margin-top: 8px;
-      font-size: 0.8rem;
+      gap: 12px;
+      margin-top: 6px;
+      font-size: 0.75rem;
       color: var(--text-secondary);
       flex-wrap: wrap;
     }
@@ -2151,6 +2150,31 @@
       height: 6px;
       border-radius: 2px;
       flex-shrink: 0;
+    }
+
+    .contribution-nav-btn {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--text-secondary);
+    }
+
+    .contribution-nav-btn:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+      border-color: var(--text-tertiary);
+    }
+
+    .contribution-nav-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
     }
 
     @media (max-width: 768px) {
@@ -2356,27 +2380,10 @@
         </div>
       </header>
 
-      <section class="focus-hero" id="focusHero">
-      </section>
-
       <div class="bento-grid">
-        <div class="bento-card" style="grid-column: 1 / -1;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-            <span class="text-xs" style="color:var(--text-tertiary)">CONTRIBUTION TRACKER</span>
-            <div id="contributionLegend" class="contribution-legend"></div>
-          </div>
-          <div class="contribution-tracker" id="contributionTracker">
-            <div class="contribution-months" id="contributionMonths"></div>
-            <div class="contribution-grid-wrapper">
-              <div class="contribution-days-labels">
-                <span>Mon</span><span>Wed</span><span>Fri</span>
-              </div>
-              <div class="contribution-grid" id="contributionGrid"></div>
-            </div>
-          </div>
-          <div class="contribution-summary" id="contributionSummary"></div>
-          <div class="contribution-tooltip" id="contributionTooltip"></div>
-        </div>
+        <!-- First Row: Hero Focus and Daily Goal -->
+        <section class="focus-hero bento-card" id="focusHero">
+        </section>
 
         <div class="bento-card">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
@@ -2415,6 +2422,37 @@
             </div>
             <p class="text-sm" style="color:var(--text-secondary);" id="progressQuote">Set your daily goal and build your streak! 🚀</p>
           </div>
+        </div>
+
+        <!-- Second Row: Contribution Tracker (full width) -->
+        <div class="bento-card" style="grid-column: 1 / -1;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span class="text-xs" style="color:var(--text-tertiary)">CONTRIBUTION TRACKER</span>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <button id="prevMonthBtn" class="contribution-nav-btn" onclick="navigateContributionMonth(-1)" aria-label="Previous month">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+              </button>
+              <button id="nextMonthBtn" class="contribution-nav-btn" onclick="navigateContributionMonth(1)" aria-label="Next month">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+              <div id="contributionLegend" class="contribution-legend"></div>
+            </div>
+          </div>
+          <div class="contribution-tracker" id="contributionTracker">
+            <div class="contribution-months" id="contributionMonths"></div>
+            <div class="contribution-grid-wrapper">
+              <div class="contribution-days-labels">
+                <span>Mon</span><span>Wed</span><span>Fri</span>
+              </div>
+              <div class="contribution-grid" id="contributionGrid"></div>
+            </div>
+          </div>
+          <div class="contribution-summary" id="contributionSummary"></div>
+          <div class="contribution-tooltip" id="contributionTooltip"></div>
         </div>
       </div>
 
@@ -3678,6 +3716,13 @@
       gray: '#8E8E93'
     };
 
+    let contributionMonthOffset = 0; // Track the current month offset for navigation
+
+    function navigateContributionMonth(direction) {
+      contributionMonthOffset += direction;
+      renderContributionTracker();
+    }
+
     function getContributionData() {
       // Build contribution data from completed tasks and goals
       const contributions = {};
@@ -3725,12 +3770,20 @@
       const totalDays = totalWeeks * 7;
 
       // Find the start date (beginning of the week, totalWeeks ago)
+      // Adjust by month offset
       const startDate = new Date(today);
+      startDate.setMonth(startDate.getMonth() + contributionMonthOffset);
       startDate.setDate(startDate.getDate() - totalDays + 1);
       // Align to Monday
       const dayOfWeek = startDate.getDay();
       const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
       startDate.setDate(startDate.getDate() + mondayOffset);
+
+      // Update navigation button states
+      const prevBtn = getEl('prevMonthBtn');
+      const nextBtn = getEl('nextMonthBtn');
+      if (nextBtn) nextBtn.disabled = contributionMonthOffset >= 0;
+      if (prevBtn) prevBtn.disabled = false; // Can always go back
 
       // Track unique projects for legend
       const projectsSet = new Map();
@@ -3760,6 +3813,9 @@
       });
 
       // Create grid cells
+      const realToday = new Date();
+      realToday.setHours(0, 0, 0, 0);
+      
       const currentDate = new Date(startDate);
       for (let w = 0; w < totalWeeks; w++) {
         for (let d = 0; d < 7; d++) {
@@ -3768,8 +3824,8 @@
           const dateKey = currentDate.toISOString().split('T')[0];
           const dayContributions = contributions[dateKey] || [];
           const count = dayContributions.length;
-
-          if (currentDate.getTime() > today.getTime()) {
+          
+          if (currentDate.getTime() > realToday.getTime()) {
             cell.style.opacity = '0.3';
             cell.style.cursor = 'default';
           } else if (count > 0) {
@@ -3806,9 +3862,10 @@
           const formattedDate = currentDate.toLocaleDateString('en-US', {
             weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'
           });
+          const cellDate = new Date(currentDate); // Capture for closure
 
           cell.onmouseenter = (e) => {
-            if (currentDate.getTime() > today.getTime()) return;
+            if (cellDate.getTime() > realToday.getTime()) return;
             let html = `<div class="contribution-tooltip-date">${formattedDate}</div>`;
             if (count === 0) {
               html += '<div style="color:var(--text-tertiary)">No contributions</div>';
@@ -3834,8 +3891,25 @@
             tooltip.classList.add('visible');
 
             const rect = cell.getBoundingClientRect();
-            tooltip.style.left = Math.min(rect.left, window.innerWidth - 230) + 'px';
-            tooltip.style.top = (rect.top - tooltip.offsetHeight - 8) + 'px';
+            const tooltipWidth = 220;
+            const spaceRight = window.innerWidth - rect.right;
+            const spaceLeft = rect.left;
+            
+            // Position to the right if there's space, otherwise to the left
+            if (spaceRight > tooltipWidth + 10) {
+              tooltip.style.left = (rect.right + 8) + 'px';
+              tooltip.style.top = (rect.top + (rect.height / 2)) + 'px';
+              tooltip.style.transform = 'translateY(-50%)';
+            } else if (spaceLeft > tooltipWidth + 10) {
+              tooltip.style.left = (rect.left - tooltipWidth - 8) + 'px';
+              tooltip.style.top = (rect.top + (rect.height / 2)) + 'px';
+              tooltip.style.transform = 'translateY(-50%)';
+            } else {
+              // Fallback to top if not enough space on sides
+              tooltip.style.left = Math.min(rect.left, window.innerWidth - 230) + 'px';
+              tooltip.style.top = (rect.top - tooltip.offsetHeight - 8) + 'px';
+              tooltip.style.transform = 'none';
+            }
           };
 
           cell.onmouseleave = () => {
