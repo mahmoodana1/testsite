@@ -3013,6 +3013,23 @@
           saveData(); renderTasks(); hideToast();
         }
       };
+
+      // Arrow key navigation for contribution tracker
+      document.addEventListener('keydown', (e) => {
+        // Only handle arrow keys when not typing in an input/textarea
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        
+        if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          navigateContributionMonth(-1);
+        } else if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          const nextBtn = getEl('nextMonthBtn');
+          if (nextBtn && !nextBtn.disabled) {
+            navigateContributionMonth(1);
+          }
+        }
+      });
     }
 
     /* DATA LOGIC */
