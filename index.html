@@ -4199,7 +4199,10 @@
         const box = document.createElement('span');
         box.className = 'contribution-legend-box';
         box.style.background = CONTRIBUTION_COLORS[colorKey];
-        box.title = colorKey.charAt(0).toUpperCase() + colorKey.slice(1);
+        const colorName = colorKey.charAt(0).toUpperCase() + colorKey.slice(1);
+        box.title = colorName;
+        box.setAttribute('aria-label', colorName);
+        box.setAttribute('role', 'img');
         legendEl.appendChild(box);
       });
 
