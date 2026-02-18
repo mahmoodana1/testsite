@@ -487,6 +487,11 @@
       color: var(--text-tertiary);
     }
 
+    /* Flex utilities */
+    .flex-1 {
+      flex: 1;
+    }
+
     /* -------------------------------------------------------------------------- */
     /* LAYOUT & ANIMATIONS                                                        */
     /* -------------------------------------------------------------------------- */
@@ -2601,7 +2606,7 @@
 
     <main class="main-content">
       <header class="top-bar">
-        <div style="display:flex; align-items:center;">
+        <div class="flex-center">
           <button type="button" class="toggle-sidebar-btn" id="sidebarToggle">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
               stroke-linecap="round" stroke-linejoin="round">
@@ -2702,8 +2707,8 @@
             </div>
           </div>
           <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:16px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
-              <div style="flex:1;">
+            <div class="flex-between" style="gap:12px;">
+              <div class="flex-1">
                 <div style="display:flex; align-items:baseline; gap:8px; margin-bottom:8px;">
                   <span class="text-h1" id="progressPercent">0%</span>
                   <span class="text-body" id="progressText">0/0 Tasks</span>
@@ -3042,12 +3047,6 @@
     /* HELPERS */
     const getEl = (id) => document.getElementById(id);
     const generateId = () => '_' + Math.random().toString(36).substr(2, 9);
-    function formatTime(seconds) {
-      const m = Math.floor(seconds / 60).toString().padStart(2, '0');
-      const s = (seconds % 60).toString().padStart(2, '0');
-      return `${m}:${s}`;
-    }
-
     /* CORE */
     function init() {
       setTimeout(() => getEl('loader').style.display = 'none', 800);
@@ -3513,7 +3512,7 @@
           gItem.innerHTML = `
                         <div class="checkbox ${goal.completed ? 'checked' : ''}" style="margin-top:4px;">${goal.completed ? '✓' : ''}</div>
                         <div class="goal-inputs">
-                            <div style="display:flex; align-items:center;">
+                            <div class="flex-center">
                               <input class="goal-main-input" value="${goal.title}" placeholder="New Goal..." style="flex:1;">
                             </div>
                             <input class="goal-sub-input" value="${goal.subtitle || ''}" placeholder="Add details...">
