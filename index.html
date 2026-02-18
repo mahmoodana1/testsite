@@ -451,6 +451,47 @@
     }
 
     /* -------------------------------------------------------------------------- */
+    /* UTILITY CLASSES                                                            */
+    /* -------------------------------------------------------------------------- */
+    
+    /* Flexbox utilities */
+    .flex-center {
+      display: flex;
+      align-items: center;
+    }
+
+    .flex-center-gap-8 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .flex-center-gap-12 {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .flex-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .flex-1 {
+      flex: 1;
+    }
+
+    /* Text utilities */
+    .text-tertiary-xs {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+    }
+
+    /* -------------------------------------------------------------------------- */
     /* LAYOUT & ANIMATIONS                                                        */
     /* -------------------------------------------------------------------------- */
     .app-layout {
@@ -552,6 +593,18 @@
       margin-bottom: 24px;
     }
 
+    /* -------------------------------------------------------------------------- */
+    /* BUTTON BASE CLASS                                                          */
+    /* -------------------------------------------------------------------------- */
+    .btn-base {
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      font-weight: 600;
+    }
+
     .btn-random {
       background: var(--bg-input);
       color: var(--text-secondary);
@@ -559,11 +612,6 @@
       padding: 6px 12px;
       border-radius: 8px;
       font-size: 0.8rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
       gap: 6px;
     }
 
@@ -838,11 +886,6 @@
       padding: 4px 10px;
       border-radius: 6px;
       font-size: 0.7rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
       gap: 4px;
     }
 
@@ -1099,47 +1142,6 @@
       border-color: var(--text-tertiary);
     }
 
-    .timer-display {
-      font-size: 3.5rem;
-      font-weight: 800;
-      font-variant-numeric: tabular-nums;
-      background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin: 16px 0;
-    }
-
-    .timer-controls,
-    .timer-presets {
-      display: flex;
-      gap: 8px;
-      justify-content: center;
-    }
-
-    .timer-presets {
-      margin-top: 10px;
-    }
-
-    .btn-icon-circle {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: var(--bg-hover);
-      border: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.2s;
-      color: var(--text-secondary);
-    }
-
-    .btn-icon-circle:hover {
-      background: var(--text-primary);
-      color: var(--bg-body);
-      transform: rotate(90deg);
-    }
-
     .courses-header {
       display: flex;
       justify-content: space-between;
@@ -1155,9 +1157,6 @@
       color: var(--text-secondary);
       padding: 12px 24px;
       border-radius: var(--radius-md);
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
     }
 
     .btn-new-course:hover {
@@ -1408,14 +1407,10 @@
 
     .btn-add-goal {
       background: var(--bg-input);
-      border: none;
       padding: 6px 12px;
       border-radius: 6px;
       font-size: 0.75rem;
-      font-weight: 600;
       color: var(--text-primary);
-      cursor: pointer;
-      transition: all 0.2s;
     }
 
     .btn-add-goal:hover {
@@ -2504,9 +2499,9 @@
 
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
-        <div style="display:flex; align-items:center; gap:12px;">
+        <div class="flex-center-gap-12">
           <h2 class="text-h2">Tasks</h2>
-          <button type="button" class="btn-random" id="btnRandomTask" title="Pick Random Task">
+          <button type="button" class="btn-base btn-random" id="btnRandomTask" title="Pick Random Task">
             Pick Random
           </button>
         </div>
@@ -2520,9 +2515,9 @@
 
           <div class="task-meta-row">
             <div class="days-input-wrapper">
-              <span class="text-xs" style="color:var(--text-tertiary)">DUE IN</span>
+              <span class="text-tertiary-xs">DUE IN</span>
               <input type="text" id="taskDays" class="days-input" placeholder="Due">
-              <span class="text-xs" style="color:var(--text-tertiary)">DAYS</span>
+              <span class="text-tertiary-xs">DAYS</span>
             </div>
             <button type="submit" class="btn-primary" style="padding: 8px 16px; font-size:0.85rem;">Add</button>
           </div>
@@ -2554,7 +2549,7 @@
               <span class="text-xs">COMPLETED HISTORY</span>
               <span id="completedArrow">▼</span>
             </div>
-            <button type="button" class="btn-clear-history" onclick="event.stopPropagation(); clearCompletedHistory();" title="Clear all completed tasks">
+            <button type="button" class="btn-base btn-clear-history" onclick="event.stopPropagation(); clearCompletedHistory();" title="Clear all completed tasks">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="3 6 5 6 21 6"></polyline>
                 <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -2569,7 +2564,7 @@
 
     <main class="main-content">
       <header class="top-bar">
-        <div style="display:flex; align-items:center;">
+        <div class="flex-center">
           <button type="button" class="toggle-sidebar-btn" id="sidebarToggle">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
               stroke-linecap="round" stroke-linejoin="round">
@@ -2661,17 +2656,17 @@
         </section>
 
         <div class="bento-card">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
-            <span class="text-xs" style="color:var(--text-tertiary)">DAILY GOAL</span>
-            <div style="display:flex; align-items:center; gap:8px;" role="status" aria-label="Streak indicator">
-              <span class="text-xs" style="color:var(--text-tertiary)" aria-hidden="true">🔥</span>
+          <div class="flex-between" style="margin-bottom: 12px;">
+            <span class="text-tertiary-xs">DAILY GOAL</span>
+            <div class="flex-center-gap-8" role="status" aria-label="Streak indicator">
+              <span class="text-tertiary-xs" aria-hidden="true">🔥</span>
               <span class="text-body" id="streakCount" style="font-weight:600; color:var(--accent-orange);">0</span>
-              <span class="text-xs" style="color:var(--text-tertiary)">DAY STREAK</span>
+              <span class="text-tertiary-xs">DAY STREAK</span>
             </div>
           </div>
           <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:16px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
-              <div style="flex:1;">
+            <div class="flex-between" style="gap:12px;">
+              <div class="flex-1">
                 <div style="display:flex; align-items:baseline; gap:8px; margin-bottom:8px;">
                   <span class="text-h1" id="progressPercent">0%</span>
                   <span class="text-body" id="progressText">0/0 Tasks</span>
@@ -2701,9 +2696,9 @@
 
         <!-- Second Row: Contribution Tracker (full width) -->
         <div class="bento-card" style="grid-column: 1 / -1;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <span class="text-xs" style="color:var(--text-tertiary)">CONTRIBUTION TRACKER</span>
-            <div style="display:flex; align-items:center; gap:12px;">
+          <div class="flex-between" style="margin-bottom:8px;">
+            <span class="text-tertiary-xs">CONTRIBUTION TRACKER</span>
+            <div class="flex-center-gap-12">
               <div class="contribution-year-select">
                 <button id="prevYearBtn" class="contribution-nav-btn" onclick="navigateContributionYear(-1)" aria-label="Previous year">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -2756,7 +2751,7 @@
             <h2 class="text-h2">Courses & Projects</h2>
             <p class="text-body">Manage lectures, labs, and deadlines.</p>
           </div>
-          <button type="button" class="btn-new-course" onclick="addCourse()">+ New Course</button>
+          <button type="button" class="btn-base btn-new-course" onclick="addCourse()">+ New Course</button>
         </div>
 
         <div class="courses-grid" id="coursesContainer"></div>
@@ -3010,12 +3005,6 @@
     /* HELPERS */
     const getEl = (id) => document.getElementById(id);
     const generateId = () => '_' + Math.random().toString(36).substr(2, 9);
-    function formatTime(seconds) {
-      const m = Math.floor(seconds / 60).toString().padStart(2, '0');
-      const s = (seconds % 60).toString().padStart(2, '0');
-      return `${m}:${s}`;
-    }
-
     /* CORE */
     function init() {
       setTimeout(() => getEl('loader').style.display = 'none', 800);
@@ -3099,23 +3088,30 @@
       const theme = JSON.parse(customTheme);
       const root = document.documentElement;
       
-      // Apply custom CSS variables
-      root.style.setProperty('--bg-body', theme.bgBody);
-      root.style.setProperty('--bg-card', theme.bgCard);
-      root.style.setProperty('--bg-input', theme.bgInput);
-      root.style.setProperty('--bg-hover', adjustColorBrightness(theme.bgInput, 10));
-      root.style.setProperty('--text-primary', theme.textPrimary);
-      root.style.setProperty('--text-secondary', theme.textSecondary);
-      root.style.setProperty('--text-tertiary', adjustColorBrightness(theme.textSecondary, -20));
-      root.style.setProperty('--accent-blue', theme.accentBlue);
-      root.style.setProperty('--accent-blue-soft', hexToRgba(theme.accentBlue, 0.15));
-      root.style.setProperty('--accent-green', theme.accentGreen);
-      root.style.setProperty('--accent-green-soft', hexToRgba(theme.accentGreen, 0.15));
-      root.style.setProperty('--accent-orange', theme.accentOrange);
-      root.style.setProperty('--accent-red', theme.accentRed);
-      root.style.setProperty('--border-color', adjustColorBrightness(theme.bgInput, 5));
-      root.style.setProperty('--bg-sidebar', theme.bgCard);
-      root.style.setProperty('--bg-glass', hexToRgba(theme.bgBody, 0.85));
+      // Define mappings of CSS variables to theme properties
+      const themePropertyMap = [
+        { cssVar: '--bg-body', value: theme.bgBody },
+        { cssVar: '--bg-card', value: theme.bgCard },
+        { cssVar: '--bg-input', value: theme.bgInput },
+        { cssVar: '--bg-hover', value: adjustColorBrightness(theme.bgInput, 10) },
+        { cssVar: '--text-primary', value: theme.textPrimary },
+        { cssVar: '--text-secondary', value: theme.textSecondary },
+        { cssVar: '--text-tertiary', value: adjustColorBrightness(theme.textSecondary, -20) },
+        { cssVar: '--accent-blue', value: theme.accentBlue },
+        { cssVar: '--accent-blue-soft', value: hexToRgba(theme.accentBlue, 0.15) },
+        { cssVar: '--accent-green', value: theme.accentGreen },
+        { cssVar: '--accent-green-soft', value: hexToRgba(theme.accentGreen, 0.15) },
+        { cssVar: '--accent-orange', value: theme.accentOrange },
+        { cssVar: '--accent-red', value: theme.accentRed },
+        { cssVar: '--border-color', value: adjustColorBrightness(theme.bgInput, 5) },
+        { cssVar: '--bg-sidebar', value: theme.bgCard },
+        { cssVar: '--bg-glass', value: hexToRgba(theme.bgBody, 0.85) }
+      ];
+      
+      // Apply all CSS variables using a loop
+      themePropertyMap.forEach(({ cssVar, value }) => {
+        root.style.setProperty(cssVar, value);
+      });
     }
 
     function hexToRgba(hex, alpha) {
@@ -3454,7 +3450,7 @@
                     <div class="category-header">
                         <div class="category-title">${cat.name}</div>
                         <div style="display:flex; gap:8px;">
-                            <button type="button" class="btn-add-goal" data-action="add-goal">+ Goal</button>
+                            <button type="button" class="btn-base btn-add-goal" data-action="add-goal">+ Goal</button>
                             <button type="button" class="btn-delete-task" style="width:24px; height:24px;" data-action="delete-cat">✕</button>
                         </div>
                     </div>
@@ -3474,7 +3470,7 @@
           gItem.innerHTML = `
                         <div class="checkbox ${goal.completed ? 'checked' : ''}" style="margin-top:4px;">${goal.completed ? '✓' : ''}</div>
                         <div class="goal-inputs">
-                            <div style="display:flex; align-items:center;">
+                            <div class="flex-center">
                               <input class="goal-main-input" value="${goal.title}" placeholder="New Goal..." style="flex:1;">
                             </div>
                             <input class="goal-sub-input" value="${goal.subtitle || ''}" placeholder="Add details...">
