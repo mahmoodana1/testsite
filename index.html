@@ -2267,25 +2267,159 @@
     }
 
     @media (max-width: 768px) {
+      /* Contribution tracker header - stack vertically on mobile */
+      .bento-card > div[style*="display:flex"][style*="justify-content:space-between"] {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 8px;
+      }
+
+      .bento-card > div[style*="display:flex"] > div[style*="display:flex"] {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      /* Make year selector more compact */
+      .contribution-year-select {
+        gap: 6px;
+      }
+
+      .contribution-nav-btn {
+        width: 24px;
+        height: 24px;
+      }
+
+      .contribution-nav-btn svg {
+        width: 12px;
+        height: 12px;
+      }
+
+      .contribution-year-label {
+        font-size: 0.8rem;
+        min-width: 36px;
+      }
+
+      /* Legend adjustments */
+      .contribution-legend {
+        font-size: 0.6rem;
+        gap: 3px;
+        flex-wrap: wrap;
+      }
+
+      .contribution-legend-box {
+        width: 10px;
+        height: 10px;
+      }
+
+      /* Grid improvements */
+      .contribution-grid {
+        gap: 1.5px;
+        min-height: 70px;
+      }
+
+      .contribution-cell {
+        width: 9px;
+        height: 9px;
+      }
+
+      /* Reduce hover effect on mobile for better touch interaction */
+      .contribution-cell:hover {
+        transform: scale(1.15);
+      }
+
+      .contribution-days-labels {
+        font-size: 0.55rem;
+        width: 22px;
+        padding: 0 3px 0 0;
+      }
+
+      .contribution-days-labels span {
+        height: 9px;
+        line-height: 9px;
+      }
+
+      .contribution-months {
+        padding-left: 26px;
+        font-size: 0.6rem;
+      }
+
+      /* Summary adjustments */
+      .contribution-summary {
+        font-size: 0.7rem;
+        gap: 8px;
+      }
+
+      /* Modal improvements for mobile */
+      .contribution-modal-content {
+        max-width: calc(100vw - 32px);
+        margin: 0 16px;
+      }
+
+      .contribution-modal-overlay .modal-header {
+        padding: 16px 20px;
+      }
+
+      .contribution-modal-overlay .modal-body {
+        padding: 16px 20px;
+      }
+
+      .contribution-modal-item {
+        font-size: 0.85rem;
+        padding: 6px;
+      }
+    }
+
+    /* Extra small devices (phones, less than 480px) */
+    @media (max-width: 480px) {
       .contribution-grid {
         gap: 1px;
-        min-height: 60px;
+        min-height: 65px;
       }
+
       .contribution-cell {
+        width: 7px;
+        height: 7px;
+      }
+
+      .contribution-days-labels {
+        font-size: 0.5rem;
+        width: 18px;
+        padding: 0 2px 0 0;
+      }
+
+      .contribution-days-labels span {
+        height: 7px;
+        line-height: 7px;
+      }
+
+      .contribution-months {
+        padding-left: 20px;
+        font-size: 0.55rem;
+      }
+
+      .contribution-legend {
+        font-size: 0.55rem;
+        gap: 2px;
+      }
+
+      .contribution-legend-box {
         width: 8px;
         height: 8px;
       }
-      .contribution-days-labels {
-        font-size: 0.55rem;
-        width: 20px;
+
+      .contribution-year-label {
+        font-size: 0.75rem;
+        min-width: 32px;
       }
-      .contribution-days-labels span {
-        height: 8px;
-        line-height: 8px;
+
+      .contribution-nav-btn {
+        width: 22px;
+        height: 22px;
       }
-      .contribution-months {
-        padding-left: 24px;
-        font-size: 0.55rem;
+
+      .contribution-nav-btn svg {
+        width: 11px;
+        height: 11px;
       }
     }
 
