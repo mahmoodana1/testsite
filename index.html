@@ -74,6 +74,12 @@
       --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
       --blur-amt: 20px;
       /* Glass strength */
+
+      /* Contribution tracker green levels (GitHub-style) */
+      --contrib-level-1: #0e4429;
+      --contrib-level-2: #006d32;
+      --contrib-level-3: #26a641;
+      --contrib-level-4: #39d353;
     }
 
     /* THEME SYSTEM - Multiple themes support */
@@ -2003,18 +2009,15 @@
     }
 
     .contribution-months {
-      display: flex;
+      display: grid;
       font-size: 0.7rem;
       color: var(--text-tertiary);
       margin-bottom: 2px;
       padding-left: 32px;
-      gap: 0;
       user-select: none;
     }
 
     .contribution-months span {
-      flex: 1;
-      min-width: 0;
       text-align: left;
     }
 
@@ -2026,13 +2029,17 @@
     .contribution-days-labels {
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
       font-size: 0.65rem;
       color: var(--text-tertiary);
-      padding: 2px 2px 2px 0;
+      padding: 0 2px 0 0;
       width: 28px;
       flex-shrink: 0;
       user-select: none;
+    }
+
+    .contribution-days-labels span {
+      height: 11px;
+      line-height: 11px;
     }
 
     .contribution-grid {
@@ -2042,13 +2049,13 @@
       grid-auto-columns: 1fr;
       gap: 2px;
       flex: 1;
-      min-height: 90px;
+      min-height: 85px;
     }
 
     .contribution-cell {
       aspect-ratio: 1;
-      min-width: 10px;
-      max-width: 14px;
+      width: 11px;
+      height: 11px;
       border-radius: 2px;
       background: var(--bg-input);
       cursor: pointer;
@@ -2059,40 +2066,37 @@
 
     .contribution-cell:hover {
       border-color: var(--text-tertiary);
-      transform: scale(1.4);
+      transform: scale(1.3);
       z-index: 2;
     }
 
-    .contribution-cell.level-1 { opacity: 0.45; }
-    .contribution-cell.level-2 { opacity: 0.65; }
-    .contribution-cell.level-3 { opacity: 0.85; }
-    .contribution-cell.level-4 { opacity: 1; }
+    .contribution-cell.level-1 { background: var(--contrib-level-1) !important; }
+    .contribution-cell.level-2 { background: var(--contrib-level-2) !important; }
+    .contribution-cell.level-3 { background: var(--contrib-level-3) !important; }
+    .contribution-cell.level-4 { background: var(--contrib-level-4) !important; }
+
+    .contribution-cell.empty-cell {
+      background: transparent;
+      border: none;
+      cursor: default;
+    }
+    .contribution-cell.empty-cell:hover {
+      transform: none;
+      border-color: transparent;
+    }
 
     .contribution-legend {
       display: flex;
       align-items: center;
-      gap: 3px;
+      gap: 4px;
       font-size: 0.65rem;
       color: var(--text-tertiary);
-      flex-wrap: wrap;
     }
 
-    .contribution-legend-item {
-      display: flex;
-      align-items: center;
-      gap: 2px;
-      padding: 2px 6px;
-      border-radius: 6px;
-      background: var(--bg-input);
-      font-size: 0.65rem;
-      white-space: nowrap;
-    }
-
-    .contribution-legend-dot {
-      width: 8px;
-      height: 8px;
+    .contribution-legend-box {
+      width: 11px;
+      height: 11px;
       border-radius: 2px;
-      flex-shrink: 0;
     }
 
     .contribution-summary {
@@ -2107,6 +2111,21 @@
     .contribution-summary strong {
       color: var(--text-primary);
       font-weight: 600;
+    }
+
+    /* Contribution year selector */
+    .contribution-year-select {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .contribution-year-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      min-width: 40px;
+      text-align: center;
     }
 
     /* Contribution Modal Styles */
@@ -2225,9 +2244,9 @@
     .contribution-nav-btn {
       background: var(--bg-input);
       border: 1px solid var(--border-color);
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -2249,20 +2268,24 @@
 
     @media (max-width: 768px) {
       .contribution-grid {
-        gap: 2px;
-        min-height: 70px;
+        gap: 1px;
+        min-height: 60px;
       }
       .contribution-cell {
-        min-width: 7px;
-        max-width: 12px;
+        width: 8px;
+        height: 8px;
       }
       .contribution-days-labels {
-        font-size: 0.6rem;
-        width: 22px;
+        font-size: 0.55rem;
+        width: 20px;
+      }
+      .contribution-days-labels span {
+        height: 8px;
+        line-height: 8px;
       }
       .contribution-months {
-        padding-left: 26px;
-        font-size: 0.6rem;
+        padding-left: 24px;
+        font-size: 0.55rem;
       }
     }
 
@@ -2498,25 +2521,28 @@
         <div class="bento-card" style="grid-column: 1 / -1;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
             <span class="text-xs" style="color:var(--text-tertiary)">CONTRIBUTION TRACKER</span>
-            <div style="display:flex; align-items:center; gap:8px;">
-              <button id="prevMonthBtn" class="contribution-nav-btn" onclick="navigateContributionMonth(-1)" aria-label="Previous month">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="15 18 9 12 15 6"></polyline>
-                </svg>
-              </button>
-              <button id="nextMonthBtn" class="contribution-nav-btn" onclick="navigateContributionMonth(1)" aria-label="Next month">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="9 18 15 12 9 6"></polyline>
-                </svg>
-              </button>
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div class="contribution-year-select">
+                <button id="prevYearBtn" class="contribution-nav-btn" onclick="navigateContributionYear(-1)" aria-label="Previous year">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                  </svg>
+                </button>
+                <span id="contributionYearLabel" class="contribution-year-label"></span>
+                <button id="nextYearBtn" class="contribution-nav-btn" onclick="navigateContributionYear(1)" aria-label="Next year">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
+                </button>
+              </div>
               <div id="contributionLegend" class="contribution-legend"></div>
             </div>
           </div>
           <div class="contribution-tracker" id="contributionTracker">
             <div class="contribution-months" id="contributionMonths"></div>
             <div class="contribution-grid-wrapper">
-              <div class="contribution-days-labels">
-                <span>Mon</span><span>Wed</span><span>Fri</span>
+              <div class="contribution-days-labels" id="contributionDaysLabels">
+                <span></span><span>Mon</span><span></span><span>Wed</span><span></span><span>Fri</span><span></span>
               </div>
               <div class="contribution-grid" id="contributionGrid"></div>
             </div>
@@ -3803,15 +3829,18 @@
       gray: '#8E8E93'
     };
 
+    // Green intensity levels matching CSS --contrib-level-* custom properties
+    const CONTRIB_LEVELS = ['var(--bg-input)', '#0e4429', '#006d32', '#26a641', '#39d353'];
+
     const MS_PER_DAY = 1000 * 60 * 60 * 24; // Milliseconds in a day
-    const MODAL_TRANSITION_DURATION = 300; // Match CSS transition duration (not currently used but kept for future reference)
 
-    let contributionMonthOffset = 0; // Track the current month offset for navigation
+    let contributionYear = new Date().getFullYear(); // Track current displayed year
 
-    function navigateContributionMonth(direction) {
-      contributionMonthOffset += direction;
+    function navigateContributionYear(direction) {
+      contributionYear += direction;
       renderContributionTracker();
     }
+    window.navigateContributionYear = navigateContributionYear;
 
     function getContributionData() {
       // Build contribution data from completed tasks and goals
@@ -3844,6 +3873,7 @@
       const monthsEl = getEl('contributionMonths');
       const legendEl = getEl('contributionLegend');
       const summaryEl = getEl('contributionSummary');
+      const yearLabel = getEl('contributionYearLabel');
 
       if (!grid) return;
 
@@ -3851,138 +3881,155 @@
       monthsEl.innerHTML = '';
 
       const contributions = getContributionData();
-
-      // Calculate the target month based on offset
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      const targetDate = new Date(today);
-      targetDate.setMonth(targetDate.getMonth() + contributionMonthOffset);
+      const currentYear = today.getFullYear();
 
-      // Get first and last day of the target month
-      const year = targetDate.getFullYear();
-      const month = targetDate.getMonth();
-      const firstDayOfMonth = new Date(year, month, 1);
-      const lastDayOfMonth = new Date(year, month + 1, 0);
+      // Update year label
+      if (yearLabel) yearLabel.textContent = contributionYear;
 
-      // Find the Monday before or on the first day of the month
-      const startDate = new Date(firstDayOfMonth);
-      const dayOfWeek = startDate.getDay();
-      const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-      startDate.setDate(startDate.getDate() + mondayOffset);
+      // Disable next year button if viewing current year
+      const prevBtn = getEl('prevYearBtn');
+      const nextBtn = getEl('nextYearBtn');
+      if (nextBtn) nextBtn.disabled = contributionYear >= currentYear;
+      if (prevBtn) prevBtn.disabled = false;
 
-      // Find the Sunday after or on the last day of the month
-      const endDate = new Date(lastDayOfMonth);
-      const endDayOfWeek = endDate.getDay();
-      const sundayOffset = endDayOfWeek === 0 ? 0 : 7 - endDayOfWeek;
-      endDate.setDate(endDate.getDate() + sundayOffset);
+      // Calculate start date: Jan 1 of selected year, adjusted to the preceding Sunday
+      // getDay() returns 0 for Sunday, so subtracting it goes back to the start of the week
+      const jan1 = new Date(contributionYear, 0, 1);
+      const startDate = new Date(jan1);
+      const jan1Day = jan1.getDay();
+      startDate.setDate(jan1.getDate() - jan1Day); // go back to Sunday
 
-      // Calculate number of weeks to display
-      const totalDays = Math.ceil((endDate - startDate) / MS_PER_DAY);
+      // Calculate end date: Dec 31 of selected year, adjusted to the following Saturday
+      const dec31 = new Date(contributionYear, 11, 31);
+      const endDate = new Date(dec31);
+      const dec31Day = dec31.getDay();
+      if (dec31Day < 6) {
+        endDate.setDate(dec31.getDate() + (6 - dec31Day));
+      }
+
+      // Calculate total weeks
+      const totalDays = Math.round((endDate - startDate) / MS_PER_DAY) + 1;
       const totalWeeks = Math.ceil(totalDays / 7);
 
-      // Update navigation button states
-      const prevBtn = getEl('prevMonthBtn');
-      const nextBtn = getEl('nextMonthBtn');
-      if (nextBtn) nextBtn.disabled = contributionMonthOffset >= 0;
-      if (prevBtn) prevBtn.disabled = false; // Can always go back
+      // Build month labels with correct column spans
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const weekMonths = []; // which month each week column starts in
+      const tempDate = new Date(startDate);
+      for (let w = 0; w < totalWeeks; w++) {
+        // Use the date at the middle of the week (Wed) to determine which month the week belongs to
+        const midWeek = new Date(tempDate);
+        midWeek.setDate(midWeek.getDate() + 3);
+        weekMonths.push(midWeek.getMonth());
+        tempDate.setDate(tempDate.getDate() + 7);
+      }
 
-      // Track unique projects for legend
-      const projectsSet = new Map();
+      // Create month label spans with grid column positioning
+      let currentMonth = -1;
+      let monthStart = 1;
+      for (let w = 0; w < weekMonths.length; w++) {
+        if (weekMonths[w] !== currentMonth) {
+          if (currentMonth !== -1) {
+            const span = document.createElement('span');
+            span.textContent = monthNames[currentMonth];
+            span.style.gridColumnStart = monthStart;
+            span.style.gridColumnEnd = w + 1;
+            monthsEl.appendChild(span);
+          }
+          currentMonth = weekMonths[w];
+          monthStart = w + 1;
+        }
+      }
+      // Last month
+      if (currentMonth !== -1) {
+        const span = document.createElement('span');
+        span.textContent = monthNames[currentMonth];
+        span.style.gridColumnStart = monthStart;
+        span.style.gridColumnEnd = totalWeeks + 1;
+        monthsEl.appendChild(span);
+      }
+
+      monthsEl.style.gridTemplateColumns = `repeat(${totalWeeks}, 1fr)`;
+
+      // Stats tracking
       let totalContributions = 0;
       let activeDays = 0;
 
-      // Create month label
-      const monthName = targetDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-      const span = document.createElement('span');
-      span.textContent = monthName;
-      span.style.gridColumnStart = '1';
-      span.style.gridColumnEnd = '-1';
-      monthsEl.appendChild(span);
-
-      // Create grid cells
-      const realToday = new Date();
-      realToday.setHours(0, 0, 0, 0);
-      
+      // Create grid cells (column by column: each column = 1 week, rows = Sun-Sat)
       const currentDate = new Date(startDate);
       for (let w = 0; w < totalWeeks; w++) {
         for (let d = 0; d < 7; d++) {
           const cell = document.createElement('div');
           cell.className = 'contribution-cell';
           const dateKey = currentDate.toISOString().split('T')[0];
-          const dayContributions = contributions[dateKey] || [];
-          const count = dayContributions.length;
-          
-          if (currentDate.getTime() > realToday.getTime()) {
+          const cellYear = currentDate.getFullYear();
+
+          // Mark cells outside the selected year as empty
+          if (cellYear !== contributionYear) {
+            cell.classList.add('empty-cell');
+            grid.appendChild(cell);
+            currentDate.setDate(currentDate.getDate() + 1);
+            continue;
+          }
+
+          // Mark future dates as dimmed
+          if (currentDate.getTime() > today.getTime()) {
             cell.style.opacity = '0.3';
             cell.style.cursor = 'default';
-          } else if (count > 0) {
-            totalContributions += count;
-            activeDays++;
+          } else {
+            const dayContributions = contributions[dateKey] || [];
+            const count = dayContributions.length;
 
-            // Determine the dominant project color
-            const colorCounts = {};
-            dayContributions.forEach(c => {
-              const colorKey = c.color || 'blue';
-              colorCounts[colorKey] = (colorCounts[colorKey] || 0) + 1;
-              projectsSet.set(c.name, colorKey);
-            });
-
-            // Use dominant project color
-            const dominantColor = Object.keys(colorCounts).reduce((a, b) =>
-              colorCounts[a] > colorCounts[b] ? a : b
-            );
-            const cssColor = CONTRIBUTION_COLORS[dominantColor] || CONTRIBUTION_COLORS.blue;
-            cell.style.background = cssColor;
-
-            // Set intensity level
-            const level = count >= 6 ? 4 : count >= 4 ? 3 : count >= 2 ? 2 : 1;
-            cell.classList.add(`level-${level}`);
-
-            // Multi-color gradient for mixed projects
-            if (Object.keys(colorCounts).length > 1) {
-              const gradColors = Object.keys(colorCounts).map(c => CONTRIBUTION_COLORS[c] || CONTRIBUTION_COLORS.blue);
-              cell.style.background = `linear-gradient(135deg, ${gradColors.join(', ')})`;
+            if (count > 0) {
+              totalContributions += count;
+              activeDays++;
+              // Mono green color with intensity levels (GitHub style)
+              const level = count >= 6 ? 4 : count >= 4 ? 3 : count >= 2 ? 2 : 1;
+              cell.classList.add(`level-${level}`);
             }
+
+            // Click to show modal with contribution details
+            const formattedDate = currentDate.toLocaleDateString('en-US', {
+              weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'
+            });
+            const cellDate = new Date(currentDate);
+            const cellCount = count;
+            const cellContributions = [...(contributions[dateKey] || [])];
+
+            cell.onclick = () => {
+              if (cellDate.getTime() > today.getTime()) return;
+              openContributionModal(formattedDate, cellCount, cellContributions);
+            };
           }
 
-          // Click to show modal with contribution details
-          const formattedDate = currentDate.toLocaleDateString('en-US', {
-            weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'
-          });
-          const cellDate = new Date(currentDate); // Capture for closure
-          const cellCount = count;
-          const cellContributions = [...dayContributions]; // Copy for closure
-
-          cell.onclick = () => {
-            if (cellDate.getTime() > realToday.getTime()) return;
-            openContributionModal(formattedDate, cellCount, cellContributions);
-          };
-
-          // Add cursor pointer for clickable cells
-          if (cellDate.getTime() <= realToday.getTime()) {
-            cell.style.cursor = 'pointer';
-          }
-
+          cell.title = dateKey;
           grid.appendChild(cell);
           currentDate.setDate(currentDate.getDate() + 1);
         }
       }
 
-      // Render legend
+      // Render legend (Less -> More scale)
       legendEl.innerHTML = '';
-      if (projectsSet.size > 0) {
-        projectsSet.forEach((color, name) => {
-          const item = document.createElement('span');
-          item.className = 'contribution-legend-item';
-          const dotColor = CONTRIBUTION_COLORS[color] || CONTRIBUTION_COLORS.blue;
-          item.innerHTML = `<span class="contribution-legend-dot" style="background:${dotColor}"></span>${name}`;
-          legendEl.appendChild(item);
-        });
-      }
+      const lessLabel = document.createElement('span');
+      lessLabel.textContent = 'Less';
+      lessLabel.style.marginRight = '2px';
+      legendEl.appendChild(lessLabel);
+      const legendColors = CONTRIB_LEVELS;
+      legendColors.forEach(color => {
+        const box = document.createElement('span');
+        box.className = 'contribution-legend-box';
+        box.style.background = color;
+        legendEl.appendChild(box);
+      });
+      const moreLabel = document.createElement('span');
+      moreLabel.textContent = 'More';
+      moreLabel.style.marginLeft = '2px';
+      legendEl.appendChild(moreLabel);
 
-      // Render summary - update to show month summary
+      // Render summary
       summaryEl.innerHTML = `
-        <span><strong>${totalContributions}</strong> contributions in ${monthName}</span>
+        <span><strong>${totalContributions}</strong> contributions in ${contributionYear}</span>
         <span><strong>${activeDays}</strong> active days</span>
       `;
     }
@@ -4055,16 +4102,16 @@
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
       
       if (e.key === 'ArrowLeft') {
-        const prevBtn = getEl('prevMonthBtn');
+        const prevBtn = getEl('prevYearBtn');
         if (prevBtn && !prevBtn.disabled) {
           e.preventDefault();
-          navigateContributionMonth(-1);
+          navigateContributionYear(-1);
         }
       } else if (e.key === 'ArrowRight') {
-        const nextBtn = getEl('nextMonthBtn');
+        const nextBtn = getEl('nextYearBtn');
         if (nextBtn && !nextBtn.disabled) {
           e.preventDefault();
-          navigateContributionMonth(1);
+          navigateContributionYear(1);
         }
       }
     });
